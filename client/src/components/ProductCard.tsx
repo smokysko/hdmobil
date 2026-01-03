@@ -72,11 +72,11 @@ export default function ProductCard({ product }: { product: Product }) {
       <CardFooter className="flex items-center justify-between p-6 pt-4">
         <div className="flex items-baseline gap-2">
           <span className="font-display text-xl font-bold text-foreground">
-            ${product.salePrice || product.price}
+            {product.salePrice || product.price} €
           </span>
           {product.isSale && (
             <span className="text-sm text-muted-foreground line-through decoration-destructive/50">
-              ${product.price}
+              {product.price} €
             </span>
           )}
         </div>

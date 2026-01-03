@@ -46,7 +46,7 @@ export default function Cart() {
                         <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{item.category}</p>
                       </div>
                       <p className="font-display text-lg font-bold text-foreground">
-                        ${(item.salePrice || item.price) * item.quantity}
+                        {(item.salePrice || item.price) * item.quantity} €
                       </p>
                     </div>
                     
@@ -96,24 +96,24 @@ export default function Cart() {
                 <div className="space-y-4">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Medzisúčet</span>
-                    <span className="font-medium">${cartTotal.toFixed(2)}</span>
+                    <span className="font-medium">{cartTotal.toFixed(2)} €</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Doprava</span>
                     <span className="font-medium">
-                      {shipping === 0 ? "Zdarma" : `$${shipping.toFixed(2)}`}
+                      {shipping === 0 ? "Zdarma" : `${shipping.toFixed(2)} €`}
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Odhadovaná daň</span>
-                    <span className="font-medium">${tax.toFixed(2)}</span>
+                    <span className="font-medium">{tax.toFixed(2)} €</span>
                   </div>
                   
                   <Separator className="bg-border/50" />
                   
                   <div className="flex justify-between text-xl font-bold">
                     <span>Spolu</span>
-                    <span className="text-foreground">${total.toFixed(2)}</span>
+                    <span className="text-foreground">{total.toFixed(2)} €</span>
                   </div>
                   
                   <Button size="lg" className="w-full font-display tracking-wide mt-6 h-12 rounded-full shadow-lg hover:shadow-xl transition-all" asChild>

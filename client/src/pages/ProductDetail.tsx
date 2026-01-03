@@ -83,11 +83,11 @@ export default function ProductDetail() {
               
               <div className="flex items-baseline gap-4">
                 <span className="font-display text-4xl font-bold text-foreground">
-                  ${product.salePrice || product.price}
+                  {product.salePrice || product.price} €
                 </span>
                 {product.isSale && (
                   <span className="text-xl text-muted-foreground line-through decoration-destructive/50">
-                    ${product.price}
+                    {product.price} €
                   </span>
                 )}
               </div>

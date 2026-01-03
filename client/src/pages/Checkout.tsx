@@ -173,7 +173,7 @@ export default function Checkout() {
               </Card>
 
               <Button type="submit" size="lg" className="w-full font-display tracking-wide h-14 text-lg rounded-full shadow-lg hover:shadow-xl transition-all" disabled={isProcessing}>
-                {isProcessing ? "SPRACOVÁVA SA..." : `ZAPLATIŤ $${total.toFixed(2)}`}
+                {isProcessing ? "SPRACOVÁVA SA..." : `ZAPLATIŤ ${total.toFixed(2)} €`}
               </Button>
             </form>
           </div>
@@ -196,7 +196,7 @@ export default function Checkout() {
                     <div className="flex-1">
                       <h4 className="text-sm font-bold line-clamp-1 text-foreground">{item.name}</h4>
                       <p className="text-xs text-muted-foreground mt-1">Množstvo: {item.quantity}</p>
-                      <p className="text-sm font-bold text-foreground mt-1">${(item.salePrice || item.price) * item.quantity}</p>
+                      <p className="text-sm font-bold text-foreground mt-1">{(item.salePrice || item.price) * item.quantity} €</p>
                     </div>
                   </div>
                 ))}
@@ -207,24 +207,24 @@ export default function Checkout() {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Medzisúčet</span>
-                  <span className="font-medium">${cartTotal.toFixed(2)}</span>
+                  <span className="font-medium">{cartTotal.toFixed(2)} €</span>
                 </div>
                 <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Doprava</span>
                     <span className="font-medium">
-                      {shipping === 0 ? "Zdarma" : `$${shipping.toFixed(2)}`}
+                      {shipping === 0 ? "Zdarma" : `${shipping.toFixed(2)} €`}
                     </span>
                 </div>
                 <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Odhadovaná daň</span>
-                  <span className="font-medium">${tax.toFixed(2)}</span>
+                  <span className="font-medium">{tax.toFixed(2)} €</span>
                 </div>
                 
                 <Separator className="bg-border/50 my-2" />
                 
                 <div className="flex justify-between text-xl font-bold">
                   <span>Spolu</span>
-                  <span className="text-foreground">${total.toFixed(2)}</span>
+                  <span className="text-foreground">{total.toFixed(2)} €</span>
                 </div>
               </div>
               
