@@ -21,8 +21,8 @@ export default function Home() {
               <Badge className="bg-primary text-primary-foreground font-bold px-3 py-1 text-sm rounded-full">NOVÁ KOLEKCIA 2024</Badge>
               
               <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
-                Prémiová elektronika <br />
-                <span className="text-primary">pre náročných.</span>
+                Všetko pre váš <br />
+                <span className="text-primary">mobilný svet.</span>
               </h1>
               
               <p className="max-w-lg text-lg text-muted-foreground">
