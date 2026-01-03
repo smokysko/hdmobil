@@ -11,6 +11,8 @@ import Checkout from "./pages/Checkout";
 import Home from "./pages/Home";
 import ProductDetail from "./pages/ProductDetail";
 import Success from "./pages/Success";
+import Preloader from "./components/Preloader";
+import { useState } from "react";
 
 function Router() {
   return (
@@ -26,19 +28,34 @@ function Router() {
   );
 }
 
-// NOTE: About Theme
-// - First choose a default theme according to your design style (dark or light bg), than change color palette in index.css
-//   to keep consistent foreground/background color across components
-// - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
-
 function App() {
+  const [isPreloaded, setIsPreloaded] = useState(false);
+
+  // Critical images to preload
+  const criticalImages = [
+    "/images/logo_nordic.png",
+    "/images/hero_iphone17_v1.png",
+    "/images/categories/cat_smartphone.png",
+    "/images/categories/cat_tablet.png",
+    "/images/categories/cat_laptop.png",
+    "/images/categories/cat_audio.png",
+    "/images/categories/cat_accessories.png",
+    "/images/categories/cat_parts.png"
+  ];
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
         <CartProvider>
           <TooltipProvider>
             <Toaster />
-            <Router />
+            <Preloader 
+              images={criticalImages} 
+              onComplete={() => setIsPreloaded(true)} 
+            />
+            <div className={`transition-opacity duration-500 ${isPreloaded ? 'opacity-100' : 'opacity-0'}`}>
+              <Router />
+            </div>
           </TooltipProvider>
         </CartProvider>
       </ThemeProvider>

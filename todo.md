@@ -24,3 +24,13 @@
     - [ ] Remove the text "HDMOBIL" from the header (next to the logo image).
     - [ ] Increase the size of the logo image (`img`) significantly.
     - [ ] Ensure the logo container has a fixed height or constraints so it doesn't expand the parent header bar height.
+- [ ] **Initial Loading Screen (Preloader)**
+    - [ ] Create a `Preloader` component that overlays the entire screen.
+    - [ ] Implement logic to preload critical images (Hero image, Category icons, Logo) before hiding the preloader.
+    - [ ] Add a smooth fade-out animation when loading is complete.
+    - [ ] Show a pulsing logo or progress indicator during loading.
+- [ ] **Mega Menu Implementation**
+    - [ ] Define subcategories structure for each main category (Smartphones, Tablets, Laptops, Audio, Accessories, Spare Parts).
+    - [ ] Create a `MegaMenu` component or update `Layout` navigation to support dropdowns on hover.
+    - [ ] Style the dropdowns to match the "Nordic Tech" aesthetic (clean, organized, shadow).
+    - [ ] Ensure hover interaction is smooth and doesn't disappear too easily (use a slight delay or safe area).

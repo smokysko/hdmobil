@@ -1,12 +1,21 @@
 import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
-import { Menu, Search, ShoppingBag, Smartphone, X, Phone, Mail, User, Heart } from "lucide-react";
+import { Menu, Search, ShoppingBag, Smartphone, X, Phone, Mail, User, Heart, ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from "@/components/ui/navigation-menu";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -14,12 +23,71 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
 
   const navItems = [
-    { name: "Smartfóny", href: "/category/smartphones" },
-    { name: "Tablety", href: "/category/tablets" },
-    { name: "Notebooky", href: "/category/laptops" },
-    { name: "Audio", href: "/category/audio" },
-    { name: "Príslušenstvo", href: "/category/accessories" },
-    { name: "Náhradné diely", href: "/category/spare-parts" },
+    { 
+      name: "Smartfóny", 
+      href: "/category/smartphones",
+      subcategories: [
+        { name: "Apple iPhone", href: "/category/smartphones/apple" },
+        { name: "Samsung Galaxy", href: "/category/smartphones/samsung" },
+        { name: "Xiaomi", href: "/category/smartphones/xiaomi" },
+        { name: "Google Pixel", href: "/category/smartphones/google" },
+        { name: "Odolné telefóny", href: "/category/smartphones/rugged" },
+        { name: "Príslušenstvo", href: "/category/accessories" }
+      ]
+    },
+    { 
+      name: "Tablety", 
+      href: "/category/tablets",
+      subcategories: [
+        { name: "iPad", href: "/category/tablets/ipad" },
+        { name: "Android tablety", href: "/category/tablets/android" },
+        { name: "Grafické tablety", href: "/category/tablets/graphic" },
+        { name: "Čítačky kníh", href: "/category/tablets/ereaders" }
+      ]
+    },
+    { 
+      name: "Notebooky", 
+      href: "/category/laptops",
+      subcategories: [
+        { name: "MacBook", href: "/category/laptops/macbook" },
+        { name: "Herné notebooky", href: "/category/laptops/gaming" },
+        { name: "Kancelárske", href: "/category/laptops/office" },
+        { name: "Ultrabooky", href: "/category/laptops/ultrabook" },
+        { name: "Príslušenstvo k PC", href: "/category/laptops/accessories" }
+      ]
+    },
+    { 
+      name: "Audio", 
+      href: "/category/audio",
+      subcategories: [
+        { name: "Bezdrôtové slúchadlá", href: "/category/audio/wireless" },
+        { name: "Bluetooth reproduktory", href: "/category/audio/speakers" },
+        { name: "Soundbary", href: "/category/audio/soundbars" },
+        { name: "Hi-Fi systémy", href: "/category/audio/hifi" }
+      ]
+    },
+    { 
+      name: "Príslušenstvo", 
+      href: "/category/accessories",
+      subcategories: [
+        { name: "Puzdrá a kryty", href: "/category/accessories/cases" },
+        { name: "Ochranné sklá", href: "/category/accessories/glass" },
+        { name: "Nabíjačky a káble", href: "/category/accessories/chargers" },
+        { name: "Powerbanky", href: "/category/accessories/powerbanks" },
+        { name: "Držiaky do auta", href: "/category/accessories/car-holders" }
+      ]
+    },
+    { 
+      name: "Náhradné diely", 
+      href: "/category/spare-parts",
+      subcategories: [
+        { name: "Displeje", href: "/category/spare-parts/displays" },
+        { name: "Batérie", href: "/category/spare-parts/batteries" },
+        { name: "Konektory", href: "/category/spare-parts/connectors" },
+        { name: "Kamery", href: "/category/spare-parts/cameras" },
+        { name: "Náradie", href: "/category/spare-parts/tools" }
+      ]
+    },
   ];
 
   return (
@@ -60,23 +128,35 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <span className="sr-only">Toggle menu</span>
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[300px] border-r border-border bg-background">
+              <SheetContent side="left" className="w-[300px] border-r border-border bg-background overflow-y-auto">
                 <div className="flex flex-col gap-8 py-8">
                   <Link href="/">
                     <span className="font-display text-2xl font-bold tracking-wider text-primary cursor-pointer">
                       HD<span className="text-foreground">MOBIL</span>
                     </span>
                   </Link>
-                  <nav className="flex flex-col gap-4">
+                  <nav className="flex flex-col gap-2">
                     {navItems.map((item) => (
-                      <Link key={item.href} href={item.href}>
-                        <span className={cn(
-                          "text-lg font-medium transition-colors hover:text-primary cursor-pointer",
-                          location === item.href ? "text-primary" : "text-muted-foreground"
-                        )}>
-                          {item.name}
-                        </span>
-                      </Link>
+                      <div key={item.href} className="flex flex-col">
+                        <Link href={item.href}>
+                          <span className={cn(
+                            "text-lg font-medium transition-colors hover:text-primary cursor-pointer py-2",
+                            location === item.href ? "text-primary" : "text-muted-foreground"
+                          )}>
+                            {item.name}
+                          </span>
+                        </Link>
+                        {/* Mobile Subcategories */}
+                        <div className="pl-4 flex flex-col gap-2 border-l border-border/50 ml-2">
+                          {item.subcategories.map((sub) => (
+                            <Link key={sub.href} href={sub.href}>
+                              <span className="text-sm text-muted-foreground hover:text-primary cursor-pointer py-1">
+                                {sub.name}
+                              </span>
+                            </Link>
+                          ))}
+                        </div>
+                      </div>
                     ))}
                   </nav>
                 </div>
@@ -141,30 +221,71 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
-          {/* Secondary Navigation - Desktop Only */}
-          <nav className="hidden lg:flex items-center gap-8 mt-4 pt-4 border-t border-border/40">
-            {navItems.map((item) => (
-              <Link key={item.href} href={item.href}>
-                <span className={cn(
-                  "text-sm font-bold uppercase tracking-wide transition-all hover:text-primary cursor-pointer relative py-2",
-                  location === item.href ? "text-primary border-b-2 border-primary" : "text-muted-foreground"
-                )}>
-                  {item.name}
-                </span>
-              </Link>
-            ))}
-            <div className="ml-auto flex items-center gap-4 text-sm font-medium text-primary">
-              <Link href="/category/sale">
-                <span className="flex items-center gap-1 cursor-pointer hover:underline">
-                  <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                  Výpredaj
-                </span>
-              </Link>
-              <Link href="/category/new">
-                <span className="cursor-pointer hover:underline">Novinky</span>
-              </Link>
-            </div>
-          </nav>
+          {/* Mega Menu - Desktop Only */}
+          <div className="hidden lg:block mt-4 pt-1 border-t border-border/40">
+            <NavigationMenu>
+              <NavigationMenuList className="gap-2">
+                {navItems.map((item) => (
+                  <NavigationMenuItem key={item.href}>
+                    <NavigationMenuTrigger 
+                      className={cn(
+                        "bg-transparent hover:bg-secondary/50 text-sm font-bold uppercase tracking-wide h-10 px-4 rounded-md transition-colors",
+                        location.startsWith(item.href) ? "text-primary" : "text-muted-foreground"
+                      )}
+                    >
+                      <Link href={item.href}>{item.name}</Link>
+                    </NavigationMenuTrigger>
+                    <NavigationMenuContent>
+                      <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                        {item.subcategories.map((sub) => (
+                          <li key={sub.href}>
+                            <NavigationMenuLink asChild>
+                              <Link
+                                href={sub.href}
+                                className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground group"
+                              >
+                                <div className="text-sm font-bold leading-none group-hover:text-primary flex items-center gap-2">
+                                  {sub.name}
+                                  <ChevronRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity -translate-x-2 group-hover:translate-x-0" />
+                                </div>
+                              </Link>
+                            </NavigationMenuLink>
+                          </li>
+                        ))}
+                        <li className="col-span-2 mt-2 pt-2 border-t border-border/50">
+                          <NavigationMenuLink asChild>
+                            <Link
+                              href={item.href}
+                              className="flex items-center justify-center w-full p-2 text-xs font-bold text-primary hover:underline uppercase tracking-wider"
+                            >
+                              Zobraziť všetko z kategórie {item.name}
+                            </Link>
+                          </NavigationMenuLink>
+                        </li>
+                      </ul>
+                    </NavigationMenuContent>
+                  </NavigationMenuItem>
+                ))}
+                
+                {/* Special Links */}
+                <NavigationMenuItem className="ml-auto">
+                  <Link href="/category/sale">
+                    <div className="flex items-center gap-1 cursor-pointer hover:bg-secondary/50 px-4 py-2 rounded-md text-sm font-bold text-primary uppercase tracking-wide">
+                      <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+                      Výpredaj
+                    </div>
+                  </Link>
+                </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <Link href="/category/new">
+                    <div className="cursor-pointer hover:bg-secondary/50 px-4 py-2 rounded-md text-sm font-bold text-primary uppercase tracking-wide">
+                      Novinky
+                    </div>
+                  </Link>
+                </NavigationMenuItem>
+              </NavigationMenuList>
+            </NavigationMenu>
+          </div>
         </div>
         
         {/* Mobile Search - Visible only on mobile below header */}
@@ -225,7 +346,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div>
               <h3 className="font-bold text-lg mb-6 text-background">Zákaznícky servis</h3>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary transition-colors">Môj účet</a></li>
+                <li><a href="#" className="hover:text-primary cursor-pointer transition-colors">Môj účet</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Stav objednávky</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Reklamácie a vrátenie</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Doprava a platba</a></li>
