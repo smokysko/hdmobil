@@ -1,0 +1,15 @@
+- [ ] **Header Redesign**
+    - [ ] Add Top Bar (black/dark grey) with phone number, email, and "Track Order" link.
+    - [ ] Move Search Bar to the center of the main header and make it large/prominent with a "Hľadať" button.
+    - [ ] Reorganize navigation to be secondary or part of a "Categories" dropdown if needed, or keep it clean but less dominant than search.
+- [ ] **Hero Section Overhaul**
+    - [ ] Change layout to feature a specific "Hero Product" (e.g., a flagship phone).
+    - [ ] Add technical specs badges/list overlay on the hero (e.g., "Snapdragon 8 Gen 2", "120Hz OLED").
+    - [ ] Add a prominent price tag and "Buy Now" button directly in the hero.
+- [ ] **Trust Indicators (Benefits Bar)**
+    - [ ] Create a new section immediately below the Hero.
+    - [ ] Add icons + text: "Doprava do 24h", "Autorizovaný servis", "Vrátenie do 14 dní", "Odborné poradenstvo".
+- [ ] **UI "Tech" Sharpening**
+    - [ ] Reduce `rounded-2xl` and `rounded-3xl` to `rounded-md` or `rounded-sm` in `index.css` and components.
+    - [ ] Increase contrast on buttons (maybe use a tech blue or keep the green but make it punchier).
+    - [ ] Ensure fonts and spacing feel denser and more information-rich, typical of tech specs.

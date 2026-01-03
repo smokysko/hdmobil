@@ -1,6 +1,6 @@
 import { useCart } from "@/contexts/CartContext";
 import { Product } from "@/../../shared/data";
-import { ShoppingCart, Star } from "lucide-react";
+import { ShoppingCart, Star, Check, Info } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter } from "./ui/card";
@@ -10,85 +10,94 @@ export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
 
   return (
-    <Card className="group relative overflow-hidden border-border bg-card transition-all duration-500 hover:shadow-lg hover:-translate-y-1 rounded-2xl">
+    <Card className="group relative overflow-hidden border border-border bg-card transition-all duration-300 hover:shadow-md hover:border-primary/50 rounded-lg h-full flex flex-col">
       {/* Image Container */}
-      <div className="aspect-square overflow-hidden bg-secondary/30 p-8 relative transition-colors group-hover:bg-secondary/50">
-        {product.isNew && (
-          <Badge className="absolute left-4 top-4 z-10 bg-primary text-primary-foreground hover:bg-primary font-display tracking-wide rounded-full px-3">
-            NOVÉ
-          </Badge>
-        )}
-        {product.isSale && (
-          <Badge variant="destructive" className="absolute left-4 top-4 z-10 font-display tracking-wide rounded-full px-3">
-            AKCIA
-          </Badge>
-        )}
-        <Badge className="absolute right-4 top-4 z-10 bg-green-600 text-white hover:bg-green-700 font-display tracking-wide rounded-full px-3 shadow-sm">
-          SKLADOM
-        </Badge>
-        <img
-          src={product.image}
-          alt={product.name}
-          className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-110 drop-shadow-sm"
-        />
+      <div className="aspect-square overflow-hidden bg-white p-6 relative border-b border-border/50">
+        {/* Badges - Top Left */}
+        <div className="absolute left-0 top-0 z-10 flex flex-col gap-1 p-2">
+          {product.isNew && (
+            <Badge className="bg-blue-600 text-white hover:bg-blue-700 font-bold text-[10px] uppercase rounded-sm px-2 py-0.5 w-fit">
+              NOVINKA
+            </Badge>
+          )}
+          {product.isSale && (
+            <Badge variant="destructive" className="font-bold text-[10px] uppercase rounded-sm px-2 py-0.5 w-fit">
+              AKCIA
+            </Badge>
+          )}
+        </div>
+
+        {/* Stock Status - Top Right */}
+        <div className="absolute right-2 top-2 z-10">
+          <div className="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-sm border border-green-100">
+            <div className="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse"></div>
+            SKLADOM
+          </div>
+        </div>
+
+        <Link href={`/product/${product.id}`}>
+          <img
+            src={product.image}
+            alt={product.name}
+            className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-105 cursor-pointer"
+          />
+        </Link>
+      </div>
+
+      {/* Content */}
+      <CardContent className="p-4 flex-1 flex flex-col">
+        <div className="mb-2">
+          <Link href={`/product/${product.id}`}>
+            <h3 className="font-bold text-base leading-tight text-foreground transition-colors hover:text-primary cursor-pointer line-clamp-2 min-h-[2.5rem]">
+              {product.name}
+            </h3>
+          </Link>
+        </div>
         
-        {/* Quick Add Overlay */}
-        <div className="absolute inset-x-0 bottom-0 p-6 opacity-0 transition-all duration-300 translate-y-4 group-hover:translate-y-0 group-hover:opacity-100">
+        {/* Tech Specs / Description Preview */}
+        <div className="text-xs text-muted-foreground mb-3 line-clamp-2 min-h-[2rem]">
+          {product.description}
+        </div>
+
+        {/* Rating */}
+        <div className="flex items-center gap-1 mb-3">
+          <div className="flex">
+            {[1, 2, 3, 4, 5].map((star) => (
+              <Star 
+                key={star} 
+                className={`h-3 w-3 ${star <= Math.round(product.rating) ? "fill-yellow-400 text-yellow-400" : "text-gray-300"}`} 
+              />
+            ))}
+          </div>
+          <span className="text-xs text-muted-foreground">({Math.floor(Math.random() * 50) + 5})</span>
+        </div>
+
+        <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between">
+          <div className="flex flex-col">
+            {product.isSale && (
+              <span className="text-xs text-muted-foreground line-through">
+                {product.price} €
+              </span>
+            )}
+            <span className={`text-lg font-bold ${product.isSale ? "text-destructive" : "text-foreground"}`}>
+              {product.salePrice || product.price} €
+            </span>
+            <span className="text-[10px] text-muted-foreground">s DPH</span>
+          </div>
+          
           <Button 
+            size="icon"
+            className="h-9 w-9 rounded-md shadow-sm hover:shadow-md transition-all bg-primary hover:bg-primary/90"
             onClick={(e) => {
               e.preventDefault();
               addToCart(product);
             }}
-            className="w-full gap-2 font-display tracking-wide shadow-lg rounded-full h-11"
           >
-            <ShoppingCart className="mr-2 h-4 w-4" />
-            RÝCHLO PRIDAŤ
+            <ShoppingCart className="h-4 w-4 text-primary-foreground" />
+            <span className="sr-only">Do košíka</span>
           </Button>
         </div>
-      </div>
-
-      {/* Content */}
-      <CardContent className="p-6 pb-2">
-        <div className="mb-3 flex items-center justify-between">
-          <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
-            {product.category}
-          </span>
-          <div className="flex items-center gap-1 text-foreground/70 text-xs font-bold bg-secondary px-2 py-1 rounded-full">
-            <Star className="h-3 w-3 fill-current text-yellow-500" />
-            <span className="text-xs font-medium text-foreground">{product.rating}</span>
-          </div>
-        </div>
-        <Link href={`/product/${product.id}`}>
-          <h3 className="font-display text-xl font-bold leading-tight text-foreground transition-colors hover:text-primary cursor-pointer line-clamp-1">
-            {product.name}
-          </h3>
-        </Link>
-        <p className="mt-3 text-sm text-muted-foreground line-clamp-2 leading-relaxed">
-          {product.description}
-        </p>
       </CardContent>
-
-      {/* Footer */}
-      <CardFooter className="flex items-center justify-between p-6 pt-4">
-        <div className="flex items-baseline gap-2">
-          <span className="font-display text-xl font-bold text-foreground">
-            {product.salePrice || product.price} €
-          </span>
-          {product.isSale && (
-            <span className="text-sm text-muted-foreground line-through decoration-destructive/50">
-              {product.price} €
-            </span>
-          )}
-        </div>
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="text-primary hover:text-primary hover:bg-primary/10 font-bold tracking-wide"
-          asChild
-        >
-          <Link href={`/product/${product.id}`}>DETAILY</Link>
-        </Button>
-      </CardFooter>
     </Card>
   );
 }
