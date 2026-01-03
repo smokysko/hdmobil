@@ -13,3 +13,10 @@
     - [ ] Reduce `rounded-2xl` and `rounded-3xl` to `rounded-md` or `rounded-sm` in `index.css` and components.
     - [ ] Increase contrast on buttons (maybe use a tech blue or keep the green but make it punchier).
     - [ ] Ensure fonts and spacing feel denser and more information-rich, typical of tech specs.
+- [ ] **Update Hero to iPhone 17 Pro (2026 Context)**
+    - [ ] Generate a new high-quality Hero image featuring a futuristic "iPhone 17 Pro" design (sleek, titanium/glass, premium look).
+    - [ ] Update `Home.tsx` text:
+        - [ ] Change "iPhone 15 Pro" to "iPhone 17 Pro".
+        - [ ] Update specs: "A17 Pro" -> "A19 Bionic" (or similar futuristic name), "48MPx" -> "200MPx" or "Fusion Camera", etc.
+        - [ ] Update price to reflect a new flagship (maybe slightly higher or similar).
+    - [ ] Ensure the new image fits the "Nordic Air" / "Tech" aesthetic (clean background, sharp details).

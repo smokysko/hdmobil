@@ -20,36 +20,36 @@ export default function Home() {
             <div className="lg:col-span-5 space-y-6 order-2 lg:order-1">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
                 <Star className="w-3 h-3 fill-primary" />
-                Vlajková loď 2024
+                Vlajková loď 2026
               </div>
               
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.1]">
-                iPhone 15 Pro <br/>
+                iPhone 17 Pro <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">Titanium</span>
               </h1>
               
               <div className="flex flex-col gap-3 text-sm text-muted-foreground border-l-2 border-primary/30 pl-4 my-6">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>Čip A17 Pro s 6-jadrovým GPU</span>
+                  <span>Čip A19 Bionic s Neural Engine</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>48MPx hlavný fotoaparát</span>
+                  <span>200MPx Fusion Camera System</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>Titánová konštrukcia</span>
+                  <span>Ultra-odolné titánové telo</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>Výdrž batérie až 29 hodín</span>
+                  <span>Výdrž batérie až 35 hodín</span>
                 </div>
               </div>
 
               <div className="flex items-end gap-4 mb-4">
-                <div className="text-3xl font-bold text-foreground">1 199 €</div>
-                <div className="text-lg text-muted-foreground line-through mb-1">1 299 €</div>
+                <div className="text-3xl font-bold text-foreground">1 299 €</div>
+                <div className="text-lg text-muted-foreground line-through mb-1">1 399 €</div>
               </div>
               
               <div className="flex flex-wrap gap-3">
@@ -69,20 +69,20 @@ export default function Home() {
               
               <div className="relative z-10 w-full max-w-[600px] aspect-square flex items-center justify-center">
                 <img
-                  src="/images/hero_nordic_transparent.png"
-                  alt="iPhone 15 Pro Titanium"
+                  src="/images/hero_iphone17_v1.png"
+                  alt="iPhone 17 Pro Titanium"
                   className="w-full h-auto object-contain drop-shadow-2xl transform hover:scale-105 transition-transform duration-700"
                 />
                 
                 {/* Floating Spec Cards */}
                 <div className="absolute top-10 right-10 bg-card/90 backdrop-blur-md p-3 rounded-lg shadow-xl border border-border hidden md:block animate-in fade-in zoom-in duration-700 delay-300">
                   <div className="text-xs text-muted-foreground uppercase font-bold">Procesor</div>
-                  <div className="font-bold text-foreground">A17 Pro</div>
+                  <div className="font-bold text-foreground">A19 Bionic</div>
                 </div>
                 
                 <div className="absolute bottom-20 left-10 bg-card/90 backdrop-blur-md p-3 rounded-lg shadow-xl border border-border hidden md:block animate-in fade-in zoom-in duration-700 delay-500">
                   <div className="text-xs text-muted-foreground uppercase font-bold">Kamera</div>
-                  <div className="font-bold text-foreground">48 MPx</div>
+                  <div className="font-bold text-foreground">200 MPx</div>
                 </div>
               </div>
             </div>

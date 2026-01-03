@@ -259,7 +259,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
           
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
-            <p>&copy; 2024 HDmobil. Všetky práva vyhradené.</p>
+            <p>&copy; 2026 HDmobil. Všetky práva vyhradené.</p>
             <div className="flex gap-4">
               <span>Ochrana súkromia</span>
               <span>Cookies</span>
