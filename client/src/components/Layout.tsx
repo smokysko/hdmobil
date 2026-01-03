@@ -61,12 +61,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           {/* Logo */}
           <Link href="/">
             <div className="flex items-center gap-3 cursor-pointer group">
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 transition-all duration-500 group-hover:bg-primary/20">
-                <Smartphone className="h-5 w-5 text-primary transition-transform duration-500 group-hover:rotate-12" />
-              </div>
-              <span className="hidden font-display text-2xl font-bold tracking-tight text-foreground md:inline-block">
-                HDmobil
-              </span>
+              <img 
+                src="/images/logo_nordic.png" 
+                alt="HDmobil Logo" 
+                className="h-10 w-auto object-contain transition-opacity duration-300 hover:opacity-90"
+              />
             </div>
           </Link>
 
