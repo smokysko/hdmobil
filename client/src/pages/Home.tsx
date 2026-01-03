@@ -12,52 +12,40 @@ export default function Home() {
 
   return (
     <Layout>
-      {/* Hero Section - Nordic Air Style */}
-      <section className="relative overflow-hidden bg-background py-24 md:py-36">
-        {/* Organic Background Shapes */}
-        <div className="absolute inset-0 z-0 overflow-hidden">
-          <div className="absolute -top-[10%] -right-[5%] h-[600px] w-[600px] rounded-full bg-primary/10 blur-[120px] animate-pulse duration-[10000ms]" />
-          <div className="absolute top-[60%] -left-[10%] h-[500px] w-[500px] rounded-full bg-secondary/40 blur-[100px]" />
-        </div>
-
+      {/* Compact Hero Section - E-commerce Focus */}
+      <section className="relative overflow-hidden bg-secondary/10 py-12">
         <div className="container relative z-10">
-          <div className="grid gap-16 lg:grid-cols-12 items-center">
-            {/* Text Content - Asymmetric Layout (7 cols) */}
-            <div className="lg:col-span-7 space-y-10">
-              <div className="inline-flex items-center space-x-2">
-                <span className="h-px w-8 bg-primary"></span>
-                <span className="text-sm font-medium tracking-widest text-primary uppercase">Technológia budúcnosti</span>
-              </div>
+          <div className="grid gap-8 lg:grid-cols-12 items-center">
+            {/* Text Content - Direct & Sales Focused (7 cols) */}
+            <div className="lg:col-span-7 space-y-6">
+              <Badge className="bg-primary text-primary-foreground font-bold px-3 py-1 text-sm rounded-full">NOVÁ KOLEKCIA 2024</Badge>
               
-              <h1 className="font-display text-6xl font-medium leading-[1.1] tracking-tight text-foreground md:text-7xl lg:text-8xl">
-                Objavte <br />
-                <span className="italic text-muted-foreground font-light">čistú</span> eleganciu.
+              <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl">
+                Prémiová elektronika <br />
+                <span className="text-primary">pre náročných.</span>
               </h1>
               
-              <p className="max-w-xl text-xl text-muted-foreground leading-relaxed font-light">
-                Zažite vrchol mobilných technológií v dokonalej harmónii s dizajnom. Prémiové zariadenia, ktoré definujú váš životný štýl.
+              <p className="max-w-lg text-lg text-muted-foreground">
+                Najnovšie smartfóny, tablety a príslušenstvo skladom. Objednajte do 15:00 a tovar máte zajtra doma.
               </p>
               
-              <div className="flex flex-col sm:flex-row gap-6 pt-4">
-                <Button size="lg" className="font-display tracking-wide text-base h-16 px-12 rounded-full shadow-xl shadow-primary/10 hover:shadow-2xl hover:scale-105 transition-all duration-300" asChild>
-                  <Link href="/category/smartphones">Preskúmať kolekciu</Link>
+              <div className="flex flex-wrap gap-4 pt-2">
+                <Button size="lg" className="font-bold h-12 px-8 rounded-lg shadow-lg hover:shadow-xl transition-all" asChild>
+                  <Link href="/category/smartphones">Kúpiť Smartfón</Link>
                 </Button>
-                <Button size="lg" variant="ghost" className="font-display tracking-wide text-base h-16 px-8 rounded-full hover:bg-secondary/50 text-foreground group" asChild>
-                  <Link href="/category/accessories">
-                    Príslušenstvo <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                  </Link>
+                <Button size="lg" variant="outline" className="font-bold h-12 px-8 rounded-lg border-2 hover:bg-secondary/50" asChild>
+                  <Link href="/category/spare-parts">Náhradné diely</Link>
                 </Button>
               </div>
             </div>
             
-            {/* Image Content - Floating Effect (5 cols) */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto w-full max-w-[600px] lg:max-w-full aspect-[4/5] flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-tr from-secondary to-transparent rounded-[3rem] -rotate-6 scale-90 opacity-50" />
+            {/* Image Content - Compact & Clean (5 cols) */}
+            <div className="lg:col-span-5 relative flex justify-center lg:justify-end">
+              <div className="relative w-full max-w-[400px] aspect-square flex items-center justify-center">
                 <img
                   src="/images/hero_nordic_transparent.png"
                   alt="Premium Smartphone Ecosystem"
-                  className="relative z-10 w-full h-auto object-contain transition-transform duration-1000 hover:-translate-y-4 scale-125"
+                  className="relative z-10 w-full h-auto object-contain transition-transform duration-500 hover:scale-105"
                 />
               </div>
             </div>
@@ -65,36 +53,45 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Features Grid */}
-      <section className="border-y border-border/40 bg-secondary/5 py-12 backdrop-blur-sm">
+      {/* Quick Categories - Instant Navigation */}
+      <section className="py-10 border-b border-border/40">
         <div className="container">
-          <div className="grid gap-8 md:grid-cols-3">
-            <div className="flex items-center gap-6 rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:shadow-md">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-primary">
-                <Truck className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-display text-lg font-bold text-foreground mb-1">Expresná doprava zdarma</h3>
-                <p className="text-sm text-muted-foreground">Pri objednávkach nad 500 €</p>
-              </div>
+          <h2 className="text-xl font-bold mb-6">Nakupovať podľa kategórie</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+            {[
+              { name: "Smartfóny", href: "/category/smartphones", icon: "📱" },
+              { name: "Tablety", href: "/category/tablets", icon: "📟" },
+              { name: "Notebooky", href: "/category/laptops", icon: "💻" },
+              { name: "Audio", href: "/category/audio", icon: "🎧" },
+              { name: "Príslušenstvo", href: "/category/accessories", icon: "🔌" },
+              { name: "Náhradné diely", href: "/category/spare-parts", icon: "🔧" },
+            ].map((cat) => (
+              <Link key={cat.href} href={cat.href}>
+                <div className="flex flex-col items-center justify-center p-6 rounded-xl border border-border bg-card hover:border-primary hover:shadow-md transition-all cursor-pointer group h-full">
+                  <span className="text-3xl mb-3 group-hover:scale-110 transition-transform">{cat.icon}</span>
+                  <span className="font-medium text-sm text-center group-hover:text-primary transition-colors">{cat.name}</span>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Trust Signals - Compact Bar */}
+      <section className="bg-secondary/20 py-4 border-b border-border/40">
+        <div className="container">
+          <div className="flex flex-wrap justify-center md:justify-between gap-4 text-sm font-medium text-muted-foreground">
+            <div className="flex items-center gap-2">
+              <Truck className="h-4 w-4 text-primary" />
+              <span>Doprava zdarma nad 500 €</span>
             </div>
-            <div className="flex items-center gap-6 rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:shadow-md">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-primary">
-                <ShieldCheck className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-display text-lg font-bold text-foreground mb-1">2-ročná záruka</h3>
-                <p className="text-sm text-muted-foreground">Komplexná ochrana</p>
-              </div>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="h-4 w-4 text-primary" />
+              <span>Autorizovaný predajca</span>
             </div>
-            <div className="flex items-center gap-6 rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:shadow-md">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-primary">
-                <Zap className="h-6 w-6" />
-              </div>
-              <div>
-                <h3 className="font-display text-lg font-bold text-foreground mb-1">Technická podpora</h3>
-                <p className="text-sm text-muted-foreground">24/7 Odborná pomoc</p>
-              </div>
+            <div className="flex items-center gap-2">
+              <Zap className="h-4 w-4 text-primary" />
+              <span>Expresné doručenie do 24h</span>
             </div>
           </div>
         </div>
