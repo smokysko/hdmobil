@@ -64,7 +64,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <img 
                 src="/images/logo_nordic.png" 
                 alt="HDmobil Logo" 
-                className="h-10 w-auto object-contain transition-opacity duration-300 hover:opacity-90"
+                className="h-14 w-auto object-contain transition-opacity duration-300 hover:opacity-90"
               />
             </div>
           </Link>

@@ -52,12 +52,12 @@ export default function Home() {
             
             {/* Image Content - Floating Effect (5 cols) */}
             <div className="lg:col-span-5 relative">
-              <div className="relative mx-auto w-full max-w-[400px] lg:max-w-full aspect-[4/5] flex items-center justify-center">
+              <div className="relative mx-auto w-full max-w-[600px] lg:max-w-full aspect-[4/5] flex items-center justify-center">
                 <div className="absolute inset-0 bg-gradient-to-tr from-secondary to-transparent rounded-[3rem] -rotate-6 scale-90 opacity-50" />
                 <img
-                  src="/images/hero_nordic.png"
-                  alt="Premium Smartphone"
-                  className="relative z-10 w-full h-auto object-contain drop-shadow-2xl transition-transform duration-1000 hover:-translate-y-4"
+                  src="/images/hero_nordic_rich.png"
+                  alt="Premium Smartphone Ecosystem"
+                  className="relative z-10 w-full h-auto object-contain drop-shadow-2xl transition-transform duration-1000 hover:-translate-y-4 scale-125"
                 />
               </div>
             </div>
