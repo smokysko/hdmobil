@@ -71,14 +71,16 @@ export default function Checkout() {
           <div className="lg:col-span-2">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
               {/* Contact & Shipping */}
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-display text-xl">
-                    <Truck className="h-5 w-5 text-primary" />
+              <Card className="border-border bg-card shadow-sm rounded-2xl">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-3 font-display text-xl font-bold">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-primary">
+                      <Truck className="h-5 w-5" />
+                    </div>
                     Doručovacie údaje
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="grid gap-4 sm:grid-cols-2">
+                <CardContent className="grid gap-6 sm:grid-cols-2 pt-2">
                   <div className="sm:col-span-2">
                     <Label htmlFor="email">Emailová adresa</Label>
                     <Input id="email" {...register("email")} className="mt-1.5" placeholder="john@example.com" />
@@ -124,20 +126,22 @@ export default function Checkout() {
               </Card>
 
               {/* Payment */}
-              <Card className="border-border/50 bg-card/50 backdrop-blur-sm">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2 font-display text-xl">
-                    <CreditCard className="h-5 w-5 text-primary" />
+              <Card className="border-border bg-card shadow-sm rounded-2xl">
+                <CardHeader className="pb-4">
+                  <CardTitle className="flex items-center gap-3 font-display text-xl font-bold">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary text-primary">
+                      <CreditCard className="h-5 w-5" />
+                    </div>
                     Spôsob platby
                   </CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-6">
+                <CardContent className="space-y-8 pt-2">
                   <RadioGroup defaultValue="card" className="grid grid-cols-3 gap-4">
                     <div>
                       <RadioGroupItem value="card" id="card" className="peer sr-only" />
                       <Label
                         htmlFor="card"
-                        className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-popover p-4 hover:bg-accent hover:text-accent-foreground peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+                        className="flex flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 hover:bg-secondary hover:text-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary transition-all cursor-pointer"
                       >
                         <CreditCard className="mb-3 h-6 w-6" />
                         Karta
@@ -146,7 +150,7 @@ export default function Checkout() {
                     {/* Add more payment methods if needed */}
                   </RadioGroup>
 
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="grid gap-6 sm:grid-cols-2">
                     <div className="sm:col-span-2">
                       <Label htmlFor="cardNumber">Číslo karty</Label>
                       <Input id="cardNumber" {...register("cardNumber")} className="mt-1.5" placeholder="0000 0000 0000 0000" />
@@ -168,7 +172,7 @@ export default function Checkout() {
                 </CardContent>
               </Card>
 
-              <Button type="submit" size="lg" className="w-full font-display tracking-wider h-14 text-lg" disabled={isProcessing}>
+              <Button type="submit" size="lg" className="w-full font-display tracking-wide h-14 text-lg rounded-full shadow-lg hover:shadow-xl transition-all" disabled={isProcessing}>
                 {isProcessing ? "SPRACOVÁVA SA..." : `ZAPLATIŤ $${total.toFixed(2)}`}
               </Button>
             </form>
@@ -176,13 +180,13 @@ export default function Checkout() {
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 rounded-xl border border-border/50 bg-card/50 p-6 backdrop-blur-sm">
+            <div className="sticky top-24 rounded-3xl border border-border bg-card p-8 shadow-sm">
               <h2 className="font-display text-xl font-bold text-foreground mb-6">Súhrn objednávky</h2>
               
-              <div className="space-y-4 mb-6">
+              <div className="space-y-6 mb-8">
                 {items.map((item) => (
                   <div key={item.id} className="flex gap-4">
-                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-md border border-border/50 bg-secondary/20 p-1">
+                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-xl border border-border bg-secondary/30 p-2">
                       <img
                         src={item.image}
                         alt={item.name}
@@ -190,9 +194,9 @@ export default function Checkout() {
                       />
                     </div>
                     <div className="flex-1">
-                      <h4 className="text-sm font-medium line-clamp-1">{item.name}</h4>
-                      <p className="text-xs text-muted-foreground">Qty: {item.quantity}</p>
-                      <p className="text-sm font-bold text-primary">${(item.salePrice || item.price) * item.quantity}</p>
+                      <h4 className="text-sm font-bold line-clamp-1 text-foreground">{item.name}</h4>
+                      <p className="text-xs text-muted-foreground mt-1">Množstvo: {item.quantity}</p>
+                      <p className="text-sm font-bold text-foreground mt-1">${(item.salePrice || item.price) * item.quantity}</p>
                     </div>
                   </div>
                 ))}
@@ -218,18 +222,18 @@ export default function Checkout() {
                 
                 <Separator className="bg-border/50 my-2" />
                 
-                <div className="flex justify-between text-lg font-bold">
+                <div className="flex justify-between text-xl font-bold">
                   <span>Spolu</span>
-                  <span className="text-primary">${total.toFixed(2)}</span>
+                  <span className="text-foreground">${total.toFixed(2)}</span>
                 </div>
               </div>
               
-              <div className="mt-6 rounded-lg bg-secondary/20 p-4">
+              <div className="mt-8 rounded-2xl bg-secondary/30 p-6">
                 <div className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 text-primary mt-0.5" />
                   <div>
-                    <h4 className="text-sm font-bold">Bezpečná platba</h4>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <h4 className="text-sm font-bold text-foreground">Bezpečná platba</h4>
+                    <p className="text-xs text-muted-foreground mt-2 leading-relaxed">
                       Vaše platobné údaje sú šifrované a v bezpečí. Nikdy neukladáme údaje o vašej kreditnej karte.
                     </p>
                   </div>

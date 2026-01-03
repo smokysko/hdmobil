@@ -24,37 +24,36 @@ export default function Home() {
         <div className="container relative z-10">
           <div className="grid gap-12 lg:grid-cols-2 items-center">
             <div className="space-y-8">
-              <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-medium text-primary backdrop-blur-sm">
-                <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
+              <div className="inline-flex items-center rounded-full border border-border bg-secondary/50 px-4 py-1.5 text-sm font-medium text-foreground backdrop-blur-sm">
+                <span className="flex h-2 w-2 rounded-full bg-primary mr-2"></span>
                 TECHNOLÓGIA BUDÚCNOSTI
               </div>
-              <h1 className="font-display text-5xl font-black leading-tight tracking-tight text-foreground md:text-7xl lg:text-8xl">
+              <h1 className="font-display text-5xl font-bold leading-tight tracking-tight text-foreground md:text-7xl lg:text-8xl">
                 NOVÁ GENERÁCIA <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">
+                <span className="text-primary italic">
                   MOBILOV
                 </span>
               </h1>
-              <p className="max-w-lg text-lg text-muted-foreground md:text-xl">
+              <p className="max-w-lg text-lg text-muted-foreground md:text-xl leading-relaxed">
                 Zažite vrchol mobilných technológií. Prémiové zariadenia navrhnuté pre digitálnu hranicu.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Button size="lg" className="font-display tracking-wider text-base h-12 px-8" asChild>
+                <Button size="lg" className="font-display tracking-wide text-base h-14 px-10 rounded-full shadow-lg hover:shadow-xl transition-all" asChild>
                   <Link href="/category/smartphones">NAKUPOVAŤ</Link>
                 </Button>
-                <Button size="lg" variant="outline" className="font-display tracking-wider text-base h-12 px-8 border-primary/20 hover:bg-primary/10" asChild>
+                <Button size="lg" variant="outline" className="font-display tracking-wide text-base h-14 px-10 rounded-full border-border hover:bg-secondary hover:text-foreground" asChild>
                   <Link href="/category/accessories">PRÍSLUŠENSTVO</Link>
                 </Button>
               </div>
             </div>
             
-            <div className="relative lg:h-[600px] flex items-center justify-center">
-              <div className="relative z-10 w-full max-w-[500px] animate-in fade-in zoom-in duration-1000 slide-in-from-bottom-10">
-                <img 
-                  src="/images/hero_banner.png" 
-                  alt="Hero Devices" 
-                  className="w-full h-auto object-contain drop-shadow-[0_0_50px_rgba(0,240,255,0.3)]"
-                />
-              </div>
+            <div className="relative mx-auto w-full max-w-[500px] lg:max-w-none">
+              <div className="absolute inset-0 rounded-full bg-secondary blur-3xl opacity-60" />
+              <img
+                src="/images/hero_banner.png"
+                alt="Latest Smartphone"
+                className="relative z-10 w-full drop-shadow-xl transition-transform duration-700 hover:scale-105"
+              />
             </div>
           </div>
         </div>
@@ -64,30 +63,30 @@ export default function Home() {
       <section className="border-y border-border/40 bg-secondary/5 py-12 backdrop-blur-sm">
         <div className="container">
           <div className="grid gap-8 md:grid-cols-3">
-            <div className="flex items-center gap-4 rounded-lg border border-border/50 bg-background/50 p-6 backdrop-blur-sm transition-colors hover:border-primary/50">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="flex items-center gap-6 rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:shadow-md">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-primary">
                 <Truck className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="font-display font-bold text-foreground">Expresná doprava zdarma</h3>
+                <h3 className="font-display text-lg font-bold text-foreground mb-1">Expresná doprava zdarma</h3>
                 <p className="text-sm text-muted-foreground">Pri objednávkach nad 500 €</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 rounded-lg border border-border/50 bg-background/50 p-6 backdrop-blur-sm transition-colors hover:border-primary/50">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="flex items-center gap-6 rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:shadow-md">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-primary">
                 <ShieldCheck className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="font-display font-bold text-foreground">2-ročná záruka</h3>
+                <h3 className="font-display text-lg font-bold text-foreground mb-1">2-ročná záruka</h3>
                 <p className="text-sm text-muted-foreground">Komplexná ochrana</p>
               </div>
             </div>
-            <div className="flex items-center gap-4 rounded-lg border border-border/50 bg-background/50 p-6 backdrop-blur-sm transition-colors hover:border-primary/50">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+            <div className="flex items-center gap-6 rounded-2xl border border-border bg-card p-8 shadow-sm transition-all hover:shadow-md">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary text-primary">
                 <Zap className="h-6 w-6" />
               </div>
               <div>
-                <h3 className="font-display font-bold text-foreground">Technická podpora</h3>
+                <h3 className="font-display text-lg font-bold text-foreground mb-1">Technická podpora</h3>
                 <p className="text-sm text-muted-foreground">24/7 Odborná pomoc</p>
               </div>
             </div>
@@ -129,23 +128,22 @@ export default function Home() {
       {/* Promo Banner */}
       <section className="py-10">
         <div className="container">
-          <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-background to-secondary/20 px-6 py-16 md:px-12 lg:py-24">
-            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
+          <div className="relative overflow-hidden rounded-3xl bg-secondary/30 px-6 py-16 md:px-12 lg:py-24">
             <div className="relative z-10 max-w-2xl">
-              <Badge className="mb-4 bg-primary text-primary-foreground font-display tracking-wider">ČASOVO OBMEDZENÁ PONUKA</Badge>
-              <h2 className="font-display text-4xl font-black tracking-tight text-foreground md:text-5xl lg:text-6xl mb-6">
+              <Badge className="mb-6 bg-primary text-primary-foreground font-display tracking-wide px-4 py-1.5 rounded-full text-sm">ČASOVO OBMEDZENÁ PONUKA</Badge>
+              <h2 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl lg:text-6xl mb-6 leading-tight">
                 VYLEPŠITE SVOJ <br />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">DIGITÁLNY ŽIVOT</span>
+                <span className="text-primary italic">DIGITÁLNY ŽIVOT</span>
               </h2>
-              <p className="text-lg text-muted-foreground mb-8 max-w-lg">
+              <p className="text-lg text-muted-foreground mb-10 max-w-lg leading-relaxed">
                 Získajte zľavu až 20% na vybrané prémiové balíčky. Zahŕňa predĺženú záruku a prioritnú podporu.
               </p>
-              <Button size="lg" className="font-display tracking-wider" asChild>
+              <Button size="lg" className="font-display tracking-wide h-14 px-10 rounded-full shadow-lg hover:shadow-xl transition-all" asChild>
                 <Link href="/category/all">PRESKÚMAŤ PONUKY</Link>
               </Button>
             </div>
-            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 opacity-20 lg:opacity-100 lg:translate-x-0 pointer-events-none">
-              <div className="h-[400px] w-[400px] rounded-full bg-primary/20 blur-[100px]" />
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 opacity-10 lg:opacity-100 lg:translate-x-0 pointer-events-none">
+              <div className="h-[500px] w-[500px] rounded-full bg-white blur-[80px]" />
             </div>
           </div>
         </div>

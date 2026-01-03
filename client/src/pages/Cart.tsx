@@ -25,9 +25,9 @@ export default function Cart() {
               {items.map((item) => (
                 <div 
                   key={item.id} 
-                  className="flex gap-4 rounded-lg border border-border/50 bg-card/50 p-4 backdrop-blur-sm transition-colors hover:border-primary/30"
+                  className="flex gap-6 rounded-2xl border border-border bg-card p-6 shadow-sm transition-all hover:shadow-md"
                 >
-                  <div className="h-24 w-24 flex-shrink-0 overflow-hidden rounded-md border border-border/50 bg-secondary/20 p-2">
+                  <div className="h-28 w-28 flex-shrink-0 overflow-hidden rounded-xl border border-border bg-secondary/30 p-3">
                     <img
                       src={item.image}
                       alt={item.name}
@@ -38,35 +38,35 @@ export default function Cart() {
                   <div className="flex flex-1 flex-col justify-between">
                     <div className="flex justify-between gap-4">
                       <div>
-                        <h3 className="font-display font-bold text-foreground">
+                        <h3 className="font-display text-lg font-bold text-foreground mb-1">
                           <Link href={`/product/${item.id}`} className="hover:text-primary transition-colors">
                             {item.name}
                           </Link>
                         </h3>
-                        <p className="text-sm text-muted-foreground">{item.category}</p>
+                        <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{item.category}</p>
                       </div>
-                      <p className="font-display font-bold text-primary">
+                      <p className="font-display text-lg font-bold text-foreground">
                         ${(item.salePrice || item.price) * item.quantity}
                       </p>
                     </div>
                     
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center rounded-md border border-border bg-background/50">
+                    <div className="flex items-center justify-between mt-4">
+                      <div className="flex items-center rounded-full border border-border bg-background shadow-sm">
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-none hover:bg-secondary"
+                          className="h-9 w-9 rounded-l-full hover:bg-secondary"
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         >
                           <Minus className="h-3 w-3" />
                         </Button>
-                        <span className="flex h-8 w-10 items-center justify-center text-sm font-bold">
+                        <span className="flex h-9 w-10 items-center justify-center text-sm font-bold">
                           {item.quantity}
                         </span>
                         <Button
                           variant="ghost"
                           size="icon"
-                          className="h-8 w-8 rounded-none hover:bg-secondary"
+                          className="h-9 w-9 rounded-r-full hover:bg-secondary"
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         >
                           <Plus className="h-3 w-3" />
@@ -76,7 +76,7 @@ export default function Cart() {
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="text-muted-foreground hover:text-destructive"
+                        className="text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-full px-4"
                         onClick={() => removeFromCart(item.id)}
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
@@ -90,7 +90,7 @@ export default function Cart() {
 
             {/* Order Summary */}
             <div className="lg:col-span-1">
-              <div className="sticky top-24 rounded-xl border border-border/50 bg-card/50 p-6 backdrop-blur-sm">
+              <div className="sticky top-24 rounded-3xl border border-border bg-card p-8 shadow-sm">
                 <h2 className="font-display text-xl font-bold text-foreground mb-6">Súhrn objednávky</h2>
                 
                 <div className="space-y-4">
@@ -111,12 +111,12 @@ export default function Cart() {
                   
                   <Separator className="bg-border/50" />
                   
-                  <div className="flex justify-between text-lg font-bold">
+                  <div className="flex justify-between text-xl font-bold">
                     <span>Spolu</span>
-                    <span className="text-primary">${total.toFixed(2)}</span>
+                    <span className="text-foreground">${total.toFixed(2)}</span>
                   </div>
                   
-                  <Button size="lg" className="w-full font-display tracking-wider mt-4" asChild>
+                  <Button size="lg" className="w-full font-display tracking-wide mt-6 h-12 rounded-full shadow-lg hover:shadow-xl transition-all" asChild>
                     <Link href="/checkout">
                       PREJSŤ K POKLADNI <ArrowRight className="ml-2 h-4 w-4" />
                     </Link>

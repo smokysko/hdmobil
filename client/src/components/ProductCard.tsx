@@ -10,33 +10,33 @@ export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
 
   return (
-    <Card className="group relative overflow-hidden border-border/50 bg-card/50 backdrop-blur-sm transition-all duration-300 hover:border-primary/50 hover:shadow-[0_0_30px_-10px_var(--color-primary)]">
+    <Card className="group relative overflow-hidden border-border bg-card transition-all duration-500 hover:shadow-lg hover:-translate-y-1 rounded-2xl">
       {/* Image Container */}
-      <div className="aspect-square overflow-hidden bg-secondary/20 p-6 relative">
+      <div className="aspect-square overflow-hidden bg-secondary/30 p-8 relative transition-colors group-hover:bg-secondary/50">
         {product.isNew && (
-          <Badge className="absolute left-3 top-3 z-10 bg-primary text-primary-foreground hover:bg-primary font-display tracking-wider">
+          <Badge className="absolute left-4 top-4 z-10 bg-primary text-primary-foreground hover:bg-primary font-display tracking-wide rounded-full px-3">
             NOVÉ
           </Badge>
         )}
         {product.isSale && (
-          <Badge variant="destructive" className="absolute left-3 top-3 z-10 font-display tracking-wider">
+          <Badge variant="destructive" className="absolute left-4 top-4 z-10 font-display tracking-wide rounded-full px-3">
             AKCIA
           </Badge>
         )}
         <img
           src={product.image}
           alt={product.name}
-          className="h-full w-full object-contain transition-transform duration-500 group-hover:scale-110 drop-shadow-2xl"
+          className="h-full w-full object-contain transition-transform duration-700 group-hover:scale-110 drop-shadow-sm"
         />
         
         {/* Quick Add Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 backdrop-blur-[2px] transition-opacity duration-300 group-hover:opacity-100">
+        <div className="absolute inset-x-0 bottom-0 p-6 opacity-0 transition-all duration-300 translate-y-4 group-hover:translate-y-0 group-hover:opacity-100">
           <Button 
             onClick={(e) => {
               e.preventDefault();
               addToCart(product);
             }}
-            className="translate-y-4 transition-transform duration-300 group-hover:translate-y-0 font-display tracking-wide"
+            className="w-full gap-2 font-display tracking-wide shadow-lg rounded-full h-11"
           >
             <ShoppingCart className="mr-2 h-4 w-4" />
             RÝCHLO PRIDAŤ
@@ -45,42 +45,42 @@ export default function ProductCard({ product }: { product: Product }) {
       </div>
 
       {/* Content */}
-      <CardContent className="p-4">
-        <div className="mb-2 flex items-center justify-between">
-          <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+      <CardContent className="p-6 pb-2">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-xs font-bold text-muted-foreground uppercase tracking-widest">
             {product.category}
           </span>
-          <div className="flex items-center gap-1 text-yellow-500">
-            <Star className="h-3 w-3 fill-current" />
+          <div className="flex items-center gap-1 text-foreground/70 text-xs font-bold bg-secondary px-2 py-1 rounded-full">
+            <Star className="h-3 w-3 fill-current text-yellow-500" />
             <span className="text-xs font-medium text-foreground">{product.rating}</span>
           </div>
         </div>
         <Link href={`/product/${product.id}`}>
-          <h3 className="font-display text-lg font-bold leading-tight text-foreground transition-colors hover:text-primary cursor-pointer line-clamp-1">
+          <h3 className="font-display text-xl font-bold leading-tight text-foreground transition-colors hover:text-primary cursor-pointer line-clamp-1">
             {product.name}
           </h3>
         </Link>
-        <p className="mt-2 text-sm text-muted-foreground line-clamp-2">
+        <p className="mt-3 text-sm text-muted-foreground line-clamp-2 leading-relaxed">
           {product.description}
         </p>
       </CardContent>
 
       {/* Footer */}
-      <CardFooter className="flex items-center justify-between p-4 pt-0">
-        <div className="flex flex-col">
+      <CardFooter className="flex items-center justify-between p-6 pt-4">
+        <div className="flex items-baseline gap-2">
+          <span className="font-display text-xl font-bold text-foreground">
+            ${product.salePrice || product.price}
+          </span>
           {product.isSale && (
-            <span className="text-xs text-muted-foreground line-through">
+            <span className="text-sm text-muted-foreground line-through decoration-destructive/50">
               ${product.price}
             </span>
           )}
-          <span className="font-display text-xl font-bold text-primary">
-            ${product.salePrice || product.price}
-          </span>
         </div>
         <Button 
-          variant="outline" 
+          variant="ghost" 
           size="sm" 
-          className="opacity-0 transition-opacity group-hover:opacity-100 border-primary/20 hover:border-primary hover:bg-primary/10"
+          className="text-primary hover:text-primary hover:bg-primary/10 font-bold tracking-wide"
           asChild
         >
           <Link href={`/product/${product.id}`}>DETAILY</Link>

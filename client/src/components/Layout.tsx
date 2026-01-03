@@ -1,6 +1,6 @@
 import { useCart } from "@/contexts/CartContext";
 import { cn } from "@/lib/utils";
-import { Menu, Search, ShoppingBag, X } from "lucide-react";
+import { Menu, Search, ShoppingBag, Smartphone, X } from "lucide-react";
 import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Badge } from "./ui/badge";
@@ -23,10 +23,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground font-body selection:bg-primary selection:text-primary-foreground">
-      {/* Tech Noir Header */}
-      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/80 backdrop-blur-md supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-16 items-center justify-between">
+    <div className="min-h-screen bg-background text-foreground font-body selection:bg-primary/30 selection:text-foreground">
+      {/* Nordic Air Header */}
+      <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur-sm">
+        <div className="container flex h-24 items-center justify-between">
           {/* Mobile Menu */}
           <Sheet>
             <SheetTrigger asChild>
@@ -60,13 +60,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
           {/* Logo */}
           <Link href="/">
-            <div className="flex items-center gap-2 cursor-pointer group">
-              <div className="relative flex h-8 w-8 items-center justify-center rounded bg-primary/10 group-hover:bg-primary/20 transition-colors">
-                <div className="absolute inset-0 animate-pulse rounded bg-primary/20 blur-sm" />
-                <div className="h-4 w-4 rounded-sm bg-primary" />
+            <div className="flex items-center gap-3 cursor-pointer group">
+              <div className="relative flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 transition-all duration-500 group-hover:bg-primary/20">
+                <Smartphone className="h-5 w-5 text-primary transition-transform duration-500 group-hover:rotate-12" />
               </div>
-              <span className="hidden font-display text-2xl font-bold tracking-wider md:inline-block">
-                HD<span className="text-primary">MOBIL</span>
+              <span className="hidden font-display text-2xl font-bold tracking-tight text-foreground md:inline-block">
+                HDmobil
               </span>
             </div>
           </Link>
@@ -76,8 +75,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {navItems.map((item) => (
               <Link key={item.href} href={item.href}>
                 <span className={cn(
-                  "text-sm font-medium uppercase tracking-widest transition-colors hover:text-primary cursor-pointer relative group",
-                  location === item.href ? "text-primary" : "text-muted-foreground"
+                  "text-sm font-medium tracking-wide transition-all hover:text-foreground cursor-pointer relative group",
+                  location === item.href ? "text-foreground font-bold" : "text-muted-foreground"
                 )}>
                   {item.name}
                   <span className={cn(
@@ -98,7 +97,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   <Input
                     type="search"
                     placeholder="Hľadať produkty..."
-                    className="h-9 w-full rounded-none border-primary/50 bg-background pl-9 focus-visible:ring-1 focus-visible:ring-primary md:w-64"
+                    className="h-10 w-full rounded-full border-border bg-secondary/50 pl-10 focus-visible:ring-1 focus-visible:ring-primary md:w-64 transition-all hover:bg-secondary"
                     autoFocus
                   />
                   <Button
@@ -124,12 +123,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             )}
 
             <Link href="/cart">
-              <Button variant="ghost" size="icon" className="relative hover:text-primary">
+              <Button variant="ghost" size="icon" className="relative hover:bg-secondary hover:text-foreground transition-colors rounded-full">
                 <ShoppingBag className="h-5 w-5" />
                 {cartCount > 0 && (
                   <Badge
                     variant="default"
-                    className="absolute -right-1 -top-1 h-5 w-5 justify-center rounded-full p-0 text-[10px] animate-in zoom-in"
+                    className="absolute -right-1 -top-1 h-5 w-5 justify-center rounded-full bg-primary p-0 text-[10px] font-bold text-primary-foreground animate-in zoom-in border-2 border-background"
                   >
                     {cartCount}
                   </Badge>
@@ -146,13 +145,13 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {children}
       </main>
 
-      {/* Tech Noir Footer */}
-      <footer className="border-t border-border/40 bg-background/50 backdrop-blur-sm">
+      {/* Nordic Air Footer */}
+      <footer className="border-t border-border/40 bg-secondary/30">
         <div className="container py-12 md:py-16">
           <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-4">
             <div className="space-y-4">
-              <span className="font-display text-2xl font-bold tracking-wider">
-                HD<span className="text-primary">MOBIL</span>
+              <span className="font-display text-2xl font-bold tracking-tight">
+                HDmobil
               </span>
               <p className="text-sm text-muted-foreground max-w-xs">
                 Prémiová elektronika pre digitálnu dobu. Zažite budúcnosť technológií už dnes.
@@ -160,7 +159,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
             
             <div>
-              <h3 className="font-display text-sm font-bold uppercase tracking-widest text-foreground mb-4">Obchod</h3>
+              <h3 className="font-display text-lg font-bold text-foreground mb-6">Obchod</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><Link href="/category/smartphones"><span className="hover:text-primary cursor-pointer transition-colors">Smartfóny</span></Link></li>
                 <li><Link href="/category/tablets"><span className="hover:text-primary cursor-pointer transition-colors">Tablety</span></Link></li>
@@ -171,7 +170,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div>
-              <h3 className="font-display text-sm font-bold uppercase tracking-widest text-foreground mb-4">Podpora</h3>
+              <h3 className="font-display text-lg font-bold text-foreground mb-6">Podpora</h3>
               <ul className="space-y-2 text-sm text-muted-foreground">
                 <li><a href="#" className="hover:text-primary transition-colors">Kontaktujte nás</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">Časté otázky</a></li>
@@ -181,19 +180,19 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
 
             <div>
-              <h3 className="font-display text-sm font-bold uppercase tracking-widest text-foreground mb-4">Novinky</h3>
-              <div className="flex flex-col gap-2">
+              <h3 className="font-display text-lg font-bold text-foreground mb-6">Novinky</h3>
+              <div className="flex flex-col gap-3">
                 <Input 
                   placeholder="Zadajte váš email" 
-                  className="bg-background/50 border-primary/20 focus-visible:border-primary"
+                  className="bg-background border-border focus-visible:border-primary rounded-lg h-11"
                 />
-                <Button className="w-full font-display tracking-wide">ODOBERAŤ</Button>
+                <Button className="w-full font-display tracking-wide rounded-lg h-11 shadow-sm hover:shadow-md transition-all">ODOBERAŤ</Button>
               </div>
             </div>
           </div>
           
           <div className="mt-12 border-t border-border/40 pt-8 text-center text-xs text-muted-foreground">
-            <p>&copy; 2024 HDmobil. Všetky práva vyhradené. Dizajnované s filozofiou Tech Noir.</p>
+            <p>&copy; 2024 HDmobil. Všetky práva vyhradené. Dizajnované s filozofiou Nordic Air.</p>
           </div>
         </div>
       </footer>

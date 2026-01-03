@@ -20,13 +20,14 @@ export default function Category() {
 
   return (
     <Layout>
-      <div className="bg-secondary/5 py-12 md:py-20">
+      <div className="bg-background py-12 md:py-20">
         <div className="container">
-          <div className="mb-12 text-center">
-            <h1 className="font-display text-4xl font-black tracking-tight text-foreground md:text-6xl uppercase">
+          <div className="mb-16 text-center">
+            <h1 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-6xl mb-6">
               {categoryName}
             </h1>
-            <p className="mt-4 text-lg text-muted-foreground max-w-2xl mx-auto">
+            <div className="h-1 w-20 bg-primary mx-auto rounded-full mb-6"></div>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Preskúmajte našu prémiovú kolekciu {categoryName.toLowerCase()}. Navrhnuté pre výkon a štýl.
             </p>
           </div>
