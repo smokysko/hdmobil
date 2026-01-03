@@ -23,6 +23,9 @@ export default function ProductCard({ product }: { product: Product }) {
             AKCIA
           </Badge>
         )}
+        <Badge className="absolute right-4 top-4 z-10 bg-green-600 text-white hover:bg-green-700 font-display tracking-wide rounded-full px-3 shadow-sm">
+          SKLADOM
+        </Badge>
         <img
           src={product.image}
           alt={product.name}

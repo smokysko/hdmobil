@@ -39,13 +39,13 @@ export default function Home() {
               </div>
             </div>
             
-            {/* Image Content - Compact & Clean (5 cols) */}
+            {/* Image Content - Large & Impactful (5 cols) */}
             <div className="lg:col-span-5 relative flex justify-center lg:justify-end">
-              <div className="relative w-full max-w-[400px] aspect-square flex items-center justify-center">
+              <div className="relative w-full max-w-[800px] aspect-square flex items-center justify-center -mr-20">
                 <img
                   src="/images/hero_nordic_transparent.png"
                   alt="Premium Smartphone Ecosystem"
-                  className="relative z-10 w-full h-auto object-contain transition-transform duration-500 hover:scale-105"
+                  className="relative z-10 w-full h-auto object-contain transition-transform duration-500 hover:scale-105 scale-125"
                 />
               </div>
             </div>
