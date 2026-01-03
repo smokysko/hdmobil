@@ -34,3 +34,7 @@
     - [ ] Create a `MegaMenu` component or update `Layout` navigation to support dropdowns on hover.
     - [ ] Style the dropdowns to match the "Nordic Tech" aesthetic (clean, organized, shadow).
     - [ ] Ensure hover interaction is smooth and doesn't disappear too easily (use a slight delay or safe area).
+- [ ] **Logo Transparency**
+    - [ ] Process `/images/logo_nordic.png` to remove the white background and save as `/images/logo_nordic_transparent.png`.
+    - [ ] Update `Layout.tsx` to use the new transparent logo.
+    - [ ] Update `Preloader.tsx` to use the new transparent logo.

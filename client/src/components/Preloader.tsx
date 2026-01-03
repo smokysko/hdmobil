@@ -59,7 +59,7 @@ export default function Preloader({ images, onComplete }: PreloaderProps) {
       <div className="relative flex flex-col items-center">
         <div className="mb-8 relative">
            <img 
-              src="/images/logo_nordic.png" 
+              src="/images/logo_nordic_transparent.png" 
               alt="HDmobil" 
               className="h-24 w-auto object-contain animate-pulse"
             />
