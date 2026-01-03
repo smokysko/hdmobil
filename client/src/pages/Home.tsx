@@ -1,25 +1,173 @@
+import Layout from "@/components/Layout";
+import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
-import { Loader2 } from "lucide-react";
-import { Streamdown } from 'streamdown';
+import { Badge } from "@/components/ui/badge";
+import { products } from "@/../../shared/data";
+import { ArrowRight, ShieldCheck, Truck, Zap } from "lucide-react";
+import { Link } from "wouter";
 
-/**
- * All content in this page are only for example, replace with your own feature implementation
- * When building pages, remember your instructions in Frontend Best Practices, Design Guide and Common Pitfalls
- */
 export default function Home() {
-  // If theme is switchable in App.tsx, we can implement theme toggling like this:
-  // const { theme, toggleTheme } = useTheme();
+  const featuredProducts = products.filter(p => p.isNew || p.rating >= 4.8).slice(0, 4);
+  const saleProducts = products.filter(p => p.isSale || p.price < 500).slice(0, 4);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <main>
-        {/* Example: lucide-react for icons */}
-        <Loader2 className="animate-spin" />
-        Example Page
-        {/* Example: Streamdown for markdown rendering */}
-        <Streamdown>Any **markdown** content</Streamdown>
-        <Button variant="default">Example Button</Button>
-      </main>
-    </div>
+    <Layout>
+      {/* Hero Section */}
+      <section className="relative overflow-hidden bg-background py-20 md:py-32">
+        {/* Background Elements */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute -top-[20%] -left-[10%] h-[500px] w-[500px] rounded-full bg-primary/20 blur-[100px]" />
+          <div className="absolute top-[40%] -right-[10%] h-[400px] w-[400px] rounded-full bg-secondary/20 blur-[100px]" />
+          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center [mask-image:linear-gradient(180deg,white,rgba(255,255,255,0))]" />
+        </div>
+
+        <div className="container relative z-10">
+          <div className="grid gap-12 lg:grid-cols-2 items-center">
+            <div className="space-y-8">
+              <div className="inline-flex items-center rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-sm font-medium text-primary backdrop-blur-sm">
+                <span className="flex h-2 w-2 rounded-full bg-primary mr-2 animate-pulse"></span>
+                TECHNOLÓGIA BUDÚCNOSTI
+              </div>
+              <h1 className="font-display text-5xl font-black leading-tight tracking-tight text-foreground md:text-7xl lg:text-8xl">
+                NOVÁ GENERÁCIA <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">
+                  MOBILOV
+                </span>
+              </h1>
+              <p className="max-w-lg text-lg text-muted-foreground md:text-xl">
+                Zažite vrchol mobilných technológií. Prémiové zariadenia navrhnuté pre digitálnu hranicu.
+              </p>
+              <div className="flex flex-wrap gap-4">
+                <Button size="lg" className="font-display tracking-wider text-base h-12 px-8" asChild>
+                  <Link href="/category/smartphones">NAKUPOVAŤ</Link>
+                </Button>
+                <Button size="lg" variant="outline" className="font-display tracking-wider text-base h-12 px-8 border-primary/20 hover:bg-primary/10" asChild>
+                  <Link href="/category/accessories">PRÍSLUŠENSTVO</Link>
+                </Button>
+              </div>
+            </div>
+            
+            <div className="relative lg:h-[600px] flex items-center justify-center">
+              <div className="relative z-10 w-full max-w-[500px] animate-in fade-in zoom-in duration-1000 slide-in-from-bottom-10">
+                <img 
+                  src="/images/hero_banner.png" 
+                  alt="Hero Devices" 
+                  className="w-full h-auto object-contain drop-shadow-[0_0_50px_rgba(0,240,255,0.3)]"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="border-y border-border/40 bg-secondary/5 py-12 backdrop-blur-sm">
+        <div className="container">
+          <div className="grid gap-8 md:grid-cols-3">
+            <div className="flex items-center gap-4 rounded-lg border border-border/50 bg-background/50 p-6 backdrop-blur-sm transition-colors hover:border-primary/50">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Truck className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-foreground">Expresná doprava zdarma</h3>
+                <p className="text-sm text-muted-foreground">Pri objednávkach nad 500 €</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 rounded-lg border border-border/50 bg-background/50 p-6 backdrop-blur-sm transition-colors hover:border-primary/50">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <ShieldCheck className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-foreground">2-ročná záruka</h3>
+                <p className="text-sm text-muted-foreground">Komplexná ochrana</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 rounded-lg border border-border/50 bg-background/50 p-6 backdrop-blur-sm transition-colors hover:border-primary/50">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Zap className="h-6 w-6" />
+              </div>
+              <div>
+                <h3 className="font-display font-bold text-foreground">Technická podpora</h3>
+                <p className="text-sm text-muted-foreground">24/7 Odborná pomoc</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Featured Products */}
+      <section className="py-20">
+        <div className="container">
+          <div className="mb-12 flex items-end justify-between">
+            <div>
+              <h2 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+                Vybrané <span className="text-primary">Novinky</span>
+              </h2>
+              <p className="mt-2 text-muted-foreground">To najnovšie a najlepšie z mobilných technológií.</p>
+            </div>
+            <Button variant="ghost" className="hidden md:flex group" asChild>
+              <Link href="/category/all">
+                Zobraziť všetko <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </Button>
+          </div>
+          
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {featuredProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+          
+          <div className="mt-8 flex justify-center md:hidden">
+            <Button variant="outline" asChild>
+              <Link href="/category/all">Zobraziť všetky produkty</Link>
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Promo Banner */}
+      <section className="py-10">
+        <div className="container">
+          <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-gradient-to-r from-background to-secondary/20 px-6 py-16 md:px-12 lg:py-24">
+            <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-20" />
+            <div className="relative z-10 max-w-2xl">
+              <Badge className="mb-4 bg-primary text-primary-foreground font-display tracking-wider">ČASOVO OBMEDZENÁ PONUKA</Badge>
+              <h2 className="font-display text-4xl font-black tracking-tight text-foreground md:text-5xl lg:text-6xl mb-6">
+                VYLEPŠITE SVOJ <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-purple-500">DIGITÁLNY ŽIVOT</span>
+              </h2>
+              <p className="text-lg text-muted-foreground mb-8 max-w-lg">
+                Získajte zľavu až 20% na vybrané prémiové balíčky. Zahŕňa predĺženú záruku a prioritnú podporu.
+              </p>
+              <Button size="lg" className="font-display tracking-wider" asChild>
+                <Link href="/category/all">PRESKÚMAŤ PONUKY</Link>
+              </Button>
+            </div>
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/4 opacity-20 lg:opacity-100 lg:translate-x-0 pointer-events-none">
+              <div className="h-[400px] w-[400px] rounded-full bg-primary/20 blur-[100px]" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Trending / Sale */}
+      <section className="py-20 bg-secondary/5">
+        <div className="container">
+          <div className="mb-12">
+            <h2 className="font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
+              Práve <span className="text-primary">Letí</span>
+            </h2>
+            <p className="mt-2 text-muted-foreground">Najlepšie hodnotené produkty obľúbené našou komunitou.</p>
+          </div>
+          
+          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {saleProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </div>
+      </section>
+    </Layout>
   );
 }
