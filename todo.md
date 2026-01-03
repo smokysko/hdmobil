@@ -38,3 +38,8 @@
     - [ ] Process `/images/logo_nordic.png` to remove the white background and save as `/images/logo_nordic_transparent.png`.
     - [ ] Update `Layout.tsx` to use the new transparent logo.
     - [ ] Update `Preloader.tsx` to use the new transparent logo.
+- [ ] **Mobile Menu Refactor**
+    - [ ] Replace the static list of subcategories in the mobile menu with an accordion/collapsible component.
+    - [ ] Use `Collapsible` from shadcn/ui or create a custom state-based toggle.
+    - [ ] Add a chevron icon that rotates when the category is expanded.
+    - [ ] Ensure only the main category link is clickable for navigation, while the expand button toggles the sub-menu.

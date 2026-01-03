@@ -16,6 +16,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import CollapsibleMenu from "./CollapsibleMenu";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -137,26 +138,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                   </Link>
                   <nav className="flex flex-col gap-2">
                     {navItems.map((item) => (
-                      <div key={item.href} className="flex flex-col">
-                        <Link href={item.href}>
-                          <span className={cn(
-                            "text-lg font-medium transition-colors hover:text-primary cursor-pointer py-2",
-                            location === item.href ? "text-primary" : "text-muted-foreground"
-                          )}>
-                            {item.name}
-                          </span>
-                        </Link>
-                        {/* Mobile Subcategories */}
-                        <div className="pl-4 flex flex-col gap-2 border-l border-border/50 ml-2">
-                          {item.subcategories.map((sub) => (
-                            <Link key={sub.href} href={sub.href}>
-                              <span className="text-sm text-muted-foreground hover:text-primary cursor-pointer py-1">
-                                {sub.name}
-                              </span>
-                            </Link>
-                          ))}
-                        </div>
-                      </div>
+                      <CollapsibleMenu key={item.href} item={item} />
                     ))}
                   </nav>
                 </div>
