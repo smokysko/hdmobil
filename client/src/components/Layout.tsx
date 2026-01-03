@@ -85,15 +85,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             {/* Logo */}
             <Link href="/">
-              <div className="flex items-center gap-2 cursor-pointer shrink-0">
+              <div className="flex items-center cursor-pointer shrink-0 h-12">
                 <img 
                   src="/images/logo_nordic.png" 
                   alt="HDmobil Logo" 
-                  className="h-10 w-auto object-contain"
+                  className="h-full w-auto object-contain max-h-12"
                 />
-                <span className="font-display text-2xl font-bold tracking-tight hidden sm:inline-block">
-                  HD<span className="text-primary">MOBIL</span>
-                </span>
               </div>
             </Link>
 

@@ -20,3 +20,7 @@
         - [ ] Update specs: "A17 Pro" -> "A19 Bionic" (or similar futuristic name), "48MPx" -> "200MPx" or "Fusion Camera", etc.
         - [ ] Update price to reflect a new flagship (maybe slightly higher or similar).
     - [ ] Ensure the new image fits the "Nordic Air" / "Tech" aesthetic (clean background, sharp details).
+- [ ] **Header Logo Optimization**
+    - [ ] Remove the text "HDMOBIL" from the header (next to the logo image).
+    - [ ] Increase the size of the logo image (`img`) significantly.
+    - [ ] Ensure the logo container has a fixed height or constraints so it doesn't expand the parent header bar height.
