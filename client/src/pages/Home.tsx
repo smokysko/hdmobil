@@ -59,16 +59,22 @@ export default function Home() {
           <h2 className="text-xl font-bold mb-6">Nakupovať podľa kategórie</h2>
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
-              { name: "Smartfóny", href: "/category/smartphones", icon: "📱" },
-              { name: "Tablety", href: "/category/tablets", icon: "📟" },
-              { name: "Notebooky", href: "/category/laptops", icon: "💻" },
-              { name: "Audio", href: "/category/audio", icon: "🎧" },
-              { name: "Príslušenstvo", href: "/category/accessories", icon: "🔌" },
-              { name: "Náhradné diely", href: "/category/spare-parts", icon: "🔧" },
+              { name: "Smartfóny", href: "/category/smartphones", image: "/images/categories/cat_smartphone.png" },
+              { name: "Tablety", href: "/category/tablets", image: "/images/categories/cat_tablet.png" },
+              { name: "Notebooky", href: "/category/laptops", image: "/images/categories/cat_laptop.png" },
+              { name: "Audio", href: "/category/audio", image: "/images/categories/cat_audio.png" },
+              { name: "Príslušenstvo", href: "/category/accessories", image: "/images/categories/cat_accessories.png" },
+              { name: "Náhradné diely", href: "/category/spare-parts", image: "/images/categories/cat_parts.png" },
             ].map((cat) => (
               <Link key={cat.href} href={cat.href}>
-                <div className="flex flex-col items-center justify-center p-6 rounded-xl border border-border bg-card hover:border-primary hover:shadow-md transition-all cursor-pointer group h-full">
-                  <span className="text-3xl mb-3 group-hover:scale-110 transition-transform">{cat.icon}</span>
+                <div className="flex flex-col items-center justify-center p-4 rounded-xl border border-border bg-card hover:border-primary hover:shadow-md transition-all cursor-pointer group h-full">
+                  <div className="w-16 h-16 mb-3 relative flex items-center justify-center">
+                    <img 
+                      src={cat.image} 
+                      alt={cat.name} 
+                      className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
+                    />
+                  </div>
                   <span className="font-medium text-sm text-center group-hover:text-primary transition-colors">{cat.name}</span>
                 </div>
               </Link>
