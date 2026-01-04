@@ -17,6 +17,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import CollapsibleMenu from "./CollapsibleMenu";
+import Logo from "./Logo";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -132,9 +133,9 @@ export default function Layout({ children }: { children: React.ReactNode }) {
               <SheetContent side="left" className="w-[300px] border-r border-border bg-background overflow-y-auto">
                 <div className="flex flex-col gap-8 py-8">
                   <Link href="/">
-                    <span className="font-display text-2xl font-bold tracking-wider text-primary cursor-pointer">
-                      HD<span className="text-foreground">MOBIL</span>
-                    </span>
+                    <div className="pl-2 pt-2 pb-4">
+                      <Logo />
+                    </div>
                   </Link>
                   <nav className="flex flex-col gap-2">
                     {navItems.map((item) => (
@@ -147,12 +148,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             {/* Logo */}
             <Link href="/">
-              <div className="flex items-center cursor-pointer shrink-0 h-12">
-                <img 
-                  src="/images/logo_new.png" 
-                  alt="HDmobil Logo" 
-                  className="h-full w-auto object-contain max-h-12"
-                />
+              <div className="flex items-center cursor-pointer shrink-0 h-12 pl-2">
+                <Logo />
               </div>
             </Link>
 

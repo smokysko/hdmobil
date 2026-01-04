@@ -51,3 +51,9 @@
         - [ ] Add the decorative brackets/accents.
         - [ ] Save as `/images/logo_new.png`.
     - [ ] Update `Layout.tsx` and `Preloader.tsx` to use `/images/logo_new.png`.
+- [ ] **Logo Component Implementation**
+    - [ ] Create `client/src/components/Logo.tsx`.
+    - [ ] Implement the logo using HTML/CSS with `skew-x` transforms to match the reference.
+    - [ ] Use the primary green color for the "HD" box and dark color for "MOBIL".
+    - [ ] Add the decorative brackets using pseudo-elements or absolute positioning.
+    - [ ] Replace the `img` tag in `Layout.tsx` and `Preloader.tsx` with the `<Logo />` component.

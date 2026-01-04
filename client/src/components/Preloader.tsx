@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Logo from "./Logo";
 import { cn } from "@/lib/utils";
 
 interface PreloaderProps {
@@ -57,12 +58,8 @@ export default function Preloader({ images, onComplete }: PreloaderProps) {
       )}
     >
       <div className="relative flex flex-col items-center">
-        <div className="mb-8 relative">
-           <img 
-              src="/images/logo_new.png" 
-              alt="HDmobil" 
-              className="h-24 w-auto object-contain animate-pulse"
-            />
+        <div className="mb-8 relative scale-150 animate-pulse">
+           <Logo />
         </div>
         
         <div className="w-64 h-1 bg-secondary rounded-full overflow-hidden">
