@@ -17,7 +17,7 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import CollapsibleMenu from "./CollapsibleMenu";
-import Logo from "./Logo";
+// import Logo from "./Logo";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -134,7 +134,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 <div className="flex flex-col gap-8 py-8">
                   <Link href="/">
                     <div className="pl-2 pt-2 pb-4">
-                      <Logo />
+                      <img src="/images/logo_final.png" alt="HDmobil Logo" className="h-10 w-auto object-contain" />
                     </div>
                   </Link>
                   <nav className="flex flex-col gap-2">
@@ -149,7 +149,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             {/* Logo */}
             <Link href="/">
               <div className="flex items-center cursor-pointer shrink-0 h-12 pl-2">
-                <Logo />
+                <img src="/images/logo_final.png" alt="HDmobil Logo" className="h-12 w-auto object-contain" />
               </div>
             </Link>
 

@@ -64,3 +64,6 @@
         - [ ] Correct green color.
         - [ ] Correct skew and layout.
     - [ ] Update `Logo.tsx` to use a bold sans-serif font (e.g., `font-sans` instead of `font-display`).
+- [ ] **User Logo Integration**
+    - [ ] Remove background from `hdmobil_logo.jpg` and save as `logo_final.png`.
+    - [ ] Update `Layout.tsx` and `Preloader.tsx` to use `logo_final.png` instead of the `<Logo />` component.
