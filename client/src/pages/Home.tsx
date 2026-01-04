@@ -203,31 +203,47 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Promo Banner - Tech Style */}
+      {/* Promo Banner - Headphones Special */}
       <section className="py-12">
         <div className="container">
-          <div className="relative overflow-hidden rounded-xl bg-foreground text-background px-6 py-12 md:px-12 lg:py-16">
+          <div className="relative overflow-hidden rounded-xl bg-black text-white px-6 py-12 md:px-12 lg:py-16 border border-border/20 shadow-2xl">
+            {/* Background Effects */}
+            <div className="absolute top-0 right-0 w-2/3 h-full bg-gradient-to-l from-primary/20 to-transparent opacity-60"></div>
+            <div className="absolute bottom-0 left-0 w-1/3 h-1/2 bg-gradient-to-t from-primary/10 to-transparent opacity-40"></div>
+            
             <div className="grid md:grid-cols-2 gap-8 items-center relative z-10">
-              <div>
-                <Badge className="mb-4 bg-primary text-primary-foreground font-bold px-3 py-1 rounded-sm">VÝPREDAJ</Badge>
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                  Upgrade pre vašu <br />
-                  <span className="text-primary">domácu kanceláriu</span>
+              <div className="order-2 md:order-1">
+                <div className="inline-flex items-center gap-2 mb-4">
+                  <Badge className="bg-primary text-primary-foreground font-bold px-3 py-1 rounded-sm text-sm">VÍKENDOVÁ AKCIA</Badge>
+                  <span className="text-primary font-bold tracking-wider text-sm">-30% ZĽAVA</span>
+                </div>
+                
+                <h2 className="text-4xl md:text-5xl font-bold tracking-tight mb-4 leading-tight">
+                  HD Sound <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">Elite</span>
                 </h2>
-                <p className="text-muted-foreground mb-8 max-w-md">
-                  Zvýšte svoju produktivitu s našou ponukou monitorov, dokovacích staníc a príslušenstva. Teraz so zľavou až 30%.
+                
+                <p className="text-gray-400 mb-6 max-w-md text-lg">
+                  Ponorte sa do zvuku s našimi novými prémiovými slúchadlami. Aktívne potlačenie hluku, 40h výdrž a štúdiová kvalita.
                 </p>
-                <Button size="lg" className="font-bold rounded-md" asChild>
-                  <Link href="/category/laptops">Pozrieť ponuku</Link>
+                
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="text-3xl font-bold text-white">139 €</div>
+                  <div className="text-xl text-gray-500 line-through">199 €</div>
+                </div>
+                
+                <Button size="lg" className="h-12 px-8 font-bold text-base rounded-md bg-primary hover:bg-primary/90 text-primary-foreground shadow-[0_0_20px_rgba(94,156,118,0.3)] hover:shadow-[0_0_30px_rgba(94,156,118,0.5)] transition-all" asChild>
+                  <Link href="/category/audio">Kúpiť teraz</Link>
                 </Button>
               </div>
-              <div className="relative h-64 md:h-full min-h-[200px] flex items-center justify-center">
-                 {/* Abstract tech shapes */}
-                 <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-full blur-3xl opacity-30"></div>
+              
+              <div className="relative h-64 md:h-[400px] flex items-center justify-center order-1 md:order-2">
+                 {/* Product Glow */}
+                 <div className="absolute inset-0 bg-primary/20 blur-[100px] rounded-full transform scale-75"></div>
+                 
                  <img 
-                    src="/images/categories/cat_laptop.png" 
-                    alt="Laptop Setup" 
-                    className="relative z-10 w-full max-w-sm object-contain drop-shadow-2xl transform -rotate-6 hover:rotate-0 transition-transform duration-500"
+                    src="/images/banner_headphones.png" 
+                    alt="HD Sound Elite Headphones" 
+                    className="relative z-10 w-full max-w-md object-contain drop-shadow-2xl transform hover:scale-105 transition-transform duration-700 animate-in fade-in zoom-in duration-1000"
                  />
               </div>
             </div>
