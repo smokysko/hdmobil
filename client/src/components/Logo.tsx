@@ -14,12 +14,12 @@ export default function Logo({ className, variant = "default" }: LogoProps) {
 
         {/* HD Box - Solid Green */}
         <div className="relative bg-primary text-primary-foreground px-3 py-1 transform -skew-x-12 z-10 flex items-center justify-center h-10 min-w-[3.5rem]">
-          <span className="font-display font-black text-2xl tracking-tighter transform skew-x-12">HD</span>
+          <span className="font-sans font-black text-2xl tracking-tighter transform skew-x-12 italic">HD</span>
         </div>
 
         {/* MOBIL Box - Outlined */}
         <div className="relative border-[3px] border-l-0 border-foreground px-3 py-1 transform -skew-x-12 flex items-center justify-center h-10 min-w-[5rem] -ml-[2px]">
-          <span className="font-display font-black text-2xl tracking-tighter transform skew-x-12 text-foreground">MOBIL</span>
+          <span className="font-sans font-black text-2xl tracking-tighter transform skew-x-12 text-foreground italic">MOBIL</span>
         </div>
 
         {/* Bottom Right Bracket Accent */}

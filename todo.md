@@ -57,3 +57,10 @@
     - [ ] Use the primary green color for the "HD" box and dark color for "MOBIL".
     - [ ] Add the decorative brackets using pseudo-elements or absolute positioning.
     - [ ] Replace the `img` tag in `Layout.tsx` and `Preloader.tsx` with the `<Logo />` component.
+- [ ] **Logo Fixes**
+    - [ ] Identify the exact HEX code for the primary green color from `index.css` (convert from OKLCH if needed).
+    - [ ] Create a Python script to generate a high-quality PNG logo with:
+        - [ ] Bold sans-serif font (e.g., DejaVu Sans Bold).
+        - [ ] Correct green color.
+        - [ ] Correct skew and layout.
+    - [ ] Update `Logo.tsx` to use a bold sans-serif font (e.g., `font-sans` instead of `font-display`).
