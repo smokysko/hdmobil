@@ -149,7 +149,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <Link href="/">
               <div className="flex items-center cursor-pointer shrink-0 h-12">
                 <img 
-                  src="/images/logo_nordic_transparent.png" 
+                  src="/images/logo_new.png" 
                   alt="HDmobil Logo" 
                   className="h-full w-auto object-contain max-h-12"
                 />

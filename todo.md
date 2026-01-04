@@ -43,3 +43,11 @@
     - [ ] Use `Collapsible` from shadcn/ui or create a custom state-based toggle.
     - [ ] Add a chevron icon that rotates when the category is expanded.
     - [ ] Ensure only the main category link is clickable for navigation, while the expand button toggles the sub-menu.
+- [ ] **New Logo Generation**
+    - [ ] Extract primary green color from `index.css`.
+    - [ ] Create a Python script using PIL/Pillow to draw the new logo:
+        - [ ] "HD" in a solid green box (white text).
+        - [ ] "MOBIL" in a black outlined box (black text).
+        - [ ] Add the decorative brackets/accents.
+        - [ ] Save as `/images/logo_new.png`.
+    - [ ] Update `Layout.tsx` and `Preloader.tsx` to use `/images/logo_new.png`.
