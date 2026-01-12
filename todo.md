@@ -12,17 +12,26 @@
 - [x] Design `product_accessories` table (cross-sell relations)
 - [x] Create SQL migration file for Supabase
 
-## Phase 2: Supabase Edge Functions
-- [ ] Auth functions (register, login, company auto-fill by ICO)
-- [ ] Product functions (CRUD, search, filter)
-- [ ] Cart functions (add, remove, update quantity)
-- [ ] Order functions (create, update status, tracking)
-- [ ] Payment webhooks (Stripe, bank transfer confirmation)
-- [ ] Invoice generation (PDF)
-- [ ] Email notifications (order confirmation, tracking)
-- [ ] MKSOFT export function
+## Phase 2: API Endpoints (tRPC/REST)
+- [x] Products API (list, search, filter by category)
+- [x] Cart API (add/remove items, get cart, update quantity)
+- [x] Orders API (create, list, get details, update status)
+- [x] Payments API (create payment intent, webhook handlers)
+- [x] Customers API (register, login, profile, company lookup)
+- [x] Shipping API (get methods, calculate cost)
+- [x] Discounts API (validate coupon)
+- [ ] Invoices API (generate, download)
 
-## Phase 3: Frontend Migration
+## Phase 3: Admin Panel (Czech)
+- [x] Dashboard with orders/revenue stats
+- [x] Product management (CRUD, images, pricing)
+- [x] Order management (status updates, tracking)
+- [ ] Customer management
+- [ ] Discount/coupon management
+- [x] Shipping settings
+- [x] Settings (shop info, company details)
+
+## Phase 4: Frontend Migration
 - [ ] Install Supabase client (`@supabase/supabase-js`)
 - [ ] Configure Supabase connection
 - [ ] Replace tRPC calls with Supabase client
@@ -30,14 +39,13 @@
 - [ ] Update product listing to use Supabase
 - [ ] Update cart to use Supabase
 
-## Phase 4: Core E-commerce Features
+## Phase 5: Core E-commerce Features
 - [ ] Product catalog with categories
 - [ ] Shopping cart with cross-sell
 - [ ] Checkout flow (shipping, payment selection)
 - [ ] Customer registration (personal + company)
 - [ ] Order management
 - [ ] Bazaar section
-- [ ] Admin panel for product/order management
 
 ## Phase 5: Integrations & Deployment
 - [ ] Stripe integration (card, Apple Pay, Google Pay)
