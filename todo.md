@@ -1,69 +1,53 @@
-- [ ] **Header Redesign**
-    - [ ] Add Top Bar (black/dark grey) with phone number, email, and "Track Order" link.
-    - [ ] Move Search Bar to the center of the main header and make it large/prominent with a "Hľadať" button.
-    - [ ] Reorganize navigation to be secondary or part of a "Categories" dropdown if needed, or keep it clean but less dominant than search.
-- [ ] **Hero Section Overhaul**
-    - [ ] Change layout to feature a specific "Hero Product" (e.g., a flagship phone).
-    - [ ] Add technical specs badges/list overlay on the hero (e.g., "Snapdragon 8 Gen 2", "120Hz OLED").
-    - [ ] Add a prominent price tag and "Buy Now" button directly in the hero.
-- [ ] **Trust Indicators (Benefits Bar)**
-    - [ ] Create a new section immediately below the Hero.
-    - [ ] Add icons + text: "Doprava do 24h", "Autorizovaný servis", "Vrátenie do 14 dní", "Odborné poradenstvo".
-- [ ] **UI "Tech" Sharpening**
-    - [ ] Reduce `rounded-2xl` and `rounded-3xl` to `rounded-md` or `rounded-sm` in `index.css` and components.
-    - [ ] Increase contrast on buttons (maybe use a tech blue or keep the green but make it punchier).
-    - [ ] Ensure fonts and spacing feel denser and more information-rich, typical of tech specs.
-- [ ] **Update Hero to iPhone 17 Pro (2026 Context)**
-    - [ ] Generate a new high-quality Hero image featuring a futuristic "iPhone 17 Pro" design (sleek, titanium/glass, premium look).
-    - [ ] Update `Home.tsx` text:
-        - [ ] Change "iPhone 15 Pro" to "iPhone 17 Pro".
-        - [ ] Update specs: "A17 Pro" -> "A19 Bionic" (or similar futuristic name), "48MPx" -> "200MPx" or "Fusion Camera", etc.
-        - [ ] Update price to reflect a new flagship (maybe slightly higher or similar).
-    - [ ] Ensure the new image fits the "Nordic Air" / "Tech" aesthetic (clean background, sharp details).
-- [ ] **Header Logo Optimization**
-    - [ ] Remove the text "HDMOBIL" from the header (next to the logo image).
-    - [ ] Increase the size of the logo image (`img`) significantly.
-    - [ ] Ensure the logo container has a fixed height or constraints so it doesn't expand the parent header bar height.
-- [ ] **Initial Loading Screen (Preloader)**
-    - [ ] Create a `Preloader` component that overlays the entire screen.
-    - [ ] Implement logic to preload critical images (Hero image, Category icons, Logo) before hiding the preloader.
-    - [ ] Add a smooth fade-out animation when loading is complete.
-    - [ ] Show a pulsing logo or progress indicator during loading.
-- [ ] **Mega Menu Implementation**
-    - [ ] Define subcategories structure for each main category (Smartphones, Tablets, Laptops, Audio, Accessories, Spare Parts).
-    - [ ] Create a `MegaMenu` component or update `Layout` navigation to support dropdowns on hover.
-    - [ ] Style the dropdowns to match the "Nordic Tech" aesthetic (clean, organized, shadow).
-    - [ ] Ensure hover interaction is smooth and doesn't disappear too easily (use a slight delay or safe area).
-- [ ] **Logo Transparency**
-    - [ ] Process `/images/logo_nordic.png` to remove the white background and save as `/images/logo_nordic_transparent.png`.
-    - [ ] Update `Layout.tsx` to use the new transparent logo.
-    - [ ] Update `Preloader.tsx` to use the new transparent logo.
-- [ ] **Mobile Menu Refactor**
-    - [ ] Replace the static list of subcategories in the mobile menu with an accordion/collapsible component.
-    - [ ] Use `Collapsible` from shadcn/ui or create a custom state-based toggle.
-    - [ ] Add a chevron icon that rotates when the category is expanded.
-    - [ ] Ensure only the main category link is clickable for navigation, while the expand button toggles the sub-menu.
-- [ ] **New Logo Generation**
-    - [ ] Extract primary green color from `index.css`.
-    - [ ] Create a Python script using PIL/Pillow to draw the new logo:
-        - [ ] "HD" in a solid green box (white text).
-        - [ ] "MOBIL" in a black outlined box (black text).
-        - [ ] Add the decorative brackets/accents.
-        - [ ] Save as `/images/logo_new.png`.
-    - [ ] Update `Layout.tsx` and `Preloader.tsx` to use `/images/logo_new.png`.
-- [ ] **Logo Component Implementation**
-    - [ ] Create `client/src/components/Logo.tsx`.
-    - [ ] Implement the logo using HTML/CSS with `skew-x` transforms to match the reference.
-    - [ ] Use the primary green color for the "HD" box and dark color for "MOBIL".
-    - [ ] Add the decorative brackets using pseudo-elements or absolute positioning.
-    - [ ] Replace the `img` tag in `Layout.tsx` and `Preloader.tsx` with the `<Logo />` component.
-- [ ] **Logo Fixes**
-    - [ ] Identify the exact HEX code for the primary green color from `index.css` (convert from OKLCH if needed).
-    - [ ] Create a Python script to generate a high-quality PNG logo with:
-        - [ ] Bold sans-serif font (e.g., DejaVu Sans Bold).
-        - [ ] Correct green color.
-        - [ ] Correct skew and layout.
-    - [ ] Update `Logo.tsx` to use a bold sans-serif font (e.g., `font-sans` instead of `font-display`).
-- [ ] **User Logo Integration**
-    - [ ] Remove background from `hdmobil_logo.jpg` and save as `logo_final.png`.
-    - [ ] Update `Layout.tsx` and `Preloader.tsx` to use `logo_final.png` instead of the `<Logo />` component.
+# HDmobil E-commerce - Supabase Migration
+
+## Phase 1: Database Schema (PostgreSQL)
+- [x] Design `customers` table (with company fields: ICO, DIC, IC_DPH)
+- [x] Design `products` table (VAT modes, bazaar flag, stock)
+- [x] Design `categories` table (hierarchical)
+- [x] Design `orders` and `order_items` tables
+- [x] Design `discounts` table (coupons, percentage, fixed)
+- [x] Design `shipping_methods` table (DPD, Packeta, SK Posta, SPS)
+- [x] Design `payment_methods` table
+- [x] Design `invoices` table
+- [x] Design `product_accessories` table (cross-sell relations)
+- [x] Create SQL migration file for Supabase
+
+## Phase 2: Supabase Edge Functions
+- [ ] Auth functions (register, login, company auto-fill by ICO)
+- [ ] Product functions (CRUD, search, filter)
+- [ ] Cart functions (add, remove, update quantity)
+- [ ] Order functions (create, update status, tracking)
+- [ ] Payment webhooks (Stripe, bank transfer confirmation)
+- [ ] Invoice generation (PDF)
+- [ ] Email notifications (order confirmation, tracking)
+- [ ] MKSOFT export function
+
+## Phase 3: Frontend Migration
+- [ ] Install Supabase client (`@supabase/supabase-js`)
+- [ ] Configure Supabase connection
+- [ ] Replace tRPC calls with Supabase client
+- [ ] Implement Supabase Auth UI
+- [ ] Update product listing to use Supabase
+- [ ] Update cart to use Supabase
+
+## Phase 4: Core E-commerce Features
+- [ ] Product catalog with categories
+- [ ] Shopping cart with cross-sell
+- [ ] Checkout flow (shipping, payment selection)
+- [ ] Customer registration (personal + company)
+- [ ] Order management
+- [ ] Bazaar section
+- [ ] Admin panel for product/order management
+
+## Phase 5: Integrations & Deployment
+- [ ] Stripe integration (card, Apple Pay, Google Pay)
+- [ ] Shipping API integrations (Packeta, DPD)
+- [ ] ICO lookup API (Slovak business register)
+- [ ] Deploy frontend to Vercel/Netlify
+- [ ] Connect custom domain (hdmobil.sk)
+- [ ] Final testing
+
+## Completed
+- [x] Initial project setup
+- [x] Basic frontend design
+- [x] Banner generation tests

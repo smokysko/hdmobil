@@ -8,16 +8,18 @@ import { ThemeProvider } from "./contexts/ThemeContext";
 import Cart from "./pages/Cart";
 import Category from "./pages/Category";
 import Checkout from "./pages/Checkout";
-import Home from "./pages/Home";
+import Home from "@/pages/Home";
+import BannerExport from "@/pages/BannerExport";
 import ProductDetail from "./pages/ProductDetail";
 import Success from "./pages/Success";
 import Preloader from "./components/Preloader";
 import { useState } from "react";
-
 function Router() {
+  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path="/" component={Home} />
+      <Route path="/banner-export" component={BannerExport} />
       <Route path="/category/:id" component={Category} />
       <Route path="/product/:id" component={ProductDetail} />
       <Route path="/cart" component={Cart} />
