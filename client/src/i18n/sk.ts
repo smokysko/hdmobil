@@ -1,0 +1,220 @@
+export const sk = {
+  // Common
+  common: {
+    search: 'Hľadať',
+    save: 'Uložiť',
+    cancel: 'Zrušiť',
+    delete: 'Vymazať',
+    edit: 'Upraviť',
+    add: 'Pridať',
+    back: 'Späť',
+    next: 'Ďalej',
+    previous: 'Predchádzajúce',
+    loading: 'Načítavam...',
+    error: 'Chyba',
+    success: 'Úspech',
+    yes: 'Áno',
+    no: 'Nie',
+    all: 'Všetky',
+    none: 'Žiadne',
+    close: 'Zavrieť',
+    confirm: 'Potvrdiť',
+    actions: 'Akcie',
+  },
+
+  // Navigation
+  nav: {
+    home: 'Domov',
+    products: 'Produkty',
+    categories: 'Kategórie',
+    cart: 'Košík',
+    account: 'Môj účet',
+    orders: 'Objednávky',
+    login: 'Prihlásiť sa',
+    logout: 'Odhlásiť sa',
+    register: 'Registrácia',
+    admin: 'Administrácia',
+    contact: 'Kontakt',
+    about: 'O nás',
+  },
+
+  // Admin
+  admin: {
+    dashboard: 'Prehľad',
+    products: 'Produkty',
+    orders: 'Objednávky',
+    customers: 'Zákazníci',
+    discounts: 'Zľavy',
+    settings: 'Nastavenia',
+    
+    // Dashboard
+    totalOrders: 'Celkové objednávky',
+    revenue: 'Tržby',
+    newCustomers: 'Noví zákazníci',
+    pendingPayments: 'Čakajúce platby',
+    comparedToLastMonth: 'oproti minulému mesiacu',
+    recentOrders: 'Posledné objednávky',
+    viewAll: 'Zobraziť všetko',
+    
+    // Products
+    productManagement: 'Správa produktov',
+    newProduct: 'Nový produkt',
+    productName: 'Názov produktu',
+    sku: 'SKU',
+    price: 'Cena',
+    stock: 'Sklad',
+    category: 'Kategória',
+    status: 'Stav',
+    active: 'Aktívny',
+    inactive: 'Neaktívny',
+    allCategories: 'Všetky kategórie',
+    allStatuses: 'Všetky stavy',
+    searchPlaceholder: 'Názov alebo SKU...',
+    createProduct: 'Vytvoriť produkt',
+    description: 'Popis',
+    pieces: 'ks',
+    
+    // Orders
+    orderManagement: 'Správa objednávok',
+    orderNumber: 'Číslo objednávky',
+    customer: 'Zákazník',
+    amount: 'Suma',
+    items: 'položiek',
+    paymentStatus: 'Stav platby',
+    date: 'Dátum',
+    orderDetails: 'Detaily objednávky',
+    billingInfo: 'Fakturačné údaje',
+    shippingInfo: 'Doručovacie údaje',
+    downloadInvoice: 'Stiahnuť faktúru',
+    updateStatus: 'Aktualizovať stav',
+    
+    // Order statuses
+    orderStatus: {
+      pending: 'Čakajúca',
+      processing: 'Spracováva sa',
+      shipped: 'Odoslaná',
+      delivered: 'Doručená',
+      cancelled: 'Zrušená',
+    },
+    
+    // Payment statuses
+    paymentStatusLabels: {
+      paid: 'Zaplatené',
+      unpaid: 'Nezaplatené',
+      refunded: 'Vrátené',
+    },
+    
+    // Settings
+    shopSettings: 'Nastavenia obchodu',
+    shopInfo: 'Informácie o obchode',
+    shopName: 'Názov obchodu',
+    email: 'Email',
+    phone: 'Telefón',
+    address: 'Adresa',
+    companyInfo: 'Údaje spoločnosti',
+    companyName: 'Názov spoločnosti',
+    ico: 'IČO',
+    dic: 'DIČ',
+    icDph: 'IČ DPH',
+    freeShippingThreshold: 'Doprava zdarma od (EUR)',
+    defaultVatRate: 'Predvolená DPH (%)',
+    currency: 'Mena',
+    language: 'Jazyk',
+    paymentMethods: 'Spôsoby platby',
+    shippingMethods: 'Spôsoby dopravy',
+    settingsSaved: 'Nastavenia boli úspešne uložené',
+    
+    // Auth
+    adminLogin: 'Prihlásenie do administrácie',
+    enterCredentials: 'Zadajte svoje prihlasovacie údaje',
+    password: 'Heslo',
+    rememberMe: 'Zapamätať si ma',
+    forgotPassword: 'Zabudnuté heslo?',
+    loginButton: 'Prihlásiť sa',
+    invalidCredentials: 'Nesprávny email alebo heslo',
+  },
+
+  // Products
+  products: {
+    addToCart: 'Pridať do košíka',
+    outOfStock: 'Vypredané',
+    inStock: 'Skladom',
+    fewLeft: 'Posledné kusy',
+    priceWithVat: 'Cena s DPH',
+    priceWithoutVat: 'Cena bez DPH',
+    specifications: 'Špecifikácie',
+    reviews: 'Recenzie',
+    relatedProducts: 'Súvisiace produkty',
+    accessories: 'Príslušenstvo',
+  },
+
+  // Cart
+  cart: {
+    yourCart: 'Váš košík',
+    emptyCart: 'Váš košík je prázdny',
+    continueShopping: 'Pokračovať v nákupe',
+    subtotal: 'Medzisúčet',
+    shipping: 'Doprava',
+    total: 'Celkom',
+    checkout: 'Pokračovať k pokladni',
+    remove: 'Odstrániť',
+    quantity: 'Množstvo',
+    freeShipping: 'Doprava zdarma',
+    addMore: 'Pridajte ešte {amount} EUR pre dopravu zdarma',
+  },
+
+  // Checkout
+  checkout: {
+    checkout: 'Pokladňa',
+    billingDetails: 'Fakturačné údaje',
+    shippingDetails: 'Doručovacie údaje',
+    sameAsBilling: 'Rovnaké ako fakturačné',
+    firstName: 'Meno',
+    lastName: 'Priezvisko',
+    email: 'Email',
+    phone: 'Telefón',
+    street: 'Ulica a číslo',
+    city: 'Mesto',
+    zip: 'PSČ',
+    country: 'Krajina',
+    companyDetails: 'Firemné údaje (voliteľné)',
+    companyName: 'Názov spoločnosti',
+    ico: 'IČO',
+    dic: 'DIČ',
+    icDph: 'IČ DPH',
+    lookupByIco: 'Vyhľadať podľa IČO',
+    shippingMethod: 'Spôsob dopravy',
+    paymentMethod: 'Spôsob platby',
+    orderNote: 'Poznámka k objednávke',
+    discountCode: 'Zľavový kód',
+    applyDiscount: 'Použiť',
+    placeOrder: 'Objednať s povinnosťou platby',
+    orderSummary: 'Súhrn objednávky',
+    agreeToTerms: 'Súhlasím s obchodnými podmienkami',
+  },
+
+  // Languages
+  languages: {
+    sk: 'Slovenčina',
+    cs: 'Čeština',
+    en: 'Angličtina',
+  },
+
+  // Footer
+  footer: {
+    aboutUs: 'O nás',
+    contact: 'Kontakt',
+    terms: 'Obchodné podmienky',
+    privacy: 'Ochrana súkromia',
+    shipping: 'Doprava a platba',
+    returns: 'Reklamácie a vrátenie',
+    faq: 'Časté otázky',
+    followUs: 'Sledujte nás',
+    newsletter: 'Newsletter',
+    subscribeText: 'Prihláste sa na odber noviniek',
+    subscribe: 'Prihlásiť',
+    allRightsReserved: 'Všetky práva vyhradené',
+  },
+};
+
+export type Translations = typeof sk;

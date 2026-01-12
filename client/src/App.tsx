@@ -12,10 +12,15 @@ import Home from "@/pages/Home";
 import BannerExport from "@/pages/BannerExport";
 import ProductDetail from "./pages/ProductDetail";
 import Success from "./pages/Success";
+import AdminLogin from "./pages/admin/login";
+import AdminDashboard from "./pages/admin/dashboard";
+import AdminProducts from "./pages/admin/products";
+import AdminOrders from "./pages/admin/orders";
+import AdminSettings from "./pages/admin/settings";
 import Preloader from "./components/Preloader";
 import { useState } from "react";
+
 function Router() {
-  // make sure to consider if you need authentication for certain routes
   return (
     <Switch>
       <Route path="/" component={Home} />
@@ -25,6 +30,12 @@ function Router() {
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/success" component={Success} />
+      {/* Admin routes */}
+      <Route path="/admin/login" component={AdminLogin} />
+      <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/admin/products" component={AdminProducts} />
+      <Route path="/admin/orders" component={AdminOrders} />
+      <Route path="/admin/settings" component={AdminSettings} />
       <Route component={NotFound} />
     </Switch>
   );

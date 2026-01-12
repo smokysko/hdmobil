@@ -59,3 +59,12 @@
 - [x] Initial project setup
 - [x] Basic frontend design
 - [x] Banner generation tests
+
+## Phase 6: Localization & Admin Auth
+- [x] Create i18n system with Slovak and Czech translations
+- [x] Add language switcher component
+- [x] Translate admin panel to Slovak (default) with Czech option
+- [x] Create admin login page
+- [x] Implement admin authentication (localStorage demo)
+- [x] Protect admin routes with auth check
+- [ ] Add admin user management (Supabase Auth)
