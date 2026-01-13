@@ -17,6 +17,8 @@ import {
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
 import CollapsibleMenu from "./CollapsibleMenu";
+import { LanguageSwitcher } from "./LanguageSwitcher";
+import UserProfileDropdown from "./UserProfileDropdown";
 // import Logo from "./Logo";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
@@ -110,10 +112,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           <div className="flex items-center gap-6">
             <a href="#" className="hover:text-primary transition-colors">Sledovať objednávku</a>
             <a href="#" className="hover:text-primary transition-colors">Kontakt</a>
-            <div className="flex items-center gap-1 hover:text-primary transition-colors cursor-pointer">
-              <User className="h-3 w-3" />
-              <span>Prihlásiť</span>
-            </div>
+            <LanguageSwitcher />
+            <UserProfileDropdown />
           </div>
         </div>
       </div>

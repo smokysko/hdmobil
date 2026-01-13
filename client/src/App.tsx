@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { CartProvider } from "./contexts/CartContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { I18nProvider } from "./i18n";
 import Cart from "./pages/Cart";
 import Category from "./pages/Category";
 import Checkout from "./pages/Checkout";
@@ -20,6 +21,8 @@ import AdminOrders from "./pages/admin/orders";
 import AdminSettings from "./pages/admin/settings";
 import CustomerLogin from "./pages/auth/login";
 import CustomerRegister from "./pages/auth/register";
+import AccountPage from "./pages/account/index";
+import OrdersPage from "./pages/account/orders";
 import Preloader from "./components/Preloader";
 import { useState } from "react";
 
@@ -38,6 +41,9 @@ function Router() {
       <Route path="/auth/register" component={CustomerRegister} />
       <Route path="/prihlasenie" component={CustomerLogin} />
       <Route path="/registracia" component={CustomerRegister} />
+      {/* Account routes */}
+      <Route path="/moj-ucet" component={AccountPage} />
+      <Route path="/moje-objednavky" component={OrdersPage} />
       {/* Admin routes */}
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
@@ -67,8 +73,9 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
-        <AuthProvider>
-          <CartProvider>
+        <I18nProvider>
+          <AuthProvider>
+            <CartProvider>
             <TooltipProvider>
               <Toaster />
               <Preloader 
@@ -79,8 +86,9 @@ function App() {
                 <Router />
               </div>
             </TooltipProvider>
-          </CartProvider>
-        </AuthProvider>
+            </CartProvider>
+          </AuthProvider>
+        </I18nProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

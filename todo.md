@@ -85,3 +85,12 @@
 - [x] Create customer login page
 - [ ] Add user profile dropdown in header
 - [x] Protect admin routes with Supabase session
+
+## Phase 9: Language Switcher, User Profile & Cart
+- [x] Create i18n context with Slovak and Czech translations
+- [x] Add language switcher component in header (SK/CZ flags)
+- [x] Create user profile dropdown menu
+- [x] Add order history page for logged-in users
+- [x] Connect cart to Supabase carts table
+- [x] Sync cart between localStorage and database for logged-in users
+- [x] Add cart item count badge in header
