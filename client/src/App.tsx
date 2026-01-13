@@ -5,6 +5,7 @@ import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { CartProvider } from "./contexts/CartContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { AuthProvider } from "./contexts/AuthContext";
 import Cart from "./pages/Cart";
 import Category from "./pages/Category";
 import Checkout from "./pages/Checkout";
@@ -17,6 +18,8 @@ import AdminDashboard from "./pages/admin/dashboard";
 import AdminProducts from "./pages/admin/products";
 import AdminOrders from "./pages/admin/orders";
 import AdminSettings from "./pages/admin/settings";
+import CustomerLogin from "./pages/auth/login";
+import CustomerRegister from "./pages/auth/register";
 import Preloader from "./components/Preloader";
 import { useState } from "react";
 
@@ -30,6 +33,11 @@ function Router() {
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/success" component={Success} />
+      {/* Customer auth routes */}
+      <Route path="/auth/login" component={CustomerLogin} />
+      <Route path="/auth/register" component={CustomerRegister} />
+      <Route path="/prihlasenie" component={CustomerLogin} />
+      <Route path="/registracia" component={CustomerRegister} />
       {/* Admin routes */}
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
@@ -59,18 +67,20 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
-        <CartProvider>
-          <TooltipProvider>
-            <Toaster />
-            <Preloader 
-              images={criticalImages} 
-              onComplete={() => setIsPreloaded(true)} 
-            />
-            <div className={`transition-opacity duration-500 ${isPreloaded ? 'opacity-100' : 'opacity-0'}`}>
-              <Router />
-            </div>
-          </TooltipProvider>
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <TooltipProvider>
+              <Toaster />
+              <Preloader 
+                images={criticalImages} 
+                onComplete={() => setIsPreloaded(true)} 
+              />
+              <div className={`transition-opacity duration-500 ${isPreloaded ? 'opacity-100' : 'opacity-0'}`}>
+                <Router />
+              </div>
+            </TooltipProvider>
+          </CartProvider>
+        </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

@@ -75,3 +75,13 @@
 - [x] Modernize dashboard layout with cleaner design
 - [x] Update color scheme to match website green (#22c55e)
 - [x] Create 3 visual design concepts via nano banana slides
+
+## Phase 8: Supabase Auth Implementation
+- [x] Configure Supabase client with auth
+- [x] Create auth context and hooks
+- [x] Update admin login to use Supabase Auth
+- [x] Create admin user in Supabase
+- [x] Create customer registration page
+- [x] Create customer login page
+- [ ] Add user profile dropdown in header
+- [x] Protect admin routes with Supabase session

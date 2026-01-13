@@ -1,28 +1,56 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function AdminLogin() {
   const [, navigate] = useLocation();
+  const { signIn, user, isAdmin, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
+
+  // Redirect if already logged in as admin
+  useEffect(() => {
+    if (!authLoading && user && isAdmin) {
+      navigate('/admin/dashboard');
+    }
+  }, [user, isAdmin, authLoading, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
 
-    // Simple admin check - in production this would use Supabase Auth
-    if (email === 'admin@hdmobil.sk' && password === 'admin123') {
-      localStorage.setItem('hdmobil_admin', 'true');
-      navigate('/admin/dashboard');
-    } else {
-      setError('Nesprávny email alebo heslo');
+    try {
+      const { error } = await signIn(email, password);
+      
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          setError('Nesprávny email alebo heslo');
+        } else if (error.message.includes('Email not confirmed')) {
+          setError('Email nie je potvrdený. Skontrolujte svoju emailovú schránku.');
+        } else {
+          setError(error.message);
+        }
+      }
+      // Navigation will happen automatically via useEffect when user state updates
+    } catch (err) {
+      setError('Nastala chyba pri prihlasovaní. Skúste to znova.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
+
+  if (authLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center">
+        <div className="animate-spin w-8 h-8 border-4 border-green-500 border-t-transparent rounded-full"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 flex items-center justify-center p-4">
@@ -86,9 +114,13 @@ export default function AdminLogin() {
                 />
                 <span className="text-sm text-gray-600">Zapamätať si ma</span>
               </label>
-              <a href="#" className="text-sm text-green-600 hover:text-green-700 font-medium">
+              <button 
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-sm text-green-600 hover:text-green-700 font-medium"
+              >
                 Zabudnuté heslo?
-              </a>
+              </button>
             </div>
 
             <button
@@ -102,7 +134,7 @@ export default function AdminLogin() {
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Načítavam...
+                  Prihlasujem...
                 </span>
               ) : (
                 'Prihlásiť sa'
@@ -112,8 +144,7 @@ export default function AdminLogin() {
 
           <div className="mt-6 pt-6 border-t border-gray-200">
             <p className="text-sm text-gray-500 text-center">
-              Demo prihlasovacie údaje:<br />
-              <span className="font-mono text-xs">admin@hdmobil.sk / admin123</span>
+              Prístup len pre administrátorov HDmobil
             </p>
           </div>
         </div>
