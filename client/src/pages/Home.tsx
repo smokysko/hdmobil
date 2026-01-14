@@ -25,9 +25,9 @@ export default function Home() {
       const totalHeaderHeight = topBarHeight + mainHeaderHeight;
       const viewportHeight = window.innerHeight;
       
-      // Calculate the wrapper height to fill viewport minus header
-      // Subtract additional 80px to ensure trust bar is fully visible
-      const wrapperHeight = viewportHeight - totalHeaderHeight - 80;
+      // Calculate the wrapper height to fill exactly viewport minus header
+      // Hero + Trust bar together = 100vh - header
+      const wrapperHeight = viewportHeight - totalHeaderHeight;
       setHeroHeight(`${wrapperHeight}px`);
     };
 
@@ -50,11 +50,11 @@ export default function Home() {
       <div 
         ref={heroWrapperRef}
         className="flex flex-col"
-        style={{ minHeight: heroHeight, maxHeight: heroHeight }}
+        style={{ height: heroHeight }}
       >
         {/* Tech Hero Section - Product Focused */}
-        <section className="relative bg-background overflow-hidden border-b border-border flex-1 min-h-0">
-        <div className="container relative z-10 py-4 lg:py-6">
+        <section className="relative bg-background overflow-auto border-b border-border flex-1 min-h-0">
+        <div className="container relative z-10 py-2 lg:py-4 h-full flex flex-col justify-start">
           <div className="grid lg:grid-cols-12 gap-4 items-center">
             {/* Left Content - Specs & CTA (5 cols) */}
             <div className="lg:col-span-5 space-y-4 order-2 lg:order-1">
@@ -103,11 +103,11 @@ export default function Home() {
             </div>
             
             {/* Right Content - Hero Image (7 cols) */}
-            <div className="lg:col-span-7 relative flex justify-center items-center order-1 lg:order-2 min-h-[180px] lg:min-h-[240px]">
+            <div className="lg:col-span-7 relative flex justify-center items-center order-1 lg:order-2 min-h-[150px] lg:min-h-[200px]">
               {/* Background Elements */}
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent rounded-full blur-3xl opacity-60 transform scale-75"></div>
               
-              <div className="relative z-10 w-full max-w-[340px] h-[240px] flex items-center justify-center">
+              <div className="relative z-10 w-full max-w-[340px] h-[200px] flex items-center justify-center">
                 <img
                   src="/images/hero_iphone17_v1.png"
                   alt="iPhone 17 Pro Titanium"

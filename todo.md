@@ -98,3 +98,4 @@
 ## Phase 10: UI/UX Improvements
 - [x] Fix trust bar positioning - visible at bottom of viewport on page load
 - [x] Trust bar scrolls normally with content (not fixed)
+- [x] Hero section + trust bar fill exactly 100vh (full viewport height)
