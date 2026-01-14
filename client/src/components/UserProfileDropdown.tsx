@@ -12,15 +12,25 @@ import { User, Package, Heart, Settings, LogOut, ChevronDown } from 'lucide-reac
 import { Link, useLocation } from 'wouter';
 
 export default function UserProfileDropdown() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const [, setLocation] = useLocation();
 
   const handleLogout = async () => {
-    await logout();
+    await signOut();
     setLocation('/');
   };
 
-  if (!isAuthenticated || !user) {
+  // Show nothing while loading
+  if (loading) {
+    return (
+      <Button variant="ghost" size="sm" className="flex items-center gap-1.5 h-8 px-2 text-xs font-medium opacity-50">
+        <User className="h-4 w-4" />
+        <span className="hidden sm:inline">...</span>
+      </Button>
+    );
+  }
+
+  if (!user) {
     return (
       <Link href="/prihlasenie">
         <Button variant="ghost" size="sm" className="flex items-center gap-1.5 h-8 px-2 text-xs font-medium">

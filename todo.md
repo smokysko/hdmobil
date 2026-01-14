@@ -100,3 +100,5 @@
 - [x] Fix language switcher height stretching the top bar
 - [x] Fix language switching functionality (Czech not working)
 - [x] Replace emoji flags with SVG icons for Windows/Chrome compatibility
+
+- [x] Fix user login state not showing in header after login
