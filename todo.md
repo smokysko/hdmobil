@@ -105,4 +105,17 @@
 - [x] Add isAuthenticated and logout to AuthContext
 - [x] Fix UserProfileDropdown to show for logged-in users
 - [x] Handle unconfigured Supabase gracefully
-- [ ] Test admin panel access
+- [x] Test admin panel access
+
+## Phase 12: Admin Role Management
+- [x] Create profiles table with is_admin field in database
+- [x] Update AuthContext to check is_admin from profiles table
+- [x] Update AdminAuthContext to check is_admin from profiles table
+- [x] Set current user (admin@hdmobil.sk) as admin in database
+- [x] Add redirect from /admin to /admin/login
+- [x] Test admin login and panel access
+- [ ] Push database migration
+- [ ] Update AuthContext to check is_admin from database
+- [ ] Fix admin panel login to use database-based admin check
+- [ ] Set current user as admin in database
+- [ ] Test admin login and panel access

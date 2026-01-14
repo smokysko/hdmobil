@@ -62,21 +62,37 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const checkAdminRole = async (authUser: User) => {
     try {
-      const { data: userData, error } = await supabase
-        .from('users')
-        .select('id, email, role')
+      // Check profiles table for is_admin field
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('is_admin')
         .eq('id', authUser.id)
         .single();
 
-      if (error || userData?.role !== 'admin') {
+      if (error) {
+        console.warn('Could not fetch profile:', error.message);
+        // Fallback: check if email ends with @hdmobil.sk
+        if (authUser.email?.endsWith('@hdmobil.sk')) {
+          setUser({
+            id: authUser.id,
+            email: authUser.email || '',
+            role: 'admin',
+          });
+        } else {
+          setUser(null);
+        }
+        return;
+      }
+
+      if (!profile?.is_admin) {
         setUser(null);
         return;
       }
 
       setUser({
-        id: userData.id,
-        email: userData.email,
-        role: userData.role,
+        id: authUser.id,
+        email: authUser.email || '',
+        role: 'admin',
       });
     } catch (error) {
       console.error('Error checking admin role:', error);

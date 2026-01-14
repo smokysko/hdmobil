@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE IF NOT EXISTS profiles (\n  id VARCHAR(36) PRIMARY KEY,\n  email VARCHAR(320),\n  full_name VARCHAR(255),\n  phone VARCHAR(50),\n  is_admin BOOLEAN DEFAULT FALSE NOT NULL,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user CSL6GK5n976V4Xn.root --database RjiuiJWQWLJ6AHZCgV4EsS --execute CREATE TABLE IF NOT EXISTS profiles (\n  id VARCHAR(36) PRIMARY KEY,\n  email VARCHAR(320),\n  full_name VARCHAR(255),\n  phone VARCHAR(50),\n  is_admin BOOLEAN DEFAULT FALSE NOT NULL,\n  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,\n  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP\n);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 1583
+}

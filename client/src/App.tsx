@@ -45,6 +45,7 @@ function Router() {
       <Route path="/moj-ucet" component={AccountPage} />
       <Route path="/moje-objednavky" component={OrdersPage} />
       {/* Admin routes */}
+      <Route path="/admin">{() => { window.location.href = '/admin/login'; return null; }}</Route>
       <Route path="/admin/login" component={AdminLogin} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
       <Route path="/admin/products" component={AdminProducts} />

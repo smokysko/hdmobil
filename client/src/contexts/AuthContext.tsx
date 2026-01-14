@@ -58,22 +58,25 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
     
-    // Check if user has admin role in metadata or in admin_users table
-    const isAdminUser = user.user_metadata?.role === 'admin' || 
-                        user.email?.endsWith('@hdmobil.sk') ||
-                        user.email === 'admin@hdmobil.sk';
-    
-    // Also check admin_users table
-    if (!isAdminUser) {
-      const { data } = await supabase
-        .from('admin_users')
-        .select('id')
-        .eq('user_id', user.id)
+    try {
+      // Check profiles table for is_admin field
+      const { data: profile, error } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
         .single();
       
-      setIsAdmin(!!data);
-    } else {
-      setIsAdmin(true);
+      if (error) {
+        console.warn('Could not fetch profile:', error.message);
+        // Fallback: check if email ends with @hdmobil.sk
+        setIsAdmin(user.email?.endsWith('@hdmobil.sk') || false);
+        return;
+      }
+      
+      setIsAdmin(profile?.is_admin || false);
+    } catch (err) {
+      console.error('Error checking admin status:', err);
+      setIsAdmin(false);
     }
   };
 
