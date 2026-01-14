@@ -62,9 +62,9 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
 
   const checkAdminRole = async (authUser: User) => {
     try {
-      // Check profiles table for is_admin field
+      // Check admin_users table for is_admin field
       const { data: profile, error } = await supabase
-        .from('profiles')
+        .from('admin_users')
         .select('is_admin')
         .eq('id', authUser.id)
         .single();

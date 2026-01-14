@@ -59,9 +59,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
     
     try {
-      // Check profiles table for is_admin field
+      // Check admin_users table for is_admin field
       const { data: profile, error } = await supabase
-        .from('profiles')
+        .from('admin_users')
         .select('is_admin')
         .eq('id', user.id)
         .single();
@@ -93,6 +93,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         data: metadata,
       },
     });
+    
+    // If signup successful, add user to app_users table
+    if (data.user && !error) {
+      try {
+        await supabase.from('admin_users').upsert({
+          id: data.user.id,
+          email: data.user.email,
+          full_name: metadata?.full_name || null,
+          phone: metadata?.phone || null,
+          is_admin: false,
+          created_at: new Date().toISOString(),
+        }, { onConflict: 'id' });
+      } catch (insertError) {
+        console.warn('Could not add user to app_users table:', insertError);
+      }
+    }
     
     // Check if email confirmation is required
     const needsConfirmation = data.user && !data.session;

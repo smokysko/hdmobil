@@ -119,3 +119,10 @@
 - [ ] Fix admin panel login to use database-based admin check
 - [ ] Set current user as admin in database
 - [ ] Test admin login and panel access
+
+## Phase 13: User Management System
+- [x] Create admin_users table with id, email, full_name, is_admin, created_at in Supabase
+- [x] Update registration to auto-add users to admin_users table
+- [x] Add user management UI in admin panel (Zákazníci section)
+- [x] Allow toggling is_admin for users in admin panel
+- [x] Test user registration and admin management

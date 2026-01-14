@@ -1,0 +1,9 @@
+{
+  "query": "INSERT INTO app_users (id, is_admin, created_at) VALUES ('02c04171-a6a0-4330-a943-2dd8eed96607', TRUE, NOW()) ON DUPLICATE KEY UPDATE is_admin = TRUE;",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user CSL6GK5n976V4Xn.root --database RjiuiJWQWLJ6AHZCgV4EsS --execute INSERT INTO app_users (id, is_admin, created_at) VALUES ('02c04171-a6a0-4330-a943-2dd8eed96607', TRUE, NOW()) ON DUPLICATE KEY UPDATE is_admin = TRUE;",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 719
+}
