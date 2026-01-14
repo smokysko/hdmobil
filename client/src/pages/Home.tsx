@@ -90,8 +90,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trust Bar - High Visibility */}
-      <section className="bg-foreground text-background py-6 border-b border-border/10">
+      {/* Trust Bar - Fixed at Bottom */}
+      <section className="fixed bottom-0 left-0 right-0 z-50 bg-foreground text-background py-4 border-t border-border/10 shadow-lg">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="flex items-center gap-3 justify-center md:justify-start">
