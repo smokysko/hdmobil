@@ -94,3 +94,9 @@
 - [x] Connect cart to Supabase carts table
 - [x] Sync cart between localStorage and database for logged-in users
 - [x] Add cart item count badge in header
+
+
+## Bug Fixes
+- [x] Fix language switcher height stretching the top bar
+- [x] Fix language switching functionality (Czech not working)
+- [x] Replace emoji flags with SVG icons for Windows/Chrome compatibility
