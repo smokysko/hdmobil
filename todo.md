@@ -102,3 +102,4 @@
 - [x] Replace emoji flags with SVG icons for Windows/Chrome compatibility
 
 - [x] Fix user login state not showing in header after login
+- [x] Fix hero section height - trust bar should be at bottom of viewport on page load

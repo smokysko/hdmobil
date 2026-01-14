@@ -12,9 +12,11 @@ export default function Home() {
 
   return (
     <Layout>
-      {/* Tech Hero Section - Product Focused */}
-      <section className="relative bg-background overflow-hidden border-b border-border">
-        <div className="container relative z-10 py-8 lg:py-12">
+      {/* Hero + Trust Bar wrapper - fills exactly viewport height minus header */}
+      <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 180px)' }}>
+      {/* Tech Hero Section - Product Focused - takes remaining space */}
+      <section className="relative bg-background overflow-hidden border-b border-border flex-1">
+        <div className="container relative z-10 py-8 lg:py-12 h-full flex items-center">
           <div className="grid lg:grid-cols-12 gap-8 items-center">
             {/* Left Content - Specs & CTA (5 cols) */}
             <div className="lg:col-span-5 space-y-6 order-2 lg:order-1">
@@ -90,8 +92,8 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trust Bar - High Visibility */}
-      <section className="bg-foreground text-background py-6 border-b border-border/10">
+      {/* Trust Bar - High Visibility - stays at bottom of viewport */}
+      <section className="bg-foreground text-background py-4 border-b border-border/10 shrink-0">
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="flex items-center gap-3 justify-center md:justify-start">
@@ -136,6 +138,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </div>
 
       {/* Quick Categories - Grid Layout */}
       <section className="py-12 bg-background">
