@@ -99,3 +99,10 @@
 - [x] Fix trust bar positioning - visible at bottom of viewport on page load
 - [x] Trust bar scrolls normally with content (not fixed)
 - [x] Hero section + trust bar fill exactly 100vh (full viewport height)
+
+## Phase 11: Authentication Fix
+- [x] Fix login page redirect issue (redirects to homepage instead of showing login form)
+- [x] Add isAuthenticated and logout to AuthContext
+- [x] Fix UserProfileDropdown to show for logged-in users
+- [x] Handle unconfigured Supabase gracefully
+- [ ] Test admin panel access

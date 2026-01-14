@@ -14,7 +14,8 @@ export default function CustomerLogin() {
 
   // Redirect if already logged in
   useEffect(() => {
-    if (!authLoading && user) {
+    // Only redirect if user is actually logged in (not null/undefined)
+    if (!authLoading && user && user.id) {
       navigate('/');
     }
   }, [user, authLoading, navigate]);
