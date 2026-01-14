@@ -116,7 +116,7 @@ export default function Home() {
       </section>
 
       {/* Trust Bar - High Visibility - stays at bottom of viewport */}
-      <section className="bg-foreground text-background py-4 border-b border-border/10 shrink-0">
+      <section className="bg-foreground text-background py-4 border-b border-border/10 shrink-0" style={{ marginTop: '-30px' }}>
         <div className="container">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="flex items-center gap-3 justify-center md:justify-start">
