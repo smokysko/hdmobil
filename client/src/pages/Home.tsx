@@ -23,7 +23,7 @@ export default function Home() {
       // We want hero + trust bar to fill exactly the viewport minus header
       // Using smaller values to push trust bar up into viewport
       const headerHeight = 180;
-      const trustBarHeight = 140;
+      const trustBarHeight = 160;
       const heroSectionHeight = vh - headerHeight - trustBarHeight;
       setHeroHeight(`${Math.max(heroSectionHeight, 300)}px`);
     };
