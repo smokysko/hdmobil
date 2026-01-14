@@ -5,17 +5,40 @@ import { Badge } from "@/components/ui/badge";
 import { products } from "@/../../shared/data";
 import { ArrowRight, ShieldCheck, Truck, Zap, CheckCircle2, RotateCcw, Headphones, Star } from "lucide-react";
 import { Link } from "wouter";
+import { useState, useEffect } from "react";
 
 export default function Home() {
   const featuredProducts = products.filter(p => p.isNew || p.rating >= 4.8).slice(0, 4);
   const saleProducts = products.filter(p => p.isSale || p.price < 500).slice(0, 4);
+  
+  // Dynamic viewport height calculation for trust bar positioning
+  const [heroHeight, setHeroHeight] = useState('auto');
+  
+  useEffect(() => {
+    const calculateHeight = () => {
+      // Get actual viewport height (works on all devices including mobile with address bar)
+      const vh = window.innerHeight;
+      // Header height: top bar (~32px) + main header (~80px) + nav (~48px) = ~160px
+      // Trust bar height: ~80px
+      // We want hero + trust bar to fill exactly the viewport minus header
+      // Using smaller values to push trust bar up into viewport
+      const headerHeight = 180;
+      const trustBarHeight = 140;
+      const heroSectionHeight = vh - headerHeight - trustBarHeight;
+      setHeroHeight(`${Math.max(heroSectionHeight, 300)}px`);
+    };
+    
+    calculateHeight();
+    window.addEventListener('resize', calculateHeight);
+    return () => window.removeEventListener('resize', calculateHeight);
+  }, []);
 
   return (
     <Layout>
       {/* Hero + Trust Bar wrapper - fills exactly viewport height minus header */}
-      <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 230px)' }}>
-      {/* Tech Hero Section - Product Focused - takes remaining space */}
-      <section className="relative bg-background overflow-hidden border-b border-border flex-1">
+      <div className="flex flex-col">
+      {/* Tech Hero Section - Product Focused - dynamically sized */}
+      <section className="relative bg-background overflow-hidden border-b border-border" style={{ minHeight: heroHeight }}>
         <div className="container relative z-10 py-8 lg:py-12 h-full flex items-center">
           <div className="grid lg:grid-cols-12 gap-8 items-center">
             {/* Left Content - Specs & CTA (5 cols) */}
