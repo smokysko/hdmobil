@@ -5,30 +5,70 @@ import { Badge } from "@/components/ui/badge";
 import { products } from "@/../../shared/data";
 import { ArrowRight, ShieldCheck, Truck, Zap, CheckCircle2, RotateCcw, Headphones, Star } from "lucide-react";
 import { Link } from "wouter";
+import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
   const featuredProducts = products.filter(p => p.isNew || p.rating >= 4.8).slice(0, 4);
   const saleProducts = products.filter(p => p.isSale || p.price < 500).slice(0, 4);
+  const heroWrapperRef = useRef<HTMLDivElement>(null);
+  const [heroHeight, setHeroHeight] = useState<string>('auto');
+
+  useEffect(() => {
+    const calculateHeight = () => {
+      // Get the header height dynamically
+      const topBar = document.querySelector('.bg-foreground.text-background.py-2');
+      const mainHeader = document.querySelector('header.sticky');
+      
+      const topBarHeight = topBar?.getBoundingClientRect().height || 32;
+      const mainHeaderHeight = mainHeader?.getBoundingClientRect().height || 130;
+      
+      const totalHeaderHeight = topBarHeight + mainHeaderHeight;
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate the wrapper height to fill viewport minus header
+      // Subtract additional 80px to ensure trust bar is fully visible
+      const wrapperHeight = viewportHeight - totalHeaderHeight - 80;
+      setHeroHeight(`${wrapperHeight}px`);
+    };
+
+    // Calculate on mount and resize
+    calculateHeight();
+    window.addEventListener('resize', calculateHeight);
+    
+    // Recalculate after a short delay to ensure layout is complete
+    const timeout = setTimeout(calculateHeight, 100);
+    
+    return () => {
+      window.removeEventListener('resize', calculateHeight);
+      clearTimeout(timeout);
+    };
+  }, []);
 
   return (
     <Layout>
-      {/* Tech Hero Section - Product Focused */}
-      <section className="relative bg-background overflow-hidden border-b border-border">
-        <div className="container relative z-10 py-8 lg:py-12">
-          <div className="grid lg:grid-cols-12 gap-8 items-center">
+      {/* Hero + Trust Bar Wrapper - fills viewport on load */}
+      <div 
+        ref={heroWrapperRef}
+        className="flex flex-col"
+        style={{ minHeight: heroHeight, maxHeight: heroHeight }}
+      >
+        {/* Tech Hero Section - Product Focused */}
+        <section className="relative bg-background overflow-hidden border-b border-border flex-1 min-h-0">
+        <div className="container relative z-10 py-4 lg:py-6">
+          <div className="grid lg:grid-cols-12 gap-4 items-center">
             {/* Left Content - Specs & CTA (5 cols) */}
-            <div className="lg:col-span-5 space-y-6 order-2 lg:order-1">
+            <div className="lg:col-span-5 space-y-4 order-2 lg:order-1">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-wider">
                 <Star className="w-3 h-3 fill-primary" />
                 Vlajková loď 2026
               </div>
               
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-[1.1]">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight text-foreground leading-[1.1]">
                 iPhone 17 Pro <br/>
                 <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/60">Titanium</span>
               </h1>
               
-              <div className="flex flex-col gap-3 text-sm text-muted-foreground border-l-2 border-primary/30 pl-4 my-6">
+              <div className="flex flex-col gap-2 text-sm text-muted-foreground border-l-2 border-primary/30 pl-4 my-3">
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-primary" />
                   <span>Čip A19 Bionic s Neural Engine</span>
@@ -47,7 +87,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="flex items-end gap-4 mb-4">
+              <div className="flex items-end gap-4 mb-2">
                 <div className="text-3xl font-bold text-foreground">1 299 €</div>
                 <div className="text-lg text-muted-foreground line-through mb-1">1 399 €</div>
               </div>
@@ -63,11 +103,11 @@ export default function Home() {
             </div>
             
             {/* Right Content - Hero Image (7 cols) */}
-            <div className="lg:col-span-7 relative flex justify-center items-center order-1 lg:order-2 min-h-[300px] lg:min-h-[500px]">
+            <div className="lg:col-span-7 relative flex justify-center items-center order-1 lg:order-2 min-h-[180px] lg:min-h-[240px]">
               {/* Background Elements */}
               <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent rounded-full blur-3xl opacity-60 transform scale-75"></div>
               
-              <div className="relative z-10 w-full max-w-[600px] aspect-square flex items-center justify-center">
+              <div className="relative z-10 w-full max-w-[340px] h-[240px] flex items-center justify-center">
                 <img
                   src="/images/hero_iphone17_v1.png"
                   alt="iPhone 17 Pro Titanium"
@@ -75,12 +115,12 @@ export default function Home() {
                 />
                 
                 {/* Floating Spec Cards */}
-                <div className="absolute top-10 right-10 bg-card/90 backdrop-blur-md p-3 rounded-lg shadow-xl border border-border hidden md:block animate-in fade-in zoom-in duration-700 delay-300">
+                <div className="absolute top-2 right-2 bg-card/90 backdrop-blur-md p-2 rounded-lg shadow-xl border border-border hidden md:block animate-in fade-in zoom-in duration-700 delay-300">
                   <div className="text-xs text-muted-foreground uppercase font-bold">Procesor</div>
                   <div className="font-bold text-foreground">A19 Bionic</div>
                 </div>
                 
-                <div className="absolute bottom-20 left-10 bg-card/90 backdrop-blur-md p-3 rounded-lg shadow-xl border border-border hidden md:block animate-in fade-in zoom-in duration-700 delay-500">
+                <div className="absolute bottom-2 left-2 bg-card/90 backdrop-blur-md p-2 rounded-lg shadow-xl border border-border hidden md:block animate-in fade-in zoom-in duration-700 delay-500">
                   <div className="text-xs text-muted-foreground uppercase font-bold">Kamera</div>
                   <div className="font-bold text-foreground">200 MPx</div>
                 </div>
@@ -90,10 +130,10 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Trust Bar - Fixed at Bottom */}
-      <section className="fixed bottom-0 left-0 right-0 z-50 bg-foreground text-background py-4 border-t border-border/10 shadow-lg">
+      {/* Trust Bar - High Visibility */}
+      <section className="bg-foreground text-background py-3 border-b border-border/10 shrink-0">
         <div className="container">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
             <div className="flex items-center gap-3 justify-center md:justify-start">
               <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
                 <Truck className="h-5 w-5 text-primary" />
@@ -136,6 +176,7 @@ export default function Home() {
           </div>
         </div>
       </section>
+      </div>
 
       {/* Quick Categories - Grid Layout */}
       <section className="py-12 bg-background">

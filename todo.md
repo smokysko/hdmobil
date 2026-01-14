@@ -94,3 +94,7 @@
 - [x] Connect cart to Supabase carts table
 - [x] Sync cart between localStorage and database for logged-in users
 - [x] Add cart item count badge in header
+
+## Phase 10: UI/UX Improvements
+- [x] Fix trust bar positioning - visible at bottom of viewport on page load
+- [x] Trust bar scrolls normally with content (not fixed)
