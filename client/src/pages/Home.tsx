@@ -13,7 +13,7 @@ export default function Home() {
   return (
     <Layout>
       {/* Hero + Trust Bar wrapper - fills exactly viewport height minus header */}
-      <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 180px)' }}>
+      <div className="flex flex-col" style={{ minHeight: 'calc(100vh - 230px)' }}>
       {/* Tech Hero Section - Product Focused - takes remaining space */}
       <section className="relative bg-background overflow-hidden border-b border-border flex-1">
         <div className="container relative z-10 py-8 lg:py-12 h-full flex items-center">
