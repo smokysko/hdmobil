@@ -1,9 +1,0 @@
-{
-  "query": "ALTER TABLE app_users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255); ALTER TABLE app_users ADD COLUMN IF NOT EXISTS phone VARCHAR(50);",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user CSL6GK5n976V4Xn.root --database RjiuiJWQWLJ6AHZCgV4EsS --execute ALTER TABLE app_users ADD COLUMN IF NOT EXISTS full_name VARCHAR(255); ALTER TABLE app_users ADD COLUMN IF NOT EXISTS phone VARCHAR(50);",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 202
-}

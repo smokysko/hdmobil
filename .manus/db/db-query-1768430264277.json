@@ -1,9 +1,0 @@
-{
-  "query": "INSERT INTO profiles (id, email, full_name, is_admin) \nVALUES ('a89d2f95-a3ed-4902-901a-df47270b9d29', 'admin@hdmobil.sk', 'Admin', TRUE)\nON DUPLICATE KEY UPDATE is_admin = TRUE;",
-  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user CSL6GK5n976V4Xn.root --database RjiuiJWQWLJ6AHZCgV4EsS --execute INSERT INTO profiles (id, email, full_name, is_admin) \nVALUES ('a89d2f95-a3ed-4902-901a-df47270b9d29', 'admin@hdmobil.sk', 'Admin', TRUE)\nON DUPLICATE KEY UPDATE is_admin = TRUE;",
-  "rows": [],
-  "messages": [],
-  "stdout": "",
-  "stderr": "",
-  "execution_time_ms": 122
-}
