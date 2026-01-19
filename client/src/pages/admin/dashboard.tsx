@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Link, useLocation } from 'wouter';
 import {
   LayoutDashboard,
@@ -109,13 +109,17 @@ function SimplePieChart() {
 
 export default function AdminDashboard() {
   const [location, navigate] = useLocation();
+  const hasCheckedAuth = useRef(false);
 
   useEffect(() => {
+    if (hasCheckedAuth.current) return;
+    hasCheckedAuth.current = true;
+
     const isAdmin = localStorage.getItem('hdmobil_admin');
     if (!isAdmin) {
       navigate('/admin/login');
     }
-  }, [navigate]);
+  }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('hdmobil_admin');

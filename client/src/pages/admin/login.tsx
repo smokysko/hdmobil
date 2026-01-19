@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -11,13 +11,14 @@ export default function AdminLogin() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const hasRedirected = useRef(false);
 
-  // Redirect if already logged in as admin
   useEffect(() => {
-    if (!authLoading && user && isAdmin) {
+    if (!authLoading && user && isAdmin && !hasRedirected.current) {
+      hasRedirected.current = true;
       navigate('/admin/dashboard');
     }
-  }, [user, isAdmin, authLoading, navigate]);
+  }, [user, isAdmin, authLoading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
