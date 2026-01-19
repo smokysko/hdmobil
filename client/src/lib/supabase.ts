@@ -11,6 +11,8 @@ if (!isSupabaseConfigured) {
 
 const projectRef = supabaseUrl.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1] || 'default';
 
+console.log('[Supabase] Connected to project:', projectRef, supabaseUrl);
+
 export const supabase = isSupabaseConfigured
   ? createClient(supabaseUrl, supabaseAnonKey, {
       auth: {
