@@ -9,9 +9,14 @@ if (!isSupabaseConfigured) {
   console.warn('Supabase credentials not configured. Auth features will not work.');
 }
 
-// Create a dummy client if not configured to prevent crashes
-export const supabase = isSupabaseConfigured 
-  ? createClient(supabaseUrl, supabaseAnonKey)
+const projectRef = supabaseUrl.match(/https:\/\/([^.]+)\.supabase\.co/)?.[1] || 'default';
+
+export const supabase = isSupabaseConfigured
+  ? createClient(supabaseUrl, supabaseAnonKey, {
+      auth: {
+        storageKey: `sb-${projectRef}-auth-token`,
+      },
+    })
   : createClient('https://placeholder.supabase.co', 'placeholder-key');
 
 // Auth helper functions
