@@ -27,20 +27,22 @@ export default function AdminLogin() {
 
     try {
       const { error } = await signIn(email, password);
-      
+
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
-          setError('Nesprávny email alebo heslo');
+          setError('Nespravny email alebo heslo');
         } else if (error.message.includes('Email not confirmed')) {
-          setError('Email nie je potvrdený. Skontrolujte svoju emailovú schránku.');
+          setError('Email nie je potvrdeny. Skontrolujte svoju emailovu schranku.');
         } else {
           setError(error.message);
         }
+        setLoading(false);
+      } else {
+        localStorage.setItem('hdmobil_admin', 'true');
+        window.location.href = '/admin/dashboard';
       }
-      // Navigation will happen automatically via useEffect when user state updates
     } catch (err) {
-      setError('Nastala chyba pri prihlasovaní. Skúste to znova.');
-    } finally {
+      setError('Nastala chyba pri prihlasovani. Skuste to znova.');
       setLoading(false);
     }
   };
