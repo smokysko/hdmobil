@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import {
   LayoutDashboard,
@@ -18,50 +18,94 @@ import {
   BarChart3,
   PieChart as PieChartIcon,
 } from 'lucide-react';
-import {
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  PieChart,
-  Pie,
-  Cell,
-} from 'recharts';
 
-// Revenue data for chart
 const revenueData = [
-  { name: 'Jan', revenue: 12400, orders: 145 },
-  { name: 'Feb', revenue: 15200, orders: 178 },
-  { name: 'Mar', revenue: 18900, orders: 210 },
-  { name: 'Apr', revenue: 16800, orders: 195 },
-  { name: 'Máj', revenue: 21500, orders: 245 },
-  { name: 'Jún', revenue: 24800, orders: 289 },
-  { name: 'Júl', revenue: 28900, orders: 312 },
-  { name: 'Aug', revenue: 32100, orders: 356 },
-  { name: 'Sep', revenue: 29800, orders: 334 },
-  { name: 'Okt', revenue: 35200, orders: 398 },
-  { name: 'Nov', revenue: 41200, orders: 456 },
-  { name: 'Dec', revenue: 45320, orders: 512 },
+  { name: 'Jan', revenue: 12400 },
+  { name: 'Feb', revenue: 15200 },
+  { name: 'Mar', revenue: 18900 },
+  { name: 'Apr', revenue: 16800 },
+  { name: 'Máj', revenue: 21500 },
+  { name: 'Jún', revenue: 24800 },
+  { name: 'Júl', revenue: 28900 },
+  { name: 'Aug', revenue: 32100 },
+  { name: 'Sep', revenue: 29800 },
+  { name: 'Okt', revenue: 35200 },
+  { name: 'Nov', revenue: 41200 },
+  { name: 'Dec', revenue: 45320 },
 ];
 
-// Category distribution data
 const categoryData = [
-  { name: 'Smartfóny', value: 45, color: '#22c55e' },
+  { name: 'Smartfony', value: 45, color: '#22c55e' },
   { name: 'Tablety', value: 20, color: '#16a34a' },
   { name: 'Notebooky', value: 18, color: '#15803d' },
   { name: 'Audio', value: 12, color: '#166534' },
-  { name: 'Príslušenstvo', value: 5, color: '#14532d' },
+  { name: 'Prislusenstvo', value: 5, color: '#14532d' },
 ];
 
-// Orders by status
 const orderStatusData = [
-  { name: 'Čakajúce', count: 24, color: '#fbbf24' },
-  { name: 'Spracované', count: 18, color: '#3b82f6' },
-  { name: 'Odoslané', count: 45, color: '#8b5cf6' },
-  { name: 'Doručené', count: 156, color: '#22c55e' },
+  { name: 'Cakajuce', count: 24, color: '#fbbf24' },
+  { name: 'Spracovane', count: 18, color: '#3b82f6' },
+  { name: 'Odoslane', count: 45, color: '#8b5cf6' },
+  { name: 'Dorucene', count: 156, color: '#22c55e' },
 ];
+
+const maxRevenue = Math.max(...revenueData.map((d) => d.revenue));
+
+function SimpleBarChart() {
+  return (
+    <div className="flex items-end justify-between h-[240px] gap-2 px-2">
+      {revenueData.map((item, idx) => {
+        const height = (item.revenue / maxRevenue) * 100;
+        return (
+          <div key={idx} className="flex flex-col items-center flex-1 gap-2">
+            <div className="w-full flex flex-col items-center justify-end h-[200px]">
+              <div
+                className="w-full max-w-[40px] bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-md transition-all hover:from-emerald-600 hover:to-emerald-500"
+                style={{ height: `${height}%` }}
+                title={`${item.revenue.toLocaleString()} EUR`}
+              />
+            </div>
+            <span className="text-xs text-gray-500">{item.name}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function SimplePieChart() {
+  let cumulativePercent = 0;
+  const size = 140;
+  const strokeWidth = 24;
+  const radius = (size - strokeWidth) / 2;
+  const circumference = 2 * Math.PI * radius;
+
+  return (
+    <div className="flex justify-center">
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
+        {categoryData.map((item, idx) => {
+          const strokeDasharray = `${(item.value / 100) * circumference} ${circumference}`;
+          const strokeDashoffset = -cumulativePercent * circumference / 100;
+          cumulativePercent += item.value;
+          return (
+            <circle
+              key={idx}
+              cx={size / 2}
+              cy={size / 2}
+              r={radius}
+              fill="none"
+              stroke={item.color}
+              strokeWidth={strokeWidth}
+              strokeDasharray={strokeDasharray}
+              strokeDashoffset={strokeDashoffset}
+              transform={`rotate(-90 ${size / 2} ${size / 2})`}
+            />
+          );
+        })}
+      </svg>
+    </div>
+  );
+}
 
 export default function AdminDashboard() {
   const [location, navigate] = useLocation();
@@ -79,54 +123,54 @@ export default function AdminDashboard() {
   };
 
   const dashboardStats = [
-    { 
-      label: 'Celkové objednávky', 
-      value: '1,234', 
-      change: '+12%', 
+    {
+      label: 'Celkove objednavky',
+      value: '1,234',
+      change: '+12%',
       positive: true,
       icon: ShoppingCart,
-      description: 'oproti minulému mesiacu'
+      description: 'oproti minulemu mesiacu',
     },
-    { 
-      label: 'Tržby', 
-      value: '45,320 €', 
-      change: '+8%', 
+    {
+      label: 'Trzby',
+      value: '45,320 EUR',
+      change: '+8%',
       positive: true,
       icon: Euro,
-      description: 'oproti minulému mesiacu'
+      description: 'oproti minulemu mesiacu',
     },
-    { 
-      label: 'Noví zákazníci', 
-      value: '89', 
-      change: '+5%', 
+    {
+      label: 'Novi zakaznici',
+      value: '89',
+      change: '+5%',
       positive: true,
       icon: Users,
-      description: 'oproti minulému mesiacu'
+      description: 'oproti minulemu mesiacu',
     },
-    { 
-      label: 'Čakajúce platby', 
-      value: '12', 
-      change: '-2%', 
+    {
+      label: 'Cakajuce platby',
+      value: '12',
+      change: '-2%',
       positive: false,
       icon: Clock,
-      description: 'oproti minulému mesiacu'
+      description: 'oproti minulemu mesiacu',
     },
   ];
 
   const recentOrders = [
-    { id: 'OBJ000001', customer: 'Ján Novák', email: 'jan.novak@email.sk', amount: 1299, status: 'pending', date: '2025-01-12', items: 2 },
-    { id: 'OBJ000002', customer: 'Mária Svobodová', email: 'maria.s@email.sk', amount: 2599, status: 'shipped', date: '2025-01-11', items: 1 },
-    { id: 'OBJ000003', customer: 'Peter Kučera', email: 'peter.k@email.sk', amount: 899, status: 'delivered', date: '2025-01-10', items: 3 },
-    { id: 'OBJ000004', customer: 'Anna Čermáková', email: 'anna.c@email.sk', amount: 3499, status: 'pending', date: '2025-01-09', items: 1 },
-    { id: 'OBJ000005', customer: 'Tomáš Horák', email: 'tomas.h@email.sk', amount: 1599, status: 'processing', date: '2025-01-08', items: 4 },
+    { id: 'OBJ000001', customer: 'Jan Novak', email: 'jan.novak@email.sk', amount: 1299, status: 'pending', date: '2025-01-12', items: 2 },
+    { id: 'OBJ000002', customer: 'Maria Svobodova', email: 'maria.s@email.sk', amount: 2599, status: 'shipped', date: '2025-01-11', items: 1 },
+    { id: 'OBJ000003', customer: 'Peter Kucera', email: 'peter.k@email.sk', amount: 899, status: 'delivered', date: '2025-01-10', items: 3 },
+    { id: 'OBJ000004', customer: 'Anna Cermakova', email: 'anna.c@email.sk', amount: 3499, status: 'pending', date: '2025-01-09', items: 1 },
+    { id: 'OBJ000005', customer: 'Tomas Horak', email: 'tomas.h@email.sk', amount: 1599, status: 'processing', date: '2025-01-08', items: 4 },
   ];
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { bg: string; text: string; label: string; dot: string }> = {
-      pending: { bg: 'bg-amber-50', text: 'text-amber-700', label: 'Čakajúca', dot: 'bg-amber-500' },
-      processing: { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Spracováva sa', dot: 'bg-blue-500' },
-      shipped: { bg: 'bg-violet-50', text: 'text-violet-700', label: 'Odoslaná', dot: 'bg-violet-500' },
-      delivered: { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Doručená', dot: 'bg-emerald-500' },
+      pending: { bg: 'bg-amber-50', text: 'text-amber-700', label: 'Cakajuca', dot: 'bg-amber-500' },
+      processing: { bg: 'bg-blue-50', text: 'text-blue-700', label: 'Spracovava sa', dot: 'bg-blue-500' },
+      shipped: { bg: 'bg-violet-50', text: 'text-violet-700', label: 'Odoslana', dot: 'bg-violet-500' },
+      delivered: { bg: 'bg-emerald-50', text: 'text-emerald-700', label: 'Dorucena', dot: 'bg-emerald-500' },
     };
     const s = statusMap[status] || statusMap.pending;
     return (
@@ -138,17 +182,16 @@ export default function AdminDashboard() {
   };
 
   const navItems = [
-    { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Prehľad' },
+    { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Prehlad' },
     { href: '/admin/products', icon: Package, label: 'Produkty' },
-    { href: '/admin/orders', icon: ShoppingCart, label: 'Objednávky' },
-    { href: '/admin/customers', icon: Users, label: 'Zákazníci' },
-    { href: '/admin/discounts', icon: Tag, label: 'Zľavy' },
+    { href: '/admin/orders', icon: ShoppingCart, label: 'Objednavky' },
+    { href: '/admin/customers', icon: Users, label: 'Zakaznici' },
+    { href: '/admin/discounts', icon: Tag, label: 'Zlavy' },
     { href: '/admin/settings', icon: Settings, label: 'Nastavenia' },
   ];
 
   return (
     <div className="min-h-screen bg-gray-50/50">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200/80 sticky top-0 z-40 backdrop-blur-sm bg-white/95">
         <div className="max-w-[1600px] mx-auto px-6 py-3 flex justify-between items-center">
           <div className="flex items-center gap-3">
@@ -167,10 +210,10 @@ export default function AdminDashboard() {
             </button>
             <Link href="/" className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors">
               <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobraziť web</span>
+              <span className="hidden sm:inline">Zobrazit web</span>
             </Link>
             <div className="h-6 w-px bg-gray-200"></div>
-            <button 
+            <button
               onClick={handleLogout}
               className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
@@ -184,7 +227,6 @@ export default function AdminDashboard() {
       </header>
 
       <div className="flex">
-        {/* Sidebar */}
         <aside className="w-64 bg-white border-r border-gray-200/80 min-h-[calc(100vh-57px)] hidden lg:block">
           <nav className="p-4 space-y-1">
             {navItems.map((item) => {
@@ -195,9 +237,7 @@ export default function AdminDashboard() {
                   key={item.href}
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
-                    isActive
-                      ? 'bg-emerald-50 text-emerald-700 font-medium'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    isActive ? 'bg-emerald-50 text-emerald-700 font-medium' : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   <Icon className={`w-5 h-5 ${isActive ? 'text-emerald-600' : 'text-gray-400'}`} strokeWidth={1.5} />
@@ -206,33 +246,30 @@ export default function AdminDashboard() {
               );
             })}
           </nav>
-          
+
           <div className="p-4 border-t border-gray-100 mt-auto">
             <button
               onClick={handleLogout}
               className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
             >
               <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlásiť sa</span>
+              <span>Odhlasit sa</span>
             </button>
           </div>
         </aside>
 
-        {/* Main Content */}
         <main className="flex-1 p-6">
           <div className="max-w-[1400px] mx-auto space-y-6">
-            {/* Page Header */}
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900">Prehľad</h2>
-                <p className="text-gray-500 text-sm mt-1">Vitajte späť! Tu je prehľad vášho obchodu.</p>
+                <h2 className="text-2xl font-semibold text-gray-900">Prehlad</h2>
+                <p className="text-gray-500 text-sm mt-1">Vitajte spat! Tu je prehlad vasho obchodu.</p>
               </div>
               <div className="text-sm text-gray-500">
-                Posledná aktualizácia: <span className="font-medium text-gray-700">práve teraz</span>
+                Posledna aktualizacia: <span className="font-medium text-gray-700">prave teraz</span>
               </div>
             </div>
 
-            {/* Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
               {dashboardStats.map((stat, idx) => {
                 const Icon = stat.icon;
@@ -243,14 +280,8 @@ export default function AdminDashboard() {
                         <p className="text-gray-500 text-sm font-medium">{stat.label}</p>
                         <p className="text-2xl font-semibold text-gray-900 mt-2">{stat.value}</p>
                         <div className="flex items-center gap-1.5 mt-3">
-                          {stat.positive ? (
-                            <TrendingUp className="w-4 h-4 text-emerald-500" />
-                          ) : (
-                            <TrendingDown className="w-4 h-4 text-red-500" />
-                          )}
-                          <span className={`text-sm font-medium ${stat.positive ? 'text-emerald-600' : 'text-red-600'}`}>
-                            {stat.change}
-                          </span>
+                          {stat.positive ? <TrendingUp className="w-4 h-4 text-emerald-500" /> : <TrendingDown className="w-4 h-4 text-red-500" />}
+                          <span className={`text-sm font-medium ${stat.positive ? 'text-emerald-600' : 'text-red-600'}`}>{stat.change}</span>
                           <span className="text-gray-400 text-sm">{stat.description}</span>
                         </div>
                       </div>
@@ -263,9 +294,7 @@ export default function AdminDashboard() {
               })}
             </div>
 
-            {/* Charts Row */}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
-              {/* Revenue Chart */}
               <div className="xl:col-span-2 bg-white rounded-xl border border-gray-200/80 p-5">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
@@ -273,85 +302,30 @@ export default function AdminDashboard() {
                       <BarChart3 className="w-5 h-5 text-emerald-600" strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">Tržby za rok 2025</h3>
-                      <p className="text-sm text-gray-500">Mesačný prehľad tržieb</p>
+                      <h3 className="font-semibold text-gray-900">Trzby za rok 2025</h3>
+                      <p className="text-sm text-gray-500">Mesacny prehlad trzieb</p>
                     </div>
                   </div>
                   <select className="text-sm border border-gray-200 rounded-lg px-3 py-2 text-gray-600 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
                     <option>Tento rok</option>
-                    <option>Minulý rok</option>
+                    <option>Minuly rok</option>
                   </select>
                 </div>
-                <div className="h-[280px] w-full overflow-hidden">
-                  <AreaChart width={700} height={280} data={revenueData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                    <defs>
-                      <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#22c55e" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="#22c55e" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" vertical={false} />
-                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} />
-                    <YAxis axisLine={false} tickLine={false} tick={{ fill: '#9ca3af', fontSize: 12 }} tickFormatter={(value) => `${value/1000}k €`} />
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                      }}
-                      formatter={(value: number) => [`${value.toLocaleString()} €`, 'Tržby']}
-                    />
-                    <Area
-                      type="monotone"
-                      dataKey="revenue"
-                      stroke="#22c55e"
-                      strokeWidth={2}
-                      fillOpacity={1}
-                      fill="url(#colorRevenue)"
-                    />
-                  </AreaChart>
-                </div>
+                <SimpleBarChart />
               </div>
 
-              {/* Category Distribution */}
               <div className="bg-white rounded-xl border border-gray-200/80 p-5">
                 <div className="flex items-center gap-3 mb-6">
                   <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
                     <PieChartIcon className="w-5 h-5 text-emerald-600" strokeWidth={1.5} />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-900">Predaj podľa kategórií</h3>
-                    <p className="text-sm text-gray-500">Rozdelenie tržieb</p>
+                    <h3 className="font-semibold text-gray-900">Predaj podla kategorii</h3>
+                    <p className="text-sm text-gray-500">Rozdelenie trzieb</p>
                   </div>
                 </div>
-                <div className="h-[180px] flex justify-center">
-                  <PieChart width={200} height={180}>
-                    <Pie
-                      data={categoryData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={50}
-                      outerRadius={70}
-                      paddingAngle={3}
-                      dataKey="value"
-                    >
-                      {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip
-                      contentStyle={{
-                        backgroundColor: 'white',
-                        border: '1px solid #e5e7eb',
-                        borderRadius: '8px',
-                        boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)'
-                      }}
-                      formatter={(value: number) => [`${value}%`, 'Podiel']}
-                    />
-                  </PieChart>
-                </div>
-                <div className="space-y-2 mt-4">
+                <SimplePieChart />
+                <div className="space-y-2 mt-6">
                   {categoryData.map((cat, idx) => (
                     <div key={idx} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-2">
@@ -365,11 +339,9 @@ export default function AdminDashboard() {
               </div>
             </div>
 
-            {/* Orders Status + Recent Orders */}
             <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
-              {/* Order Status Cards */}
               <div className="bg-white rounded-xl border border-gray-200/80 p-5">
-                <h3 className="font-semibold text-gray-900 mb-4">Stav objednávok</h3>
+                <h3 className="font-semibold text-gray-900 mb-4">Stav objednavok</h3>
                 <div className="space-y-3">
                   {orderStatusData.map((status, idx) => (
                     <div key={idx} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -383,13 +355,12 @@ export default function AdminDashboard() {
                 </div>
               </div>
 
-              {/* Recent Orders Table */}
               <div className="xl:col-span-3 bg-white rounded-xl border border-gray-200/80">
                 <div className="p-5 border-b border-gray-100">
                   <div className="flex justify-between items-center">
-                    <h3 className="font-semibold text-gray-900">Posledné objednávky</h3>
+                    <h3 className="font-semibold text-gray-900">Posledne objednavky</h3>
                     <Link href="/admin/orders" className="flex items-center gap-1 text-emerald-600 hover:text-emerald-700 text-sm font-medium">
-                      Zobraziť všetky
+                      Zobrazit vsetky
                       <ChevronRight className="w-4 h-4" />
                     </Link>
                   </div>
@@ -398,12 +369,12 @@ export default function AdminDashboard() {
                   <table className="w-full">
                     <thead>
                       <tr className="border-b border-gray-100">
-                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Objednávka</th>
-                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zákazník</th>
-                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Položky</th>
+                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Objednavka</th>
+                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zakaznik</th>
+                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Polozky</th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Suma</th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stav</th>
-                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dátum</th>
+                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Datum</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-50">
@@ -421,7 +392,7 @@ export default function AdminDashboard() {
                             </div>
                           </td>
                           <td className="px-5 py-4 text-sm text-gray-600">{order.items} ks</td>
-                          <td className="px-5 py-4 text-sm font-semibold text-gray-900">{order.amount.toLocaleString()} €</td>
+                          <td className="px-5 py-4 text-sm font-semibold text-gray-900">{order.amount.toLocaleString()} EUR</td>
                           <td className="px-5 py-4">{getStatusBadge(order.status)}</td>
                           <td className="px-5 py-4 text-sm text-gray-500">{order.date}</td>
                         </tr>
