@@ -74,13 +74,33 @@
  * - “data-only” → Place, Geometry utilities.
  */
 
-/// <reference types="@types/google.maps" />
-
 import { useEffect, useRef } from "react";
 import { usePersistFn } from "@/hooks/usePersistFn";
 import { cn } from "@/lib/utils";
 
 declare global {
+  namespace google {
+    namespace maps {
+      interface LatLngLiteral {
+        lat: number;
+        lng: number;
+      }
+      interface MapOptions {
+        zoom?: number;
+        center?: LatLngLiteral;
+        mapTypeControl?: boolean;
+        fullscreenControl?: boolean;
+        zoomControl?: boolean;
+        streetViewControl?: boolean;
+        mapId?: string;
+      }
+      class Map {
+        constructor(element: HTMLElement, options: MapOptions);
+        setCenter(latlng: LatLngLiteral): void;
+        setZoom(zoom: number): void;
+      }
+    }
+  }
   interface Window {
     google?: typeof google;
   }

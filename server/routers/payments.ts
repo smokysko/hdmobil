@@ -137,7 +137,7 @@ export const paymentsRouter = router({
       z.object({
         provider: z.enum(['stripe', 'trustpay', 'bank_transfer']),
         eventType: z.string(),
-        data: z.record(z.any()),
+        data: z.record(z.string(), z.any()),
       })
     )
     .mutation(async ({ input }) => {

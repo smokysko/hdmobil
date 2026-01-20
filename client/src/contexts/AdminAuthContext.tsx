@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useLocation } from "wouter";
 import { User } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 
@@ -23,8 +23,7 @@ const AdminAuthContext = createContext<AdminAuthContextType | undefined>(
 export function AdminAuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<AdminUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [location, navigate] = useLocation();
 
   useEffect(() => {
     checkUser();
@@ -36,10 +35,7 @@ export function AdminAuthProvider({ children }: { children: ReactNode }) {
         await checkAdminRole(session.user);
       } else if (event === "SIGNED_OUT") {
         setUser(null);
-        if (
-          location.pathname.startsWith("/admin") &&
-          location.pathname !== "/admin/login"
-        ) {
+        if (location.startsWith("/admin") && location !== "/admin/login") {
           navigate("/admin/login");
         }
       }
@@ -129,14 +125,13 @@ export function useAdminAuth() {
 
 export function RequireAdminAuth({ children }: { children: ReactNode }) {
   const { user, loading } = useAdminAuth();
-  const navigate = useNavigate();
-  const location = useLocation();
+  const [, navigate] = useLocation();
 
   useEffect(() => {
     if (!loading && !user) {
-      navigate("/admin/login", { state: { from: location }, replace: true });
+      navigate("/admin/login", { replace: true });
     }
-  }, [user, loading, navigate, location]);
+  }, [user, loading, navigate]);
 
   if (loading) {
     return (

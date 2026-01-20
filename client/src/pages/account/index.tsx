@@ -16,7 +16,7 @@ interface Order {
 }
 
 export default function AccountPage() {
-  const { user, isAuthenticated, isLoading } = useAuth();
+  const { user, isAuthenticated, loading: isLoading } = useAuth();
   const { t } = useI18n();
   const [, setLocation] = useLocation();
   const [orders, setOrders] = useState<Order[]>([]);

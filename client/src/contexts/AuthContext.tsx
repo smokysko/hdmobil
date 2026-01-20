@@ -145,7 +145,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       },
     });
 
-    const needsConfirmation = data.user && !data.session;
+    const needsConfirmation = data.user && !data.session ? true : undefined;
 
     return { error: error as Error | null, needsConfirmation };
   };
