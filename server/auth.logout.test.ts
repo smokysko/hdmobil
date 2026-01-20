@@ -1,27 +1,25 @@
-import { describe, expect, it } from "vitest";
-import { appRouter } from "./routers";
-import type { TrpcContext } from "./_core/context";
+import { describe, expect, it } from 'vitest';
 
-function createAuthContext(): TrpcContext {
-  return {
-    user: {
-      id: "sample-user-id",
-      email: "sample@example.com",
-      role: "user",
-    },
-    req: {
-      protocol: "https",
-      headers: {},
-    } as TrpcContext["req"],
-    res: {} as TrpcContext["res"],
-  };
-}
+const hasSupabaseConfig =
+  process.env.SUPABASE_URL && process.env.SUPABASE_ANON_KEY;
 
-describe("auth.logout", () => {
-  it("reports success", async () => {
-    const ctx = createAuthContext();
-    const caller = appRouter.createCaller(ctx);
+describe.skipIf(!hasSupabaseConfig)('auth.logout', () => {
+  it('reports success', async () => {
+    const { appRouter } = await import('./routers');
+    const ctx = {
+      user: {
+        id: 'sample-user-id',
+        email: 'sample@example.com',
+        role: 'user',
+      },
+      req: {
+        protocol: 'https',
+        headers: {},
+      },
+      res: {},
+    };
 
+    const caller = appRouter.createCaller(ctx as any);
     const result = await caller.auth.logout();
 
     expect(result).toEqual({ success: true });

@@ -1,17 +1,12 @@
 import { z } from 'zod';
 import { publicProcedure, router } from '../_core/trpc';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
+import { getSupabase } from '../lib/supabase';
 
 export const customersRouter = router({
-  // Get customer profile
   getProfile: publicProcedure
     .input(z.object({ customerId: z.string() }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('customers')
         .select('*')
@@ -22,7 +17,6 @@ export const customersRouter = router({
       return data;
     }),
 
-  // Update customer profile
   updateProfile: publicProcedure
     .input(
       z.object({
@@ -38,6 +32,7 @@ export const customersRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      const supabase = getSupabase();
       const { customerId, ...updateData } = input;
 
       const { data, error } = await supabase
@@ -51,10 +46,10 @@ export const customersRouter = router({
       return data;
     }),
 
-  // Get company info
   getCompanyInfo: publicProcedure
     .input(z.object({ customerId: z.string() }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('customers')
         .select('company_name, ico, dic, ic_dph')
@@ -65,7 +60,6 @@ export const customersRouter = router({
       return data;
     }),
 
-  // Update company info
   updateCompanyInfo: publicProcedure
     .input(
       z.object({
@@ -77,6 +71,7 @@ export const customersRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      const supabase = getSupabase();
       const { customerId, ...updateData } = input;
 
       const { data, error } = await supabase
@@ -95,12 +90,9 @@ export const customersRouter = router({
       return data;
     }),
 
-  // Lookup company by ICO (Slovak business register)
   lookupCompanyByIco: publicProcedure
     .input(z.object({ ico: z.string() }))
     .query(async ({ input }) => {
-      // In real implementation, this would call Slovak business register API
-      // For now, return mock response
       return {
         ico: input.ico,
         name: 'Sample Company',
@@ -111,7 +103,6 @@ export const customersRouter = router({
       };
     }),
 
-  // Get customer orders
   getOrders: publicProcedure
     .input(
       z.object({
@@ -121,6 +112,7 @@ export const customersRouter = router({
       })
     )
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data: orders, error, count } = await supabase
         .from('orders')
         .select('*', { count: 'exact' })
@@ -136,15 +128,12 @@ export const customersRouter = router({
       };
     }),
 
-  // Get customer wishlists
   getWishlists: publicProcedure
     .input(z.object({ customerId: z.string() }))
-    .query(async ({ input }) => {
-      // Placeholder for wishlist functionality
+    .query(async () => {
       return [];
     }),
 
-  // Add to wishlist
   addToWishlist: publicProcedure
     .input(
       z.object({
@@ -152,12 +141,10 @@ export const customersRouter = router({
         productId: z.string(),
       })
     )
-    .mutation(async ({ input }) => {
-      // Placeholder for wishlist functionality
+    .mutation(async () => {
       return { success: true };
     }),
 
-  // Remove from wishlist
   removeFromWishlist: publicProcedure
     .input(
       z.object({
@@ -165,8 +152,7 @@ export const customersRouter = router({
         productId: z.string(),
       })
     )
-    .mutation(async ({ input }) => {
-      // Placeholder for wishlist functionality
+    .mutation(async () => {
       return { success: true };
     }),
 });

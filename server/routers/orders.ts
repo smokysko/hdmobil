@@ -1,14 +1,9 @@
 import { z } from 'zod';
 import { publicProcedure, router } from '../_core/trpc';
-import { createClient } from '@supabase/supabase-js';
+import { getSupabase } from '../lib/supabase';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
-
-// Generate order number
 async function generateOrderNumber(): Promise<string> {
+  const supabase = getSupabase();
   const { data: settings } = await supabase
     .from('settings')
     .select('value')
@@ -18,7 +13,6 @@ async function generateOrderNumber(): Promise<string> {
   const nextNumber = (settings?.value as number) || 1;
   const orderNumber = `OBJ${String(nextNumber).padStart(6, '0')}`;
 
-  // Update counter
   await supabase
     .from('settings')
     .update({ value: nextNumber + 1 })
@@ -28,7 +22,6 @@ async function generateOrderNumber(): Promise<string> {
 }
 
 export const ordersRouter = router({
-  // Create order from cart
   create: publicProcedure
     .input(
       z.object({
@@ -67,7 +60,7 @@ export const ordersRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      // Get cart items
+      const supabase = getSupabase();
       const { data: cartItems } = await supabase
         .from('cart_items')
         .select('*, products(*)')
@@ -77,7 +70,6 @@ export const ordersRouter = router({
         throw new Error('Cart is empty');
       }
 
-      // Get shipping and payment methods
       const { data: shippingMethod } = await supabase
         .from('shipping_methods')
         .select('*')
@@ -90,7 +82,6 @@ export const ordersRouter = router({
         .eq('id', input.paymentMethodId)
         .single();
 
-      // Calculate totals
       let subtotal = 0;
       let vatTotal = 0;
 
@@ -140,7 +131,6 @@ export const ordersRouter = router({
 
       const total = subtotal + vatTotal + shippingCost + paymentFee - discountAmount;
 
-      // Create order
       const orderNumber = await generateOrderNumber();
 
       const { data: order, error: orderError } = await supabase
@@ -187,23 +177,21 @@ export const ordersRouter = router({
 
       if (orderError) throw orderError;
 
-      // Create order items
       const { error: itemsError } = await supabase
         .from('order_items')
         .insert(orderItems.map((item) => ({ ...item, order_id: order.id })));
 
       if (itemsError) throw itemsError;
 
-      // Clear cart
       await supabase.from('cart_items').delete().eq('cart_id', input.cartId);
 
       return order;
     }),
 
-  // Get order by ID
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data: order, error: orderError } = await supabase
         .from('orders')
         .select('*')
@@ -220,7 +208,6 @@ export const ordersRouter = router({
       return { ...order, items };
     }),
 
-  // Get orders for customer
   getByCustomer: publicProcedure
     .input(
       z.object({
@@ -230,6 +217,7 @@ export const ordersRouter = router({
       })
     )
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data: orders, error, count } = await supabase
         .from('orders')
         .select('*', { count: 'exact' })
@@ -245,7 +233,6 @@ export const ordersRouter = router({
       };
     }),
 
-  // Update order status
   updateStatus: publicProcedure
     .input(
       z.object({
@@ -255,7 +242,8 @@ export const ordersRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const updateData: any = { status: input.status };
+      const supabase = getSupabase();
+      const updateData: Record<string, unknown> = { status: input.status };
 
       if (input.trackingNumber) {
         updateData.tracking_number = input.trackingNumber;
@@ -278,7 +266,6 @@ export const ordersRouter = router({
       return data;
     }),
 
-  // Update payment status
   updatePaymentStatus: publicProcedure
     .input(
       z.object({
@@ -287,7 +274,8 @@ export const ordersRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      const updateData: any = { payment_status: input.paymentStatus };
+      const supabase = getSupabase();
+      const updateData: Record<string, unknown> = { payment_status: input.paymentStatus };
 
       if (input.paymentStatus === 'paid') {
         updateData.paid_at = new Date().toISOString();

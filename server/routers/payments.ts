@@ -1,15 +1,10 @@
 import { z } from 'zod';
 import { publicProcedure, router } from '../_core/trpc';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
+import { getSupabase } from '../lib/supabase';
 
 export const paymentsRouter = router({
-  // Get all payment methods
   getMethods: publicProcedure.query(async () => {
+    const supabase = getSupabase();
     const { data, error } = await supabase
       .from('payment_methods')
       .select('*')
@@ -20,10 +15,10 @@ export const paymentsRouter = router({
     return data || [];
   }),
 
-  // Get payment method by ID
   getMethodById: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('payment_methods')
         .select('*')
@@ -34,7 +29,6 @@ export const paymentsRouter = router({
       return data;
     }),
 
-  // Create payment intent (for card payments)
   createIntent: publicProcedure
     .input(
       z.object({
@@ -44,7 +38,7 @@ export const paymentsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      // Get order details
+      const supabase = getSupabase();
       const { data: order } = await supabase
         .from('orders')
         .select('*')
@@ -55,8 +49,6 @@ export const paymentsRouter = router({
         throw new Error('Order not found');
       }
 
-      // In real implementation, this would create a Stripe intent
-      // For now, return a mock response
       return {
         orderId: input.orderId,
         amount: input.amount,
@@ -66,7 +58,6 @@ export const paymentsRouter = router({
       };
     }),
 
-  // Confirm payment
   confirm: publicProcedure
     .input(
       z.object({
@@ -76,8 +67,8 @@ export const paymentsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      // Update order payment status
-      const { data, error } = await supabase
+      const supabase = getSupabase();
+      const { error } = await supabase
         .from('orders')
         .update({
           payment_status: 'paid',
@@ -97,7 +88,6 @@ export const paymentsRouter = router({
       };
     }),
 
-  // Get payment fee
   getFee: publicProcedure
     .input(
       z.object({
@@ -106,6 +96,7 @@ export const paymentsRouter = router({
       })
     )
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data: method } = await supabase
         .from('payment_methods')
         .select('*')
@@ -131,7 +122,6 @@ export const paymentsRouter = router({
       };
     }),
 
-  // Webhook handler for payment confirmation
   handleWebhook: publicProcedure
     .input(
       z.object({
@@ -141,16 +131,12 @@ export const paymentsRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      // Handle different payment provider webhooks
       switch (input.provider) {
         case 'stripe':
-          // Handle Stripe webhook
           return handleStripeWebhook(input.data);
         case 'trustpay':
-          // Handle TrustPay webhook
           return handleTrustPayWebhook(input.data);
         case 'bank_transfer':
-          // Handle bank transfer confirmation
           return handleBankTransferWebhook(input.data);
         default:
           throw new Error('Unknown payment provider');
@@ -158,17 +144,14 @@ export const paymentsRouter = router({
     }),
 });
 
-async function handleStripeWebhook(data: any) {
-  // Implementation for Stripe webhook
+async function handleStripeWebhook(_data: Record<string, unknown>) {
   return { success: true, provider: 'stripe' };
 }
 
-async function handleTrustPayWebhook(data: any) {
-  // Implementation for TrustPay webhook
+async function handleTrustPayWebhook(_data: Record<string, unknown>) {
   return { success: true, provider: 'trustpay' };
 }
 
-async function handleBankTransferWebhook(data: any) {
-  // Implementation for bank transfer webhook
+async function handleBankTransferWebhook(_data: Record<string, unknown>) {
   return { success: true, provider: 'bank_transfer' };
 }

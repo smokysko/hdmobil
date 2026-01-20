@@ -1,14 +1,8 @@
 import { z } from 'zod';
 import { publicProcedure, router } from '../_core/trpc';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
+import { getSupabase } from '../lib/supabase';
 
 export const productsRouter = router({
-  // List all products with pagination and filters
   list: publicProcedure
     .input(
       z.object({
@@ -20,6 +14,7 @@ export const productsRouter = router({
       })
     )
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       let query = supabase
         .from('products')
         .select('*', { count: 'exact' })
@@ -53,10 +48,10 @@ export const productsRouter = router({
       };
     }),
 
-  // Get single product by ID
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -67,10 +62,10 @@ export const productsRouter = router({
       return data;
     }),
 
-  // Get product by slug
   getBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -81,10 +76,10 @@ export const productsRouter = router({
       return data;
     }),
 
-  // Get product accessories (cross-sell)
   getAccessories: publicProcedure
     .input(z.object({ productId: z.string() }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('product_accessories')
         .select('accessory_id, accessories:accessory_id(*)')
@@ -95,7 +90,6 @@ export const productsRouter = router({
       return data || [];
     }),
 
-  // Get products by category
   getByCategory: publicProcedure
     .input(
       z.object({
@@ -104,6 +98,7 @@ export const productsRouter = router({
       })
     )
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -116,10 +111,10 @@ export const productsRouter = router({
       return data || [];
     }),
 
-  // Get featured products
   getFeatured: publicProcedure
     .input(z.object({ limit: z.number().default(10) }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -132,10 +127,10 @@ export const productsRouter = router({
       return data || [];
     }),
 
-  // Get new products
   getNew: publicProcedure
     .input(z.object({ limit: z.number().default(10) }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -148,7 +143,6 @@ export const productsRouter = router({
       return data || [];
     }),
 
-  // Search products
   search: publicProcedure
     .input(
       z.object({
@@ -157,6 +151,7 @@ export const productsRouter = router({
       })
     )
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('products')
         .select('*')

@@ -1,15 +1,10 @@
 import { z } from 'zod';
 import { publicProcedure, router } from '../_core/trpc';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
+import { getSupabase } from '../lib/supabase';
 
 export const categoriesRouter = router({
-  // Get all categories
   list: publicProcedure.query(async () => {
+    const supabase = getSupabase();
     const { data, error } = await supabase
       .from('categories')
       .select('*')
@@ -20,10 +15,10 @@ export const categoriesRouter = router({
     return data || [];
   }),
 
-  // Get category by ID
   getById: publicProcedure
     .input(z.object({ id: z.string() }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('categories')
         .select('*')
@@ -34,10 +29,10 @@ export const categoriesRouter = router({
       return data;
     }),
 
-  // Get category by slug
   getBySlug: publicProcedure
     .input(z.object({ slug: z.string() }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('categories')
         .select('*')
@@ -48,10 +43,10 @@ export const categoriesRouter = router({
       return data;
     }),
 
-  // Get subcategories
   getSubcategories: publicProcedure
     .input(z.object({ parentId: z.string() }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data, error } = await supabase
         .from('categories')
         .select('*')
@@ -63,7 +58,6 @@ export const categoriesRouter = router({
       return data || [];
     }),
 
-  // Get category with products
   getWithProducts: publicProcedure
     .input(
       z.object({
@@ -72,6 +66,7 @@ export const categoriesRouter = router({
       })
     )
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data: category, error: catError } = await supabase
         .from('categories')
         .select('*')

@@ -1,14 +1,8 @@
 import { z } from 'zod';
 import { publicProcedure, router } from '../_core/trpc';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
+import { getSupabase } from '../lib/supabase';
 
 export const discountsRouter = router({
-  // Validate and get discount by code
   validate: publicProcedure
     .input(
       z.object({
@@ -17,6 +11,7 @@ export const discountsRouter = router({
       })
     )
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data: discount, error } = await supabase
         .from('discounts')
         .select('*')
@@ -30,7 +25,6 @@ export const discountsRouter = router({
 
       if (error) throw error;
 
-      // Check if discount is still valid
       const now = new Date();
       if (discount.valid_from && new Date(discount.valid_from) > now) {
         throw new Error('Discount code is not yet valid');
@@ -40,14 +34,12 @@ export const discountsRouter = router({
         throw new Error('Discount code has expired');
       }
 
-      // Check minimum order amount
       if (discount.min_order_amount && input.cartTotal < discount.min_order_amount) {
         throw new Error(
           `Minimum order amount is ${discount.min_order_amount} EUR`
         );
       }
 
-      // Check usage limit
       if (discount.usage_limit) {
         const { count } = await supabase
           .from('orders')
@@ -59,7 +51,6 @@ export const discountsRouter = router({
         }
       }
 
-      // Calculate discount amount
       let discountAmount = 0;
       if (discount.discount_type === 'percentage') {
         discountAmount = (input.cartTotal * discount.value) / 100;
@@ -76,8 +67,8 @@ export const discountsRouter = router({
       };
     }),
 
-  // Get active discounts (for display)
   getActive: publicProcedure.query(async () => {
+    const supabase = getSupabase();
     const now = new Date().toISOString();
 
     const { data, error } = await supabase

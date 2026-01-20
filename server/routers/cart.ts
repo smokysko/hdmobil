@@ -1,14 +1,8 @@
 import { z } from 'zod';
 import { publicProcedure, router } from '../_core/trpc';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_ANON_KEY!
-);
+import { getSupabase } from '../lib/supabase';
 
 export const cartRouter = router({
-  // Get or create cart for session/customer
   getOrCreate: publicProcedure
     .input(
       z.object({
@@ -17,6 +11,7 @@ export const cartRouter = router({
       })
     )
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       let query = supabase.from('carts').select('*');
 
       if (input.customerId) {
@@ -29,7 +24,6 @@ export const cartRouter = router({
 
       let { data: cart, error } = await query.single();
 
-      // Create new cart if doesn't exist
       if (error?.code === 'PGRST116') {
         const { data: newCart, error: createError } = await supabase
           .from('carts')
@@ -49,10 +43,10 @@ export const cartRouter = router({
       return cart;
     }),
 
-  // Get cart with items
   get: publicProcedure
     .input(z.object({ cartId: z.string() }))
     .query(async ({ input }) => {
+      const supabase = getSupabase();
       const { data: cart, error: cartError } = await supabase
         .from('carts')
         .select('*')
@@ -68,7 +62,6 @@ export const cartRouter = router({
 
       if (itemsError) throw itemsError;
 
-      // Calculate totals
       const subtotal = (items || []).reduce((sum, item) => {
         return sum + (item.products?.price_with_vat || 0) * item.quantity;
       }, 0);
@@ -80,7 +73,6 @@ export const cartRouter = router({
       };
     }),
 
-  // Add item to cart
   addItem: publicProcedure
     .input(
       z.object({
@@ -90,7 +82,7 @@ export const cartRouter = router({
       })
     )
     .mutation(async ({ input }) => {
-      // Check if item already in cart
+      const supabase = getSupabase();
       const { data: existing } = await supabase
         .from('cart_items')
         .select('*')
@@ -99,7 +91,6 @@ export const cartRouter = router({
         .single();
 
       if (existing) {
-        // Update quantity
         const { data, error } = await supabase
           .from('cart_items')
           .update({ quantity: existing.quantity + input.quantity })
@@ -110,7 +101,6 @@ export const cartRouter = router({
         if (error) throw error;
         return data;
       } else {
-        // Add new item
         const { data, error } = await supabase
           .from('cart_items')
           .insert({
@@ -126,7 +116,6 @@ export const cartRouter = router({
       }
     }),
 
-  // Update item quantity
   updateItem: publicProcedure
     .input(
       z.object({
@@ -135,8 +124,8 @@ export const cartRouter = router({
       })
     )
     .mutation(async ({ input }) => {
+      const supabase = getSupabase();
       if (input.quantity === 0) {
-        // Delete item if quantity is 0
         const { error } = await supabase
           .from('cart_items')
           .delete()
@@ -157,10 +146,10 @@ export const cartRouter = router({
       return data;
     }),
 
-  // Remove item from cart
   removeItem: publicProcedure
     .input(z.object({ itemId: z.string() }))
     .mutation(async ({ input }) => {
+      const supabase = getSupabase();
       const { error } = await supabase
         .from('cart_items')
         .delete()
@@ -170,10 +159,10 @@ export const cartRouter = router({
       return { success: true };
     }),
 
-  // Clear cart
   clear: publicProcedure
     .input(z.object({ cartId: z.string() }))
     .mutation(async ({ input }) => {
+      const supabase = getSupabase();
       const { error } = await supabase
         .from('cart_items')
         .delete()
@@ -183,11 +172,10 @@ export const cartRouter = router({
       return { success: true };
     }),
 
-  // Get recommended products (cross-sell)
   getRecommendations: publicProcedure
     .input(z.object({ cartId: z.string() }))
     .query(async ({ input }) => {
-      // Get items in cart
+      const supabase = getSupabase();
       const { data: cartItems } = await supabase
         .from('cart_items')
         .select('product_id')
@@ -199,7 +187,6 @@ export const cartRouter = router({
 
       const productIds = cartItems.map((item) => item.product_id);
 
-      // Get accessories for these products
       const { data: accessories } = await supabase
         .from('product_accessories')
         .select('accessory_id, accessories:accessory_id(*)')
@@ -207,7 +194,6 @@ export const cartRouter = router({
 
       if (!accessories) return [];
 
-      // Get unique accessory products
       const uniqueAccessories = Array.from(
         new Map(
           accessories.map((acc) => [acc.accessory_id, acc.accessories])
