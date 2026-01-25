@@ -535,7 +535,7 @@ Deno.serve(async (req: Request) => {
           headers: {
             ...corsHeaders,
             "Content-Type": "text/html; charset=utf-8",
-            "Content-Disposition": `inline; filename="faktura-${invoice.invoice_number}.html"`,
+            "Content-Disposition": `attachment; filename="faktura-${invoice.invoice_number}.html"`,
           },
         });
       }
