@@ -20,7 +20,7 @@
 - [x] Customers API (register, login, profile, company lookup)
 - [x] Shipping API (get methods, calculate cost)
 - [x] Discounts API (validate coupon)
-- [ ] Invoices API (generate, download)
+- [x] Invoices API (generate, download)
 
 ## Phase 3: Admin Panel (Czech)
 - [x] Dashboard with orders/revenue stats
