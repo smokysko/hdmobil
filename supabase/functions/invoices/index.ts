@@ -1,10 +1,12 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
+import { PDFDocument, rgb, StandardFonts } from "npm:pdf-lib@1.17.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
-  "Access-Control-Allow-Headers": "Content-Type, Authorization, X-Client-Info, Apikey",
+  "Access-Control-Allow-Headers":
+    "Content-Type, Authorization, X-Client-Info, Apikey",
 };
 
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -36,23 +38,90 @@ function escapeXml(str: string): string {
     .replace(/'/g, "&apos;");
 }
 
-function escapeHtml(str: string): string {
-  if (!str) return "";
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}
-
-function formatDate(dateStr: string): string {
+function formatDatePdf(dateStr: string): string {
   if (!dateStr) return "";
   const date = new Date(dateStr);
-  return date.toLocaleDateString("sk-SK", { day: "2-digit", month: "2-digit", year: "numeric" });
+  const day = date.getDate().toString().padStart(2, "0");
+  const month = (date.getMonth() + 1).toString().padStart(2, "0");
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
 }
 
-function formatCurrency(amount: number): string {
-  return new Intl.NumberFormat("sk-SK", { style: "currency", currency: "EUR" }).format(amount || 0);
+function formatCurrencyPdf(amount: number): string {
+  const formatted = (amount || 0).toFixed(2).replace(".", ",");
+  const parts = formatted.split(",");
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, " ");
+  return parts.join(",") + " EUR";
+}
+
+function removeDiacritics(str: string): string {
+  if (!str) return "";
+  const map: Record<string, string> = {
+    a: "a",
+    A: "A",
+    c: "c",
+    C: "C",
+    d: "d",
+    D: "D",
+    e: "e",
+    E: "E",
+    i: "i",
+    I: "I",
+    l: "l",
+    L: "L",
+    n: "n",
+    N: "N",
+    o: "o",
+    O: "O",
+    r: "r",
+    R: "R",
+    s: "s",
+    S: "S",
+    t: "t",
+    T: "T",
+    u: "u",
+    U: "U",
+    y: "y",
+    Y: "Y",
+    z: "z",
+    Z: "Z",
+    "\u00e1": "a",
+    "\u00c1": "A",
+    "\u010d": "c",
+    "\u010c": "C",
+    "\u010f": "d",
+    "\u010e": "D",
+    "\u00e9": "e",
+    "\u00c9": "E",
+    "\u011b": "e",
+    "\u011a": "E",
+    "\u00ed": "i",
+    "\u00cd": "I",
+    "\u013e": "l",
+    "\u013d": "L",
+    "\u0148": "n",
+    "\u0147": "N",
+    "\u00f3": "o",
+    "\u00d3": "O",
+    "\u00f4": "o",
+    "\u00d4": "O",
+    "\u0155": "r",
+    "\u0154": "R",
+    "\u0161": "s",
+    "\u0160": "S",
+    "\u0165": "t",
+    "\u0164": "T",
+    "\u00fa": "u",
+    "\u00da": "U",
+    "\u00fd": "y",
+    "\u00dd": "Y",
+    "\u017e": "z",
+    "\u017d": "Z",
+  };
+  return str
+    .split("")
+    .map((char) => map[char] || char)
+    .join("");
 }
 
 interface InvoiceItem {
@@ -105,210 +174,584 @@ interface Invoice {
   items: InvoiceItem[];
 }
 
-function generateInvoiceHtml(invoice: Invoice): string {
-  const items = invoice.items || [];
+async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
+  const pdfDoc = await PDFDocument.create();
+  const page = pdfDoc.addPage([595, 842]);
+  const { width, height } = page.getSize();
 
-  let itemsHtml = "";
-  items.forEach((item, index) => {
-    itemsHtml += `
-      <tr>
-        <td style="padding: 12px 8px; border-bottom: 1px solid #e5e7eb;">${index + 1}</td>
-        <td style="padding: 12px 8px; border-bottom: 1px solid #e5e7eb;">
-          <strong>${escapeHtml(item.product_name)}</strong>
-          ${item.product_sku ? `<br><small style="color: #6b7280;">SKU: ${escapeHtml(item.product_sku)}</small>` : ""}
-        </td>
-        <td style="padding: 12px 8px; border-bottom: 1px solid #e5e7eb; text-align: center;">${item.quantity} ${item.unit || "ks"}</td>
-        <td style="padding: 12px 8px; border-bottom: 1px solid #e5e7eb; text-align: right;">${formatCurrency(item.price_with_vat)}</td>
-        <td style="padding: 12px 8px; border-bottom: 1px solid #e5e7eb; text-align: center;">${item.vat_rate}%</td>
-        <td style="padding: 12px 8px; border-bottom: 1px solid #e5e7eb; text-align: right; font-weight: 600;">${formatCurrency(item.line_total)}</td>
-      </tr>
-    `;
+  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+
+  const green = rgb(0.02, 0.59, 0.41);
+  const black = rgb(0, 0, 0);
+  const gray = rgb(0.4, 0.4, 0.4);
+  const lightGray = rgb(0.95, 0.95, 0.95);
+
+  const t = removeDiacritics;
+
+  page.drawRectangle({
+    x: 0,
+    y: height - 100,
+    width: width,
+    height: 100,
+    color: green,
   });
 
-  return `<!DOCTYPE html>
-<html lang="sk">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Faktura ${escapeHtml(invoice.invoice_number)}</title>
-  <style>
-    @media print {
-      body { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
-      .no-print { display: none !important; }
+  page.drawText("HDmobil", {
+    x: 40,
+    y: height - 55,
+    size: 24,
+    font: fontBold,
+    color: rgb(1, 1, 1),
+  });
+
+  const invoiceTitle =
+    invoice.invoice_type === "proforma" ? "Proforma faktura" : "Faktura";
+  page.drawText(t(invoiceTitle), {
+    x: width - 200,
+    y: height - 45,
+    size: 18,
+    font: fontBold,
+    color: rgb(1, 1, 1),
+  });
+  page.drawText(t(invoice.invoice_number), {
+    x: width - 200,
+    y: height - 70,
+    size: 14,
+    font: fontRegular,
+    color: rgb(1, 1, 1, 0.9),
+  });
+
+  let y = height - 140;
+
+  page.drawRectangle({
+    x: 40,
+    y: y - 100,
+    width: 240,
+    height: 110,
+    color: lightGray,
+  });
+  page.drawText("DODAVATEL", {
+    x: 50,
+    y: y - 15,
+    size: 9,
+    font: fontBold,
+    color: gray,
+  });
+  page.drawText(t(invoice.seller_name), {
+    x: 50,
+    y: y - 35,
+    size: 12,
+    font: fontBold,
+    color: black,
+  });
+  page.drawText(t(invoice.seller_street), {
+    x: 50,
+    y: y - 52,
+    size: 10,
+    font: fontRegular,
+    color: gray,
+  });
+  page.drawText(t(`${invoice.seller_zip} ${invoice.seller_city}`), {
+    x: 50,
+    y: y - 66,
+    size: 10,
+    font: fontRegular,
+    color: gray,
+  });
+  if (invoice.seller_ico)
+    page.drawText(`ICO: ${invoice.seller_ico}`, {
+      x: 50,
+      y: y - 80,
+      size: 10,
+      font: fontRegular,
+      color: gray,
+    });
+  if (invoice.seller_dic)
+    page.drawText(`DIC: ${invoice.seller_dic}`, {
+      x: 150,
+      y: y - 80,
+      size: 10,
+      font: fontRegular,
+      color: gray,
+    });
+  if (invoice.seller_ic_dph)
+    page.drawText(`IC DPH: ${invoice.seller_ic_dph}`, {
+      x: 50,
+      y: y - 94,
+      size: 10,
+      font: fontRegular,
+      color: gray,
+    });
+
+  page.drawRectangle({
+    x: 310,
+    y: y - 100,
+    width: 240,
+    height: 110,
+    color: lightGray,
+  });
+  page.drawText("ODBERATEL", {
+    x: 320,
+    y: y - 15,
+    size: 9,
+    font: fontBold,
+    color: gray,
+  });
+  page.drawText(t(invoice.buyer_name), {
+    x: 320,
+    y: y - 35,
+    size: 12,
+    font: fontBold,
+    color: black,
+  });
+  page.drawText(t(invoice.buyer_street || ""), {
+    x: 320,
+    y: y - 52,
+    size: 10,
+    font: fontRegular,
+    color: gray,
+  });
+  page.drawText(t(`${invoice.buyer_zip || ""} ${invoice.buyer_city || ""}`), {
+    x: 320,
+    y: y - 66,
+    size: 10,
+    font: fontRegular,
+    color: gray,
+  });
+  let buyerDetailY = y - 80;
+  if (invoice.buyer_ico) {
+    page.drawText(`ICO: ${invoice.buyer_ico}`, {
+      x: 320,
+      y: buyerDetailY,
+      size: 10,
+      font: fontRegular,
+      color: gray,
+    });
+    buyerDetailY -= 14;
+  }
+  if (invoice.buyer_dic) {
+    page.drawText(`DIC: ${invoice.buyer_dic}`, {
+      x: 320,
+      y: buyerDetailY,
+      size: 10,
+      font: fontRegular,
+      color: gray,
+    });
+    buyerDetailY -= 14;
+  }
+  if (invoice.buyer_ic_dph) {
+    page.drawText(`IC DPH: ${invoice.buyer_ic_dph}`, {
+      x: 320,
+      y: buyerDetailY,
+      size: 10,
+      font: fontRegular,
+      color: gray,
+    });
+  }
+
+  y = y - 130;
+
+  const dateBoxWidth = 170;
+  page.drawRectangle({
+    x: 40,
+    y: y - 45,
+    width: dateBoxWidth,
+    height: 50,
+    color: rgb(0.94, 0.99, 0.96),
+    borderColor: rgb(0.73, 0.97, 0.83),
+    borderWidth: 1,
+  });
+  page.drawText(t("DATUM VYSTAVENIA"), {
+    x: 50,
+    y: y - 15,
+    size: 8,
+    font: fontBold,
+    color: green,
+  });
+  page.drawText(formatDatePdf(invoice.issue_date), {
+    x: 50,
+    y: y - 35,
+    size: 11,
+    font: fontBold,
+    color: black,
+  });
+
+  page.drawRectangle({
+    x: 220,
+    y: y - 45,
+    width: dateBoxWidth,
+    height: 50,
+    color: rgb(0.94, 0.99, 0.96),
+    borderColor: rgb(0.73, 0.97, 0.83),
+    borderWidth: 1,
+  });
+  page.drawText(t("DATUM SPLATNOSTI"), {
+    x: 230,
+    y: y - 15,
+    size: 8,
+    font: fontBold,
+    color: green,
+  });
+  page.drawText(formatDatePdf(invoice.due_date), {
+    x: 230,
+    y: y - 35,
+    size: 11,
+    font: fontBold,
+    color: black,
+  });
+
+  page.drawRectangle({
+    x: 400,
+    y: y - 45,
+    width: 150,
+    height: 50,
+    color: rgb(0.94, 0.99, 0.96),
+    borderColor: rgb(0.73, 0.97, 0.83),
+    borderWidth: 1,
+  });
+  page.drawText(t("DATUM DODANIA"), {
+    x: 410,
+    y: y - 15,
+    size: 8,
+    font: fontBold,
+    color: green,
+  });
+  page.drawText(formatDatePdf(invoice.delivery_date), {
+    x: 410,
+    y: y - 35,
+    size: 11,
+    font: fontBold,
+    color: black,
+  });
+
+  y = y - 75;
+
+  page.drawRectangle({
+    x: 40,
+    y: y - 20,
+    width: width - 80,
+    height: 20,
+    color: lightGray,
+  });
+  page.drawText("#", {
+    x: 50,
+    y: y - 14,
+    size: 9,
+    font: fontBold,
+    color: gray,
+  });
+  page.drawText("POPIS", {
+    x: 80,
+    y: y - 14,
+    size: 9,
+    font: fontBold,
+    color: gray,
+  });
+  page.drawText("MN.", {
+    x: 300,
+    y: y - 14,
+    size: 9,
+    font: fontBold,
+    color: gray,
+  });
+  page.drawText("CENA/KS", {
+    x: 350,
+    y: y - 14,
+    size: 9,
+    font: fontBold,
+    color: gray,
+  });
+  page.drawText("DPH", {
+    x: 430,
+    y: y - 14,
+    size: 9,
+    font: fontBold,
+    color: gray,
+  });
+  page.drawText("SPOLU", {
+    x: 480,
+    y: y - 14,
+    size: 9,
+    font: fontBold,
+    color: gray,
+  });
+
+  y = y - 25;
+  const items = invoice.items || [];
+  items.forEach((item, index) => {
+    page.drawText(String(index + 1), {
+      x: 50,
+      y: y - 12,
+      size: 10,
+      font: fontRegular,
+      color: black,
+    });
+
+    const productName = t(item.product_name || "").substring(0, 35);
+    page.drawText(productName, {
+      x: 80,
+      y: y - 10,
+      size: 10,
+      font: fontBold,
+      color: black,
+    });
+    if (item.product_sku) {
+      page.drawText(`SKU: ${item.product_sku}`, {
+        x: 80,
+        y: y - 22,
+        size: 8,
+        font: fontRegular,
+        color: gray,
+      });
     }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 20px; background: #f9fafb; color: #111827; font-size: 14px; line-height: 1.5; }
-    .invoice-container { max-width: 800px; margin: 0 auto; background: white; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); overflow: hidden; }
-    .header { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; padding: 32px; display: flex; justify-content: space-between; align-items: flex-start; }
-    .logo { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; }
-    .invoice-title { text-align: right; }
-    .invoice-title h1 { margin: 0 0 8px 0; font-size: 24px; font-weight: 600; }
-    .invoice-number { font-size: 18px; opacity: 0.9; }
-    .content { padding: 32px; }
-    .parties { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-bottom: 32px; }
-    .party { padding: 20px; border-radius: 8px; background: #f9fafb; }
-    .party-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; margin-bottom: 12px; font-weight: 600; }
-    .party-name { font-size: 16px; font-weight: 700; color: #111827; margin-bottom: 8px; }
-    .party-details { color: #4b5563; font-size: 13px; }
-    .party-details div { margin-bottom: 4px; }
-    .dates { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; padding: 16px; background: #f0fdf4; border-radius: 8px; border: 1px solid #bbf7d0; }
-    .date-item { text-align: center; }
-    .date-label { font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #059669; margin-bottom: 4px; font-weight: 600; }
-    .date-value { font-size: 15px; font-weight: 600; color: #111827; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 24px; }
-    th { background: #f3f4f6; padding: 12px 8px; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; color: #6b7280; font-weight: 600; }
-    th:nth-child(3), th:nth-child(4), th:nth-child(5), th:nth-child(6) { text-align: center; }
-    th:last-child { text-align: right; }
-    .summary { display: flex; justify-content: flex-end; }
-    .summary-table { width: 280px; }
-    .summary-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e5e7eb; }
-    .summary-row.total { border-bottom: none; border-top: 2px solid #059669; margin-top: 8px; padding-top: 16px; font-size: 18px; font-weight: 700; color: #059669; }
-    .payment-info { margin-top: 32px; padding: 20px; background: #f9fafb; border-radius: 8px; }
-    .payment-title { font-weight: 600; margin-bottom: 12px; color: #111827; }
-    .payment-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
-    .payment-item { display: flex; gap: 8px; }
-    .payment-label { color: #6b7280; }
-    .payment-value { font-weight: 600; }
-    .footer { margin-top: 32px; padding-top: 24px; border-top: 1px solid #e5e7eb; text-align: center; color: #6b7280; font-size: 12px; }
-    .note { margin-top: 24px; padding: 16px; background: #fef3c7; border-radius: 8px; border: 1px solid #fcd34d; color: #92400e; font-size: 13px; }
-    .print-btn { position: fixed; bottom: 24px; right: 24px; background: #059669; color: white; border: none; padding: 12px 24px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    .print-btn:hover { background: #047857; }
-  </style>
-</head>
-<body>
-  <div class="invoice-container">
-    <div class="header">
-      <div class="logo">HDmobil</div>
-      <div class="invoice-title">
-        <h1>${invoice.invoice_type === "proforma" ? "Proforma faktura" : "Faktura"}</h1>
-        <div class="invoice-number">${escapeHtml(invoice.invoice_number)}</div>
-      </div>
-    </div>
 
-    <div class="content">
-      <div class="parties">
-        <div class="party">
-          <div class="party-label">Dodavatel</div>
-          <div class="party-name">${escapeHtml(invoice.seller_name)}</div>
-          <div class="party-details">
-            <div>${escapeHtml(invoice.seller_street)}</div>
-            <div>${escapeHtml(invoice.seller_zip)} ${escapeHtml(invoice.seller_city)}</div>
-            ${invoice.seller_ico ? `<div>ICO: ${escapeHtml(invoice.seller_ico)}</div>` : ""}
-            ${invoice.seller_dic ? `<div>DIC: ${escapeHtml(invoice.seller_dic)}</div>` : ""}
-            ${invoice.seller_ic_dph ? `<div>IC DPH: ${escapeHtml(invoice.seller_ic_dph)}</div>` : ""}
-          </div>
-        </div>
+    page.drawText(`${item.quantity} ${item.unit || "ks"}`, {
+      x: 300,
+      y: y - 12,
+      size: 10,
+      font: fontRegular,
+      color: black,
+    });
+    page.drawText(formatCurrencyPdf(item.price_with_vat), {
+      x: 350,
+      y: y - 12,
+      size: 10,
+      font: fontRegular,
+      color: black,
+    });
+    page.drawText(`${item.vat_rate}%`, {
+      x: 430,
+      y: y - 12,
+      size: 10,
+      font: fontRegular,
+      color: black,
+    });
+    page.drawText(formatCurrencyPdf(item.line_total), {
+      x: 480,
+      y: y - 12,
+      size: 10,
+      font: fontBold,
+      color: black,
+    });
 
-        <div class="party">
-          <div class="party-label">Odberatel</div>
-          <div class="party-name">${escapeHtml(invoice.buyer_name)}</div>
-          <div class="party-details">
-            <div>${escapeHtml(invoice.buyer_street)}</div>
-            <div>${escapeHtml(invoice.buyer_zip)} ${escapeHtml(invoice.buyer_city)}</div>
-            ${invoice.buyer_ico ? `<div>ICO: ${escapeHtml(invoice.buyer_ico)}</div>` : ""}
-            ${invoice.buyer_dic ? `<div>DIC: ${escapeHtml(invoice.buyer_dic)}</div>` : ""}
-            ${invoice.buyer_ic_dph ? `<div>IC DPH: ${escapeHtml(invoice.buyer_ic_dph)}</div>` : ""}
-          </div>
-        </div>
-      </div>
+    page.drawLine({
+      start: { x: 40, y: y - 30 },
+      end: { x: width - 40, y: y - 30 },
+      thickness: 0.5,
+      color: rgb(0.9, 0.9, 0.9),
+    });
 
-      <div class="dates">
-        <div class="date-item">
-          <div class="date-label">Datum vystavenia</div>
-          <div class="date-value">${formatDate(invoice.issue_date)}</div>
-        </div>
-        <div class="date-item">
-          <div class="date-label">Datum splatnosti</div>
-          <div class="date-value">${formatDate(invoice.due_date)}</div>
-        </div>
-        <div class="date-item">
-          <div class="date-label">Datum dodania</div>
-          <div class="date-value">${formatDate(invoice.delivery_date)}</div>
-        </div>
-      </div>
+    y = y - 35;
+  });
 
-      <table>
-        <thead>
-          <tr>
-            <th style="width: 40px;">#</th>
-            <th>Popis</th>
-            <th style="width: 80px;">Mnozstvo</th>
-            <th style="width: 100px;">Cena/ks</th>
-            <th style="width: 60px;">DPH</th>
-            <th style="width: 110px;">Spolu</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${itemsHtml}
-        </tbody>
-      </table>
+  y = y - 20;
+  const summaryX = 380;
+  page.drawText(t("Zaklad dane:"), {
+    x: summaryX,
+    y: y,
+    size: 10,
+    font: fontRegular,
+    color: gray,
+  });
+  page.drawText(formatCurrencyPdf(invoice.subtotal), {
+    x: 480,
+    y: y,
+    size: 10,
+    font: fontRegular,
+    color: black,
+  });
 
-      <div class="summary">
-        <div class="summary-table">
-          <div class="summary-row">
-            <span>Zaklad dane</span>
-            <span>${formatCurrency(invoice.subtotal)}</span>
-          </div>
-          <div class="summary-row">
-            <span>DPH</span>
-            <span>${formatCurrency(invoice.vat_total)}</span>
-          </div>
-          ${invoice.shipping_cost > 0 ? `
-          <div class="summary-row">
-            <span>Doprava</span>
-            <span>${formatCurrency(invoice.shipping_cost)}</span>
-          </div>
-          ` : ""}
-          ${invoice.discount_amount > 0 ? `
-          <div class="summary-row">
-            <span>Zlava</span>
-            <span>-${formatCurrency(invoice.discount_amount)}</span>
-          </div>
-          ` : ""}
-          <div class="summary-row total">
-            <span>Celkom</span>
-            <span>${formatCurrency(invoice.total)}</span>
-          </div>
-        </div>
-      </div>
+  y -= 18;
+  page.drawText("DPH:", {
+    x: summaryX,
+    y: y,
+    size: 10,
+    font: fontRegular,
+    color: gray,
+  });
+  page.drawText(formatCurrencyPdf(invoice.vat_total), {
+    x: 480,
+    y: y,
+    size: 10,
+    font: fontRegular,
+    color: black,
+  });
 
-      <div class="payment-info">
-        <div class="payment-title">Platobne udaje</div>
-        <div class="payment-grid">
-          <div class="payment-item">
-            <span class="payment-label">Sposob platby:</span>
-            <span class="payment-value">${escapeHtml(invoice.payment_method || "Neuvedeny")}</span>
-          </div>
-          <div class="payment-item">
-            <span class="payment-label">Variabilny symbol:</span>
-            <span class="payment-value">${escapeHtml(invoice.variable_symbol || "-")}</span>
-          </div>
-          ${invoice.seller_bank_account ? `
-          <div class="payment-item">
-            <span class="payment-label">Cislo uctu:</span>
-            <span class="payment-value">${escapeHtml(invoice.seller_bank_account)}</span>
-          </div>
-          ` : ""}
-          ${invoice.seller_bank_name ? `
-          <div class="payment-item">
-            <span class="payment-label">Banka:</span>
-            <span class="payment-value">${escapeHtml(invoice.seller_bank_name)}</span>
-          </div>
-          ` : ""}
-        </div>
-      </div>
+  if (invoice.shipping_cost > 0) {
+    y -= 18;
+    page.drawText("Doprava:", {
+      x: summaryX,
+      y: y,
+      size: 10,
+      font: fontRegular,
+      color: gray,
+    });
+    page.drawText(formatCurrencyPdf(invoice.shipping_cost), {
+      x: 480,
+      y: y,
+      size: 10,
+      font: fontRegular,
+      color: black,
+    });
+  }
 
-      ${invoice.note ? `<div class="note">${escapeHtml(invoice.note)}</div>` : ""}
+  if (invoice.discount_amount > 0) {
+    y -= 18;
+    page.drawText(t("Zlava:"), {
+      x: summaryX,
+      y: y,
+      size: 10,
+      font: fontRegular,
+      color: gray,
+    });
+    page.drawText(`-${formatCurrencyPdf(invoice.discount_amount)}`, {
+      x: 480,
+      y: y,
+      size: 10,
+      font: fontRegular,
+      color: black,
+    });
+  }
 
-      <div class="footer">
-        <p>Dakujeme za vas nakup!</p>
-        <p>${escapeHtml(SELLER_INFO.web)} | ${escapeHtml(SELLER_INFO.email)} | ${escapeHtml(SELLER_INFO.phone)}</p>
-      </div>
-    </div>
-  </div>
+  y -= 25;
+  page.drawLine({
+    start: { x: summaryX, y: y + 5 },
+    end: { x: width - 40, y: y + 5 },
+    thickness: 2,
+    color: green,
+  });
+  page.drawText("CELKOM:", {
+    x: summaryX,
+    y: y - 15,
+    size: 14,
+    font: fontBold,
+    color: green,
+  });
+  page.drawText(formatCurrencyPdf(invoice.total), {
+    x: 480,
+    y: y - 15,
+    size: 14,
+    font: fontBold,
+    color: green,
+  });
 
-  <button class="print-btn no-print" onclick="window.print()">Tlacit / Ulozit PDF</button>
-</body>
-</html>`;
+  y = y - 60;
+  page.drawRectangle({
+    x: 40,
+    y: y - 80,
+    width: width - 80,
+    height: 90,
+    color: lightGray,
+  });
+  page.drawText("PLATOBNE UDAJE", {
+    x: 50,
+    y: y - 15,
+    size: 10,
+    font: fontBold,
+    color: black,
+  });
+
+  page.drawText(t("Sposob platby:"), {
+    x: 50,
+    y: y - 35,
+    size: 9,
+    font: fontRegular,
+    color: gray,
+  });
+  page.drawText(t(invoice.payment_method || "Neuvedeny"), {
+    x: 130,
+    y: y - 35,
+    size: 9,
+    font: fontBold,
+    color: black,
+  });
+
+  page.drawText(t("Variabilny symbol:"), {
+    x: 300,
+    y: y - 35,
+    size: 9,
+    font: fontRegular,
+    color: gray,
+  });
+  page.drawText(invoice.variable_symbol || "-", {
+    x: 395,
+    y: y - 35,
+    size: 9,
+    font: fontBold,
+    color: black,
+  });
+
+  if (invoice.seller_bank_account) {
+    page.drawText(t("Cislo uctu:"), {
+      x: 50,
+      y: y - 55,
+      size: 9,
+      font: fontRegular,
+      color: gray,
+    });
+    page.drawText(invoice.seller_bank_account, {
+      x: 130,
+      y: y - 55,
+      size: 9,
+      font: fontBold,
+      color: black,
+    });
+  }
+
+  if (invoice.seller_bank_name) {
+    page.drawText("Banka:", {
+      x: 300,
+      y: y - 55,
+      size: 9,
+      font: fontRegular,
+      color: gray,
+    });
+    page.drawText(t(invoice.seller_bank_name), {
+      x: 395,
+      y: y - 55,
+      size: 9,
+      font: fontBold,
+      color: black,
+    });
+  }
+
+  if (invoice.note) {
+    y = y - 100;
+    page.drawRectangle({
+      x: 40,
+      y: y - 40,
+      width: width - 80,
+      height: 45,
+      color: rgb(1, 0.98, 0.92),
+      borderColor: rgb(0.99, 0.83, 0.3),
+      borderWidth: 1,
+    });
+    page.drawText(t(invoice.note), {
+      x: 50,
+      y: y - 25,
+      size: 9,
+      font: fontRegular,
+      color: rgb(0.57, 0.25, 0.05),
+    });
+  }
+
+  page.drawText(t("Dakujeme za vas nakup!"), {
+    x: width / 2 - 60,
+    y: 60,
+    size: 10,
+    font: fontRegular,
+    color: gray,
+  });
+  page.drawText(`${SELLER_INFO.web} | ${SELLER_INFO.email} | ${SELLER_INFO.phone}`, {
+    x: width / 2 - 120,
+    y: 45,
+    size: 9,
+    font: fontRegular,
+    color: gray,
+  });
+
+  return await pdfDoc.save();
 }
 
 Deno.serve(async (req: Request) => {
@@ -330,7 +773,9 @@ Deno.serve(async (req: Request) => {
 
         const { data: order } = await supabase
           .from("orders")
-          .select("*, items:order_items(*), customer:customers(*), shipping_method:shipping_methods(*), payment_method:payment_methods(*)")
+          .select(
+            "*, items:order_items(*), customer:customers(*), shipping_method:shipping_methods(*), payment_method:payment_methods(*)"
+          )
           .eq("id", orderId)
           .single();
 
@@ -344,7 +789,11 @@ Deno.serve(async (req: Request) => {
 
         if (existingInvoice) {
           return new Response(
-            JSON.stringify({ success: true, message: "Faktura uz existuje", data: existingInvoice }),
+            JSON.stringify({
+              success: true,
+              message: "Faktura uz existuje",
+              data: existingInvoice,
+            }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
@@ -352,7 +801,9 @@ Deno.serve(async (req: Request) => {
         const issueDate = new Date();
         const dueDate = new Date();
         dueDate.setDate(dueDate.getDate() + 14);
-        const deliveryDate = order.shipped_at ? new Date(order.shipped_at) : issueDate;
+        const deliveryDate = order.shipped_at
+          ? new Date(order.shipped_at)
+          : issueDate;
 
         const { data: invoice, error: invoiceError } = await supabase
           .from("invoices")
@@ -374,7 +825,9 @@ Deno.serve(async (req: Request) => {
             seller_country: SELLER_INFO.country,
             seller_bank_account: SELLER_INFO.bankAccount,
             seller_bank_name: SELLER_INFO.bankName,
-            buyer_name: order.billing_company_name || `${order.billing_first_name} ${order.billing_last_name}`,
+            buyer_name:
+              order.billing_company_name ||
+              `${order.billing_first_name} ${order.billing_last_name}`,
             buyer_ico: order.billing_ico,
             buyer_dic: order.billing_dic,
             buyer_ic_dph: order.billing_ic_dph,
@@ -390,25 +843,30 @@ Deno.serve(async (req: Request) => {
             currency: order.currency,
             payment_method: order.payment_method?.name_sk || "Neznamy",
             variable_symbol: order.order_number.replace(/\D/g, ""),
-            note: order.billing_ic_dph ? "Dodanie tovaru je oslobodene od DPH podla 43 zakona o DPH." : null,
+            note: order.billing_ic_dph
+              ? "Dodanie tovaru je oslobodene od DPH podla 43 zakona o DPH."
+              : null,
           })
           .select()
           .single();
 
-        if (invoiceError || !invoice) throw new Error("Nepodarilo sa vytvorit fakturu");
+        if (invoiceError || !invoice)
+          throw new Error("Nepodarilo sa vytvorit fakturu");
 
-        const invoiceItems = order.items.map((item: Record<string, unknown>) => ({
-          invoice_id: invoice.id,
-          product_name: item.product_name,
-          product_sku: item.product_sku,
-          quantity: item.quantity,
-          unit: "ks",
-          price_without_vat: item.price_without_vat,
-          price_with_vat: item.price_with_vat,
-          vat_rate: item.vat_rate,
-          vat_mode: item.vat_mode,
-          line_total: item.line_total,
-        }));
+        const invoiceItems = order.items.map(
+          (item: Record<string, unknown>) => ({
+            invoice_id: invoice.id,
+            product_name: item.product_name,
+            product_sku: item.product_sku,
+            quantity: item.quantity,
+            unit: "ks",
+            price_without_vat: item.price_without_vat,
+            price_with_vat: item.price_with_vat,
+            vat_rate: item.vat_rate,
+            vat_mode: item.vat_mode,
+            line_total: item.line_total,
+          })
+        );
 
         if (order.shipping_cost > 0) {
           invoiceItems.push({
@@ -417,7 +875,9 @@ Deno.serve(async (req: Request) => {
             product_sku: "SHIPPING",
             quantity: 1,
             unit: "ks",
-            price_without_vat: order.shipping_cost / (1 + (order.shipping_method?.vat_rate || 20) / 100),
+            price_without_vat:
+              order.shipping_cost /
+              (1 + (order.shipping_method?.vat_rate || 20) / 100),
             price_with_vat: order.shipping_cost,
             vat_rate: order.shipping_method?.vat_rate || 20,
             vat_mode: "standard",
@@ -426,10 +886,17 @@ Deno.serve(async (req: Request) => {
         }
 
         await supabase.from("invoice_items").insert(invoiceItems);
-        await supabase.from("orders").update({ invoice_id: invoice.id }).eq("id", orderId);
+        await supabase
+          .from("orders")
+          .update({ invoice_id: invoice.id })
+          .eq("id", orderId);
 
         return new Response(
-          JSON.stringify({ success: true, message: "Faktura bola uspesne vytvorena", data: { invoiceId: invoice.id, invoiceNumber: invoice.invoice_number } }),
+          JSON.stringify({
+            success: true,
+            message: "Faktura bola uspesne vytvorena",
+            data: { invoiceId: invoice.id, invoiceNumber: invoice.invoice_number },
+          }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -453,7 +920,10 @@ Deno.serve(async (req: Request) => {
         const { customerId, status, from, to, page = 1, limit = 20 } = body;
         let query = supabase
           .from("invoices")
-          .select("id, invoice_number, invoice_type, status, issue_date, due_date, total, buyer_name, order:orders(order_number)", { count: "exact" });
+          .select(
+            "id, invoice_number, invoice_type, status, issue_date, due_date, total, buyer_name, order:orders(order_number)",
+            { count: "exact" }
+          );
 
         if (customerId) query = query.eq("customer_id", customerId);
         if (status) query = query.eq("status", status);
@@ -461,7 +931,9 @@ Deno.serve(async (req: Request) => {
         if (to) query = query.lte("issue_date", to);
 
         const offset = (page - 1) * limit;
-        query = query.order("issue_date", { ascending: false }).range(offset, offset + limit - 1);
+        query = query
+          .order("issue_date", { ascending: false })
+          .range(offset, offset + limit - 1);
 
         const { data: invoices, count } = await query;
 
@@ -469,7 +941,12 @@ Deno.serve(async (req: Request) => {
           JSON.stringify({
             success: true,
             data: invoices || [],
-            pagination: { page, limit, total: count || 0, totalPages: Math.ceil((count || 0) / limit) },
+            pagination: {
+              page,
+              limit,
+              total: count || 0,
+              totalPages: Math.ceil((count || 0) / limit),
+            },
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
@@ -486,14 +963,22 @@ Deno.serve(async (req: Request) => {
           .select()
           .single();
 
-        if (error || !invoice) throw new Error("Nepodarilo sa aktualizovat fakturu");
+        if (error || !invoice)
+          throw new Error("Nepodarilo sa aktualizovat fakturu");
 
         if (invoice.order_id) {
-          await supabase.from("orders").update({ payment_status: "paid" }).eq("id", invoice.order_id);
+          await supabase
+            .from("orders")
+            .update({ payment_status: "paid" })
+            .eq("id", invoice.order_id);
         }
 
         return new Response(
-          JSON.stringify({ success: true, message: "Faktura bola oznacena ako zaplatena", data: invoice }),
+          JSON.stringify({
+            success: true,
+            message: "Faktura bola oznacena ako zaplatena",
+            data: invoice,
+          }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -504,15 +989,23 @@ Deno.serve(async (req: Request) => {
 
         const { data: invoice, error } = await supabase
           .from("invoices")
-          .update({ status: "cancelled", note: reason ? `Storno: ${reason}` : "Stornovana faktura" })
+          .update({
+            status: "cancelled",
+            note: reason ? `Storno: ${reason}` : "Stornovana faktura",
+          })
           .eq("id", invoiceId)
           .select()
           .single();
 
-        if (error || !invoice) throw new Error("Nepodarilo sa stornovat fakturu");
+        if (error || !invoice)
+          throw new Error("Nepodarilo sa stornovat fakturu");
 
         return new Response(
-          JSON.stringify({ success: true, message: "Faktura bola stornovana", data: invoice }),
+          JSON.stringify({
+            success: true,
+            message: "Faktura bola stornovana",
+            data: invoice,
+          }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
@@ -529,13 +1022,13 @@ Deno.serve(async (req: Request) => {
         const { data: invoice } = await query.single();
         if (!invoice) throw new Error("Faktura nebola najdena");
 
-        const html = generateInvoiceHtml(invoice);
+        const pdfBytes = await generateInvoicePdf(invoice);
 
-        return new Response(html, {
+        return new Response(pdfBytes, {
           headers: {
             ...corsHeaders,
-            "Content-Type": "text/html; charset=utf-8",
-            "Content-Disposition": `attachment; filename="faktura-${invoice.invoice_number}.html"`,
+            "Content-Type": "application/pdf",
+            "Content-Disposition": `attachment; filename="faktura-${invoice.invoice_number}.pdf"`,
           },
         });
       }
@@ -553,7 +1046,11 @@ Deno.serve(async (req: Request) => {
 
         if (!invoices || invoices.length === 0) {
           return new Response(
-            JSON.stringify({ success: true, message: "Ziadne faktury na export", data: { xml: "", count: 0 } }),
+            JSON.stringify({
+              success: true,
+              message: "Ziadne faktury na export",
+              data: { xml: "", count: 0 },
+            }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
@@ -577,7 +1074,17 @@ Deno.serve(async (req: Request) => {
           xml += `    </Odberatel>\n`;
           xml += `    <Polozky>\n`;
 
-          for (const item of inv.items as { product_name: string; product_sku: string; quantity: number; unit: string; price_without_vat: number; price_with_vat: number; vat_rate: number; vat_mode: string; line_total: number }[]) {
+          for (const item of inv.items as {
+            product_name: string;
+            product_sku: string;
+            quantity: number;
+            unit: string;
+            price_without_vat: number;
+            price_with_vat: number;
+            vat_rate: number;
+            vat_mode: string;
+            line_total: number;
+          }[]) {
             xml += `      <Polozka>\n`;
             xml += `        <Nazov>${escapeXml(item.product_name)}</Nazov>\n`;
             xml += `        <SKU>${item.product_sku}</SKU>\n`;
@@ -607,7 +1114,10 @@ Deno.serve(async (req: Request) => {
         xml += `</Faktury>`;
 
         return new Response(
-          JSON.stringify({ success: true, data: { xml, count: invoices.length, period: { from, to } } }),
+          JSON.stringify({
+            success: true,
+            data: { xml, count: invoices.length, period: { from, to } },
+          }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
