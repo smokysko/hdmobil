@@ -20,6 +20,7 @@ import AdminProducts from "./pages/admin/products";
 import AdminOrders from "./pages/admin/orders";
 import AdminSettings from "./pages/admin/settings";
 import AdminCustomers from "./pages/admin/customers";
+import AdminInvoices from "./pages/admin/invoices";
 import CustomerLogin from "./pages/auth/login";
 import CustomerRegister from "./pages/auth/register";
 import AccountPage from "./pages/account/index";
@@ -53,6 +54,7 @@ function Router() {
       <Route path="/admin/orders" component={AdminOrders} />
       <Route path="/admin/settings" component={AdminSettings} />
       <Route path="/admin/customers" component={AdminCustomers} />
+      <Route path="/admin/invoices" component={AdminInvoices} />
       <Route component={NotFound} />
     </Switch>
   );
