@@ -112,10 +112,10 @@ export default function Home() {
               
               <div className="flex flex-wrap gap-3">
                 <Button size="lg" className="h-12 px-8 font-bold text-base shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all" asChild>
-                  <Link href="/product/1">Kúpiť teraz</Link>
+                  <Link href={featuredProducts[0]?.id ? `/product/${featuredProducts[0].id}` : "/category/smartfony"}>Kupit teraz</Link>
                 </Button>
                 <Button size="lg" variant="outline" className="h-12 px-6 font-medium border-2" asChild>
-                  <Link href="/category/smartphones">Všetky smartfóny</Link>
+                  <Link href="/category/smartfony">Vsetky smartfony</Link>
                 </Button>
               </div>
             </div>
@@ -206,12 +206,12 @@ export default function Home() {
           
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
             {[
-              { name: "Smartfóny", href: "/category/smartphones", image: "/images/categories/cat_smartphone.png" },
-              { name: "Tablety", href: "/category/tablets", image: "/images/categories/cat_tablet.png" },
-              { name: "Notebooky", href: "/category/laptops", image: "/images/categories/cat_laptop.png" },
+              { name: "Smartfony", href: "/category/smartfony", image: "/images/categories/cat_smartphone.png" },
+              { name: "Tablety", href: "/category/tablety", image: "/images/categories/cat_tablet.png" },
+              { name: "Notebooky", href: "/category/notebooky", image: "/images/categories/cat_laptop.png" },
               { name: "Audio", href: "/category/audio", image: "/images/categories/cat_audio.png" },
-              { name: "Príslušenstvo", href: "/category/accessories", image: "/images/categories/cat_accessories.png" },
-              { name: "Náhradné diely", href: "/category/spare-parts", image: "/images/categories/cat_parts.png" },
+              { name: "Prislusenstvo", href: "/category/prislusenstvo", image: "/images/categories/cat_accessories.png" },
+              { name: "Nahradne diely", href: "/category/nahradne-diely", image: "/images/categories/cat_parts.png" },
             ].map((cat) => (
               <Link key={cat.href} href={cat.href}>
                 <div className="group relative flex flex-col items-center justify-between p-4 h-40 rounded-lg border border-border bg-card hover:border-primary hover:shadow-md transition-all cursor-pointer overflow-hidden">
@@ -277,7 +277,7 @@ export default function Home() {
                   Zvýšte svoju produktivitu s našou ponukou monitorov, dokovacích staníc a príslušenstva. Teraz so zľavou až 30%.
                 </p>
                 <Button size="lg" className="font-bold rounded-md" asChild>
-                  <Link href="/category/laptops">Pozrieť ponuku</Link>
+                  <Link href="/category/notebooky">Pozriet ponuku</Link>
                 </Button>
               </div>
               <div className="relative h-64 md:h-full min-h-[200px] flex items-center justify-center">
