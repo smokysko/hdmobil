@@ -2,16 +2,34 @@ import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { products } from "@/../../shared/data";
-import { ArrowRight, ShieldCheck, Truck, Zap, CheckCircle2, RotateCcw, Headphones, Star } from "lucide-react";
+import { getProducts, Product } from "@/lib/products";
+import { ArrowRight, ShieldCheck, Truck, CheckCircle2, RotateCcw, Headphones, Star } from "lucide-react";
 import { Link } from "wouter";
 import { useEffect, useRef, useState } from "react";
 
 export default function Home() {
-  const featuredProducts = products.filter(p => p.isNew || p.rating >= 4.8).slice(0, 4);
-  const saleProducts = products.filter(p => p.isSale || p.price < 500).slice(0, 4);
+  const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
+  const [saleProducts, setSaleProducts] = useState<Product[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
   const [heroHeight, setHeroHeight] = useState<string>('auto');
+
+  useEffect(() => {
+    async function loadProducts() {
+      setIsLoading(true);
+      const [featured, all] = await Promise.all([
+        getProducts({ featured: true, limit: 4 }),
+        getProducts({ limit: 8 }),
+      ]);
+
+      setFeaturedProducts(featured.length > 0 ? featured : all.slice(0, 4));
+
+      const sale = all.filter(p => p.isSale);
+      setSaleProducts(sale.length > 0 ? sale.slice(0, 4) : all.slice(0, 4));
+      setIsLoading(false);
+    }
+    loadProducts();
+  }, []);
 
   useEffect(() => {
     const calculateHeight = () => {

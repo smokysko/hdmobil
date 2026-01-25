@@ -1,6 +1,6 @@
 import { useCart } from "@/contexts/CartContext";
-import { Product } from "@/../../shared/data";
-import { ShoppingCart, Star, Check, Info } from "lucide-react";
+import { Product } from "@/lib/products";
+import { ShoppingCart, Star } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardFooter } from "./ui/card";
@@ -29,10 +29,16 @@ export default function ProductCard({ product }: { product: Product }) {
 
         {/* Stock Status - Top Right */}
         <div className="absolute right-2 top-2 z-10">
-          <div className="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-sm border border-green-100">
-            <div className="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse"></div>
-            SKLADOM
-          </div>
+          {product.stock > 0 ? (
+            <div className="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-sm border border-green-100">
+              <div className="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse"></div>
+              SKLADOM
+            </div>
+          ) : (
+            <div className="flex items-center gap-1 text-[10px] font-bold text-red-600 bg-red-50 px-2 py-1 rounded-sm border border-red-100">
+              VYPREDANE
+            </div>
+          )}
         </div>
 
         <Link href={`/product/${product.id}`}>

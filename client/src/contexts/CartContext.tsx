@@ -1,17 +1,17 @@
-import { Product } from "@/../../shared/data";
+import { Product } from "@/lib/products";
 import { createContext, ReactNode, useContext, useState, useEffect, useCallback } from "react";
 import { toast } from "sonner";
 
 export interface CartItem extends Product {
   quantity: number;
-  cart_item_id?: string; // Supabase cart item ID
+  cart_item_id?: string;
 }
 
 interface CartContextType {
   items: CartItem[];
   addToCart: (product: Product) => void;
-  removeFromCart: (productId: number) => void;
-  updateQuantity: (productId: number, quantity: number) => void;
+  removeFromCart: (productId: string) => void;
+  updateQuantity: (productId: string, quantity: number) => void;
   clearCart: () => void;
   cartTotal: number;
   cartCount: number;
@@ -59,12 +59,12 @@ export function CartProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  const removeFromCart = useCallback((productId: number) => {
+  const removeFromCart = useCallback((productId: string) => {
     setItems((prev) => prev.filter((item) => item.id !== productId));
     toast.info("Polozka odstranena z kosika");
   }, []);
 
-  const updateQuantity = useCallback((productId: number, quantity: number) => {
+  const updateQuantity = useCallback((productId: string, quantity: number) => {
     if (quantity < 1) {
       removeFromCart(productId);
       return;
