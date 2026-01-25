@@ -1,6 +1,7 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
-import { PDFDocument, rgb, StandardFonts } from "npm:pdf-lib@1.17.1";
+import { PDFDocument, rgb } from "npm:pdf-lib@1.17.1";
+import fontkit from "npm:@pdf-lib/fontkit@1.1.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,12 +18,12 @@ const SELLER_INFO = {
   ico: "12345678",
   dic: "2012345678",
   icDph: "SK2012345678",
-  street: "Hlavna 123",
+  street: "Hlavná 123",
   city: "Bratislava",
   zip: "81101",
   country: "SK",
   bankAccount: "SK12 1234 5678 9012 3456 7890",
-  bankName: "Slovenska sporitelna",
+  bankName: "Slovenská sporiteľňa",
   email: "faktury@hdmobil.sk",
   phone: "+421 900 123 456",
   web: "www.hdmobil.sk",
@@ -54,74 +55,15 @@ function formatCurrencyPdf(amount: number): string {
   return parts.join(",") + " EUR";
 }
 
-function removeDiacritics(str: string): string {
-  if (!str) return "";
-  const map: Record<string, string> = {
-    a: "a",
-    A: "A",
-    c: "c",
-    C: "C",
-    d: "d",
-    D: "D",
-    e: "e",
-    E: "E",
-    i: "i",
-    I: "I",
-    l: "l",
-    L: "L",
-    n: "n",
-    N: "N",
-    o: "o",
-    O: "O",
-    r: "r",
-    R: "R",
-    s: "s",
-    S: "S",
-    t: "t",
-    T: "T",
-    u: "u",
-    U: "U",
-    y: "y",
-    Y: "Y",
-    z: "z",
-    Z: "Z",
-    "\u00e1": "a",
-    "\u00c1": "A",
-    "\u010d": "c",
-    "\u010c": "C",
-    "\u010f": "d",
-    "\u010e": "D",
-    "\u00e9": "e",
-    "\u00c9": "E",
-    "\u011b": "e",
-    "\u011a": "E",
-    "\u00ed": "i",
-    "\u00cd": "I",
-    "\u013e": "l",
-    "\u013d": "L",
-    "\u0148": "n",
-    "\u0147": "N",
-    "\u00f3": "o",
-    "\u00d3": "O",
-    "\u00f4": "o",
-    "\u00d4": "O",
-    "\u0155": "r",
-    "\u0154": "R",
-    "\u0161": "s",
-    "\u0160": "S",
-    "\u0165": "t",
-    "\u0164": "T",
-    "\u00fa": "u",
-    "\u00da": "U",
-    "\u00fd": "y",
-    "\u00dd": "Y",
-    "\u017e": "z",
-    "\u017d": "Z",
-  };
-  return str
-    .split("")
-    .map((char) => map[char] || char)
-    .join("");
+const ROBOTO_REGULAR_URL =
+  "https://github.com/googlefonts/roboto/raw/main/src/hinted/Roboto-Regular.ttf";
+const ROBOTO_BOLD_URL =
+  "https://github.com/googlefonts/roboto/raw/main/src/hinted/Roboto-Bold.ttf";
+
+async function fetchFont(url: string): Promise<ArrayBuffer> {
+  const response = await fetch(url);
+  if (!response.ok) throw new Error(`Failed to fetch font: ${url}`);
+  return response.arrayBuffer();
 }
 
 interface InvoiceItem {
@@ -176,18 +118,23 @@ interface Invoice {
 
 async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
   const pdfDoc = await PDFDocument.create();
+  pdfDoc.registerFontkit(fontkit);
+
+  const [robotoRegularBytes, robotoBoldBytes] = await Promise.all([
+    fetchFont(ROBOTO_REGULAR_URL),
+    fetchFont(ROBOTO_BOLD_URL),
+  ]);
+
+  const fontRegular = await pdfDoc.embedFont(robotoRegularBytes);
+  const fontBold = await pdfDoc.embedFont(robotoBoldBytes);
+
   const page = pdfDoc.addPage([595, 842]);
   const { width, height } = page.getSize();
-
-  const fontRegular = await pdfDoc.embedFont(StandardFonts.Helvetica);
-  const fontBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
 
   const green = rgb(0.02, 0.59, 0.41);
   const black = rgb(0, 0, 0);
   const gray = rgb(0.4, 0.4, 0.4);
   const lightGray = rgb(0.95, 0.95, 0.95);
-
-  const t = removeDiacritics;
 
   page.drawRectangle({
     x: 0,
@@ -206,15 +153,15 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
   });
 
   const invoiceTitle =
-    invoice.invoice_type === "proforma" ? "Proforma faktura" : "Faktura";
-  page.drawText(t(invoiceTitle), {
+    invoice.invoice_type === "proforma" ? "Proforma faktúra" : "Faktúra";
+  page.drawText(invoiceTitle, {
     x: width - 200,
     y: height - 45,
     size: 18,
     font: fontBold,
     color: rgb(1, 1, 1),
   });
-  page.drawText(t(invoice.invoice_number), {
+  page.drawText(invoice.invoice_number, {
     x: width - 200,
     y: height - 70,
     size: 14,
@@ -231,28 +178,28 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     height: 110,
     color: lightGray,
   });
-  page.drawText("DODAVATEL", {
+  page.drawText("DODÁVATEĽ", {
     x: 50,
     y: y - 15,
     size: 9,
     font: fontBold,
     color: gray,
   });
-  page.drawText(t(invoice.seller_name), {
+  page.drawText(invoice.seller_name, {
     x: 50,
     y: y - 35,
     size: 12,
     font: fontBold,
     color: black,
   });
-  page.drawText(t(invoice.seller_street), {
+  page.drawText(invoice.seller_street, {
     x: 50,
     y: y - 52,
     size: 10,
     font: fontRegular,
     color: gray,
   });
-  page.drawText(t(`${invoice.seller_zip} ${invoice.seller_city}`), {
+  page.drawText(`${invoice.seller_zip} ${invoice.seller_city}`, {
     x: 50,
     y: y - 66,
     size: 10,
@@ -260,7 +207,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     color: gray,
   });
   if (invoice.seller_ico)
-    page.drawText(`ICO: ${invoice.seller_ico}`, {
+    page.drawText(`IČO: ${invoice.seller_ico}`, {
       x: 50,
       y: y - 80,
       size: 10,
@@ -268,7 +215,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
       color: gray,
     });
   if (invoice.seller_dic)
-    page.drawText(`DIC: ${invoice.seller_dic}`, {
+    page.drawText(`DIČ: ${invoice.seller_dic}`, {
       x: 150,
       y: y - 80,
       size: 10,
@@ -276,7 +223,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
       color: gray,
     });
   if (invoice.seller_ic_dph)
-    page.drawText(`IC DPH: ${invoice.seller_ic_dph}`, {
+    page.drawText(`IČ DPH: ${invoice.seller_ic_dph}`, {
       x: 50,
       y: y - 94,
       size: 10,
@@ -291,28 +238,28 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     height: 110,
     color: lightGray,
   });
-  page.drawText("ODBERATEL", {
+  page.drawText("ODBERATEĽ", {
     x: 320,
     y: y - 15,
     size: 9,
     font: fontBold,
     color: gray,
   });
-  page.drawText(t(invoice.buyer_name), {
+  page.drawText(invoice.buyer_name, {
     x: 320,
     y: y - 35,
     size: 12,
     font: fontBold,
     color: black,
   });
-  page.drawText(t(invoice.buyer_street || ""), {
+  page.drawText(invoice.buyer_street || "", {
     x: 320,
     y: y - 52,
     size: 10,
     font: fontRegular,
     color: gray,
   });
-  page.drawText(t(`${invoice.buyer_zip || ""} ${invoice.buyer_city || ""}`), {
+  page.drawText(`${invoice.buyer_zip || ""} ${invoice.buyer_city || ""}`, {
     x: 320,
     y: y - 66,
     size: 10,
@@ -321,7 +268,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
   });
   let buyerDetailY = y - 80;
   if (invoice.buyer_ico) {
-    page.drawText(`ICO: ${invoice.buyer_ico}`, {
+    page.drawText(`IČO: ${invoice.buyer_ico}`, {
       x: 320,
       y: buyerDetailY,
       size: 10,
@@ -331,7 +278,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     buyerDetailY -= 14;
   }
   if (invoice.buyer_dic) {
-    page.drawText(`DIC: ${invoice.buyer_dic}`, {
+    page.drawText(`DIČ: ${invoice.buyer_dic}`, {
       x: 320,
       y: buyerDetailY,
       size: 10,
@@ -341,7 +288,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     buyerDetailY -= 14;
   }
   if (invoice.buyer_ic_dph) {
-    page.drawText(`IC DPH: ${invoice.buyer_ic_dph}`, {
+    page.drawText(`IČ DPH: ${invoice.buyer_ic_dph}`, {
       x: 320,
       y: buyerDetailY,
       size: 10,
@@ -362,7 +309,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     borderColor: rgb(0.73, 0.97, 0.83),
     borderWidth: 1,
   });
-  page.drawText(t("DATUM VYSTAVENIA"), {
+  page.drawText("DÁTUM VYSTAVENIA", {
     x: 50,
     y: y - 15,
     size: 8,
@@ -386,7 +333,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     borderColor: rgb(0.73, 0.97, 0.83),
     borderWidth: 1,
   });
-  page.drawText(t("DATUM SPLATNOSTI"), {
+  page.drawText("DÁTUM SPLATNOSTI", {
     x: 230,
     y: y - 15,
     size: 8,
@@ -410,7 +357,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     borderColor: rgb(0.73, 0.97, 0.83),
     borderWidth: 1,
   });
-  page.drawText(t("DATUM DODANIA"), {
+  page.drawText("DÁTUM DODANIA", {
     x: 410,
     y: y - 15,
     size: 8,
@@ -488,7 +435,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
       color: black,
     });
 
-    const productName = t(item.product_name || "").substring(0, 35);
+    const productName = (item.product_name || "").substring(0, 35);
     page.drawText(productName, {
       x: 80,
       y: y - 10,
@@ -547,7 +494,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
 
   y = y - 20;
   const summaryX = 380;
-  page.drawText(t("Zaklad dane:"), {
+  page.drawText("Základ dane:", {
     x: summaryX,
     y: y,
     size: 10,
@@ -598,7 +545,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
 
   if (invoice.discount_amount > 0) {
     y -= 18;
-    page.drawText(t("Zlava:"), {
+    page.drawText("Zľava:", {
       x: summaryX,
       y: y,
       size: 10,
@@ -644,7 +591,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     height: 90,
     color: lightGray,
   });
-  page.drawText("PLATOBNE UDAJE", {
+  page.drawText("PLATOBNÉ ÚDAJE", {
     x: 50,
     y: y - 15,
     size: 10,
@@ -652,14 +599,14 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     color: black,
   });
 
-  page.drawText(t("Sposob platby:"), {
+  page.drawText("Spôsob platby:", {
     x: 50,
     y: y - 35,
     size: 9,
     font: fontRegular,
     color: gray,
   });
-  page.drawText(t(invoice.payment_method || "Neuvedeny"), {
+  page.drawText(invoice.payment_method || "Neuvedený", {
     x: 130,
     y: y - 35,
     size: 9,
@@ -667,7 +614,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     color: black,
   });
 
-  page.drawText(t("Variabilny symbol:"), {
+  page.drawText("Variabilný symbol:", {
     x: 300,
     y: y - 35,
     size: 9,
@@ -683,7 +630,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
   });
 
   if (invoice.seller_bank_account) {
-    page.drawText(t("Cislo uctu:"), {
+    page.drawText("Číslo účtu:", {
       x: 50,
       y: y - 55,
       size: 9,
@@ -707,7 +654,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
       font: fontRegular,
       color: gray,
     });
-    page.drawText(t(invoice.seller_bank_name), {
+    page.drawText(invoice.seller_bank_name, {
       x: 395,
       y: y - 55,
       size: 9,
@@ -727,7 +674,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
       borderColor: rgb(0.99, 0.83, 0.3),
       borderWidth: 1,
     });
-    page.drawText(t(invoice.note), {
+    page.drawText(invoice.note, {
       x: 50,
       y: y - 25,
       size: 9,
@@ -736,7 +683,7 @@ async function generateInvoicePdf(invoice: Invoice): Promise<Uint8Array> {
     });
   }
 
-  page.drawText(t("Dakujeme za vas nakup!"), {
+  page.drawText("Ďakujeme za váš nákup!", {
     x: width / 2 - 60,
     y: 60,
     size: 10,
@@ -844,7 +791,7 @@ Deno.serve(async (req: Request) => {
             payment_method: order.payment_method?.name_sk || "Neznamy",
             variable_symbol: order.order_number.replace(/\D/g, ""),
             note: order.billing_ic_dph
-              ? "Dodanie tovaru je oslobodene od DPH podla 43 zakona o DPH."
+              ? "Dodanie tovaru je oslobodené od DPH podľa §43 zákona o DPH."
               : null,
           })
           .select()
