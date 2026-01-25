@@ -40,6 +40,156 @@ Deno.serve(async (req: Request) => {
     }
 
     switch (action) {
+      case "create": {
+        const {
+          items,
+          billingFirstName,
+          billingLastName,
+          billingEmail,
+          billingPhone,
+          billingStreet,
+          billingCity,
+          billingZip,
+          billingCountry,
+          shippingMethodId,
+          paymentMethodId,
+          customerNote,
+        } = body;
+
+        if (!items || items.length === 0) {
+          throw new Error("Kosik je prazdny");
+        }
+
+        if (!billingEmail || !billingFirstName || !billingLastName) {
+          throw new Error("Fakturacne udaje su povinne");
+        }
+
+        const { data: shippingMethod } = shippingMethodId
+          ? await supabase.from("shipping_methods").select("*").eq("id", shippingMethodId).single()
+          : { data: null };
+
+        const { data: paymentMethod } = paymentMethodId
+          ? await supabase.from("payment_methods").select("*").eq("id", paymentMethodId).single()
+          : { data: null };
+
+        let subtotalWithoutVat = 0;
+        let vatTotal = 0;
+        const orderItems: {
+          product_id: string;
+          product_sku: string;
+          product_name: string;
+          product_image_url: string;
+          quantity: number;
+          price_without_vat: number;
+          price_with_vat: number;
+          vat_rate: number;
+          vat_mode: string;
+          line_total: number;
+        }[] = [];
+
+        for (const item of items) {
+          const { data: product } = await supabase
+            .from("products")
+            .select("*")
+            .eq("id", item.productId)
+            .single();
+
+          if (!product) {
+            throw new Error(`Produkt ${item.productId} nebol najdeny`);
+          }
+
+          const quantity = item.quantity || 1;
+          const priceWithVat = product.price_with_vat;
+          const priceWithoutVat = product.price_without_vat;
+          const vatRate = product.vat_rate || 20;
+          const lineTotal = priceWithVat * quantity;
+
+          subtotalWithoutVat += priceWithoutVat * quantity;
+          vatTotal += (priceWithVat - priceWithoutVat) * quantity;
+
+          orderItems.push({
+            product_id: product.id,
+            product_sku: product.sku || "",
+            product_name: product.name_sk,
+            product_image_url: product.main_image_url || "",
+            quantity,
+            price_without_vat: priceWithoutVat,
+            price_with_vat: priceWithVat,
+            vat_rate: vatRate,
+            vat_mode: product.vat_mode || "standard",
+            line_total: lineTotal,
+          });
+        }
+
+        const shippingCost = shippingMethod?.price || 0;
+        const paymentFee = paymentMethod?.fee_fixed || 0;
+        const total = subtotalWithoutVat + vatTotal + shippingCost + paymentFee;
+
+        const { data: order, error: orderError } = await supabase
+          .from("orders")
+          .insert({
+            customer_id: customerId,
+            status: "pending",
+            subtotal: subtotalWithoutVat,
+            vat_total: vatTotal,
+            shipping_cost: shippingCost,
+            payment_fee: paymentFee,
+            total,
+            currency: "EUR",
+            shipping_method_id: shippingMethodId || null,
+            shipping_method_name: shippingMethod?.name_sk || null,
+            payment_method_id: paymentMethodId || null,
+            payment_method_name: paymentMethod?.name_sk || null,
+            payment_status: "pending",
+            billing_first_name: billingFirstName,
+            billing_last_name: billingLastName,
+            billing_email: billingEmail,
+            billing_phone: billingPhone || null,
+            billing_street: billingStreet,
+            billing_city: billingCity,
+            billing_zip: billingZip,
+            billing_country: billingCountry || "SK",
+            shipping_first_name: billingFirstName,
+            shipping_last_name: billingLastName,
+            shipping_street: billingStreet,
+            shipping_city: billingCity,
+            shipping_zip: billingZip,
+            shipping_country: billingCountry || "SK",
+            customer_note: customerNote || null,
+          })
+          .select()
+          .single();
+
+        if (orderError || !order) {
+          throw new Error("Nepodarilo sa vytvorit objednavku: " + (orderError?.message || "Neznama chyba"));
+        }
+
+        const itemsWithOrderId = orderItems.map((item) => ({
+          ...item,
+          order_id: order.id,
+        }));
+
+        const { error: itemsError } = await supabase.from("order_items").insert(itemsWithOrderId);
+
+        if (itemsError) {
+          await supabase.from("orders").delete().eq("id", order.id);
+          throw new Error("Nepodarilo sa ulozit polozky objednavky");
+        }
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            message: "Objednavka bola uspesne vytvorena",
+            data: {
+              orderId: order.id,
+              orderNumber: order.order_number,
+              total: order.total,
+            },
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       case "list": {
         if (!customerId) {
           throw new Error("Pre zobrazenie objednavok sa musite prihlasit");
