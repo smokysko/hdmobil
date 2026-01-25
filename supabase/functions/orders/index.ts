@@ -135,7 +135,6 @@ Deno.serve(async (req: Request) => {
             shipping_cost: shippingCost,
             payment_fee: paymentFee,
             total,
-            currency: "EUR",
             shipping_method_id: shippingMethodId || null,
             shipping_method_name: shippingMethod?.name_sk || null,
             payment_method_id: paymentMethodId || null,
