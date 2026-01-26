@@ -1,8 +1,18 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
+import {
+  LayoutDashboard,
+  Package,
+  ShoppingCart,
+  Users,
+  Settings,
+  LogOut,
+  ExternalLink,
+  FileText,
+} from 'lucide-react';
 
 export default function AdminSettings() {
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
 
   useEffect(() => {
     const isAdmin = localStorage.getItem('hdmobil_admin');
@@ -33,67 +43,109 @@ export default function AdminSettings() {
     setTimeout(() => setSaved(false), 3000);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('hdmobil_admin');
+    navigate('/admin/login');
+  };
+
   const navItems = [
-    { href: '/admin/dashboard', icon: '📊', label: 'Prehľad' },
-    { href: '/admin/products', icon: '📦', label: 'Produkty' },
-    { href: '/admin/orders', icon: '📋', label: 'Objednávky' },
-    { href: '/admin/settings', icon: '⚙️', label: 'Nastavenia' },
+    { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Prehľad' },
+    { href: '/admin/products', icon: Package, label: 'Produkty' },
+    { href: '/admin/orders', icon: ShoppingCart, label: 'Objednávky' },
+    { href: '/admin/customers', icon: Users, label: 'Zákazníci' },
+    { href: '/admin/invoices', icon: FileText, label: 'Faktúry' },
+    { href: '/admin/settings', icon: Settings, label: 'Nastavenia' },
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
+    <div className="min-h-screen bg-gray-50/50">
+      <header className="bg-white border-b border-gray-200/80 sticky top-0 z-40 backdrop-blur-sm bg-white/95">
+        <div className="max-w-[1600px] mx-auto px-6 py-3 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link href="/admin/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-green-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold">HD</span>
+              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+                <span className="text-white font-bold text-sm">HD</span>
               </div>
-              <h1 className="text-xl font-bold text-gray-900">HDmobil Admin</h1>
+              <div>
+                <h1 className="text-lg font-semibold text-gray-900">HDmobil</h1>
+                <p className="text-xs text-gray-500">Admin Panel</p>
+              </div>
             </Link>
           </div>
-          <Link href="/" className="text-gray-600 hover:text-gray-900 text-sm">
-            ← Späť na web
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              href="/"
+              className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <ExternalLink className="w-4 h-4" />
+              <span className="hidden sm:inline">Zobraziť web</span>
+            </Link>
+            <div className="h-6 w-px bg-gray-200"></div>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
+                A
+              </div>
+              <span className="text-sm font-medium hidden sm:inline">Admin</span>
+            </button>
+          </div>
         </div>
       </header>
 
       <div className="flex">
-        {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-64px)] hidden md:block">
+        <aside className="w-64 bg-white border-r border-gray-200/80 min-h-[calc(100vh-57px)] hidden lg:block">
           <nav className="p-4 space-y-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                  item.href === '/admin/settings'
-                    ? 'bg-green-50 text-green-700 font-medium'
-                    : 'text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                <span className="text-xl">{item.icon}</span>
-                <span>{item.label}</span>
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = location === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
+                    isActive
+                      ? 'bg-emerald-50 text-emerald-700 font-medium'
+                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                  }`}
+                >
+                  <Icon
+                    className={`w-5 h-5 ${isActive ? 'text-emerald-600' : 'text-gray-400'}`}
+                    strokeWidth={1.5}
+                  />
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </nav>
+
+          <div className="p-4 border-t border-gray-100 mt-auto">
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
+            >
+              <LogOut className="w-5 h-5" strokeWidth={1.5} />
+              <span>Odhlásiť sa</span>
+            </button>
+          </div>
         </aside>
 
-        {/* Main Content */}
-        <main className="flex-1 p-8">
+        <main className="flex-1 p-6">
           <div className="max-w-3xl mx-auto">
-            <h2 className="text-2xl font-bold text-gray-900 mb-6">Nastavenia obchodu</h2>
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold text-gray-900">Nastavenia obchodu</h2>
+              <p className="text-gray-500 text-sm mt-1">Upravte základné informácie a nastavenia vášho obchodu</p>
+            </div>
 
             {saved && (
-              <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700">
-                Nastavenia boli úspešne uložené!
+              <div className="mb-6 p-4 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-700">
+                Nastavenia boli uspesne ulozene!
               </div>
             )}
 
-            {/* Shop Info */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Informácie o obchode</h3>
+            <div className="bg-white rounded-xl border border-gray-200/80 p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Informácie o obchode</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Názov obchodu</label>
@@ -101,7 +153,7 @@ export default function AdminSettings() {
                     type="text"
                     value={settings.shopName}
                     onChange={(e) => setSettings({ ...settings, shopName: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   />
                 </div>
                 <div>
@@ -110,7 +162,7 @@ export default function AdminSettings() {
                     type="email"
                     value={settings.email}
                     onChange={(e) => setSettings({ ...settings, email: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   />
                 </div>
                 <div>
@@ -119,7 +171,7 @@ export default function AdminSettings() {
                     type="tel"
                     value={settings.phone}
                     onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   />
                 </div>
                 <div>
@@ -128,15 +180,14 @@ export default function AdminSettings() {
                     type="text"
                     value={settings.address}
                     onChange={(e) => setSettings({ ...settings, address: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Company Info */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Údaje spoločnosti</h3>
+            <div className="bg-white rounded-xl border border-gray-200/80 p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Údaje spoločnosti</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Názov spoločnosti</label>
@@ -144,7 +195,7 @@ export default function AdminSettings() {
                     type="text"
                     value={settings.companyName}
                     onChange={(e) => setSettings({ ...settings, companyName: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   />
                 </div>
                 <div>
@@ -153,7 +204,7 @@ export default function AdminSettings() {
                     type="text"
                     value={settings.ico}
                     onChange={(e) => setSettings({ ...settings, ico: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   />
                 </div>
                 <div>
@@ -162,7 +213,7 @@ export default function AdminSettings() {
                     type="text"
                     value={settings.dic}
                     onChange={(e) => setSettings({ ...settings, dic: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   />
                 </div>
                 <div>
@@ -171,15 +222,14 @@ export default function AdminSettings() {
                     type="text"
                     value={settings.icDph}
                     onChange={(e) => setSettings({ ...settings, icDph: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   />
                 </div>
               </div>
             </div>
 
-            {/* Shop Settings */}
-            <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-6 mb-6">
-              <h3 className="text-lg font-bold text-gray-900 mb-4">Nastavenia predaja</h3>
+            <div className="bg-white rounded-xl border border-gray-200/80 p-6 mb-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">Nastavenia predaja</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Doprava zdarma od (EUR)</label>
@@ -187,7 +237,7 @@ export default function AdminSettings() {
                     type="number"
                     value={settings.freeShippingThreshold}
                     onChange={(e) => setSettings({ ...settings, freeShippingThreshold: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   />
                 </div>
                 <div>
@@ -196,7 +246,7 @@ export default function AdminSettings() {
                     type="number"
                     value={settings.defaultVatRate}
                     onChange={(e) => setSettings({ ...settings, defaultVatRate: parseInt(e.target.value) })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   />
                 </div>
                 <div>
@@ -204,7 +254,7 @@ export default function AdminSettings() {
                   <select
                     value={settings.currency}
                     onChange={(e) => setSettings({ ...settings, currency: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   >
                     <option value="EUR">EUR (€)</option>
                     <option value="CZK">CZK (Kč)</option>
@@ -215,7 +265,7 @@ export default function AdminSettings() {
                   <select
                     value={settings.language}
                     onChange={(e) => setSettings({ ...settings, language: e.target.value })}
-                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
                   >
                     <option value="sk">Slovenčina</option>
                     <option value="cs">Čeština</option>
@@ -224,11 +274,10 @@ export default function AdminSettings() {
               </div>
             </div>
 
-            {/* Save Button */}
             <div className="flex justify-end">
               <button
                 onClick={handleSave}
-                className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium transition-colors"
+                className="px-6 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors shadow-lg shadow-emerald-500/20"
               >
                 Uložiť nastavenia
               </button>
