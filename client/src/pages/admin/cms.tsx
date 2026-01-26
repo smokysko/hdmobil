@@ -23,9 +23,44 @@ import {
   Eye,
   Calendar,
   ChevronDown,
+  GripVertical,
+  Layers,
+  Grid3X3,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
+
+interface HeroSlide {
+  id: string;
+  product_id: string | null;
+  title_sk: string;
+  subtitle_sk: string | null;
+  badge_text: string | null;
+  image_url: string | null;
+  image_mobile_url: string | null;
+  price: number | null;
+  original_price: number | null;
+  features: Array<{ icon?: string; text: string }>;
+  specs: Array<{ label: string; value: string }>;
+  link_url: string | null;
+  link_text: string | null;
+  secondary_link_url: string | null;
+  secondary_link_text: string | null;
+  background_color: string | null;
+  text_color: string | null;
+  is_active: boolean;
+  sort_order: number;
+}
+
+interface HomepageCategory {
+  id: string;
+  category_id: string | null;
+  name_sk: string;
+  image_url: string | null;
+  link_url: string;
+  is_active: boolean;
+  sort_order: number;
+}
 
 interface HomepageSection {
   id: string;
@@ -36,7 +71,6 @@ interface HomepageSection {
   description_sk: string | null;
   badge_text: string | null;
   image_url: string | null;
-  image_mobile_url: string | null;
   link_url: string | null;
   link_text: string | null;
   content: Record<string, unknown>;
@@ -53,6 +87,8 @@ interface Banner {
   image_mobile_url: string | null;
   link_url: string | null;
   placement: string;
+  carousel_group: string | null;
+  carousel_interval: number | null;
   is_active: boolean;
   start_date: string | null;
   end_date: string | null;
@@ -71,20 +107,18 @@ interface MediaItem {
   created_at: string;
 }
 
-type TabType = 'homepage' | 'banners' | 'media';
+type TabType = 'hero' | 'categories' | 'banners' | 'sections' | 'media';
 
 export default function AdminCMS() {
   const [location, navigate] = useLocation();
-  const [activeTab, setActiveTab] = useState<TabType>('homepage');
+  const [activeTab, setActiveTab] = useState<TabType>('hero');
   const [isLoading, setIsLoading] = useState(true);
 
+  const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
+  const [homepageCategories, setHomepageCategories] = useState<HomepageCategory[]>([]);
   const [sections, setSections] = useState<HomepageSection[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]);
   const [mediaItems, setMediaItems] = useState<MediaItem[]>([]);
-
-  const [editingSection, setEditingSection] = useState<HomepageSection | null>(null);
-  const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
-  const [showBannerModal, setShowBannerModal] = useState(false);
 
   useEffect(() => {
     const isAdmin = localStorage.getItem('hdmobil_admin');
@@ -100,18 +134,26 @@ export default function AdminCMS() {
   async function loadData() {
     setIsLoading(true);
     try {
-      const [sectionsRes, bannersRes, mediaRes] = await Promise.all([
+      const [heroRes, categoriesRes, sectionsRes, bannersRes, mediaRes] = await Promise.all([
+        supabase.from('hero_slides').select('*').order('sort_order'),
+        supabase.from('homepage_categories').select('*').order('sort_order'),
         supabase.from('homepage_sections').select('*').order('sort_order'),
         supabase.from('banners').select('*').order('sort_order'),
-        supabase.from('media_library').select('*').order('created_at', { ascending: false }).limit(50),
+        supabase
+          .from('media_library')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(50),
       ]);
 
+      if (heroRes.data) setHeroSlides(heroRes.data);
+      if (categoriesRes.data) setHomepageCategories(categoriesRes.data);
       if (sectionsRes.data) setSections(sectionsRes.data);
       if (bannersRes.data) setBanners(bannersRes.data);
       if (mediaRes.data) setMediaItems(mediaRes.data);
     } catch (error) {
       console.error('Error loading CMS data:', error);
-      toast.error('Chyba pri načítavaní dát');
+      toast.error('Chyba pri nacitavani dat');
     } finally {
       setIsLoading(false);
     }
@@ -123,19 +165,21 @@ export default function AdminCMS() {
   };
 
   const navItems = [
-    { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Prehľad' },
+    { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Prehlad' },
     { href: '/admin/products', icon: Package, label: 'Produkty' },
-    { href: '/admin/orders', icon: ShoppingCart, label: 'Objednávky' },
-    { href: '/admin/customers', icon: Users, label: 'Zákazníci' },
-    { href: '/admin/invoices', icon: FileText, label: 'Faktúry' },
-    { href: '/admin/cms', icon: Palette, label: 'Obsah stránky' },
+    { href: '/admin/orders', icon: ShoppingCart, label: 'Objednavky' },
+    { href: '/admin/customers', icon: Users, label: 'Zakaznici' },
+    { href: '/admin/invoices', icon: FileText, label: 'Faktury' },
+    { href: '/admin/cms', icon: Palette, label: 'Obsah stranky' },
     { href: '/admin/settings', icon: Settings, label: 'Nastavenia' },
   ];
 
   const tabs = [
-    { id: 'homepage' as TabType, label: 'Úvod stránky', icon: Home },
+    { id: 'hero' as TabType, label: 'Hero Carousel', icon: Layers },
+    { id: 'categories' as TabType, label: 'Kategorie', icon: Grid3X3 },
     { id: 'banners' as TabType, label: 'Bannery', icon: ImageIcon },
-    { id: 'media' as TabType, label: 'Knižnica médií', icon: FolderOpen },
+    { id: 'sections' as TabType, label: 'Sekcie', icon: Home },
+    { id: 'media' as TabType, label: 'Media', icon: FolderOpen },
   ];
 
   return (
@@ -159,7 +203,7 @@ export default function AdminCMS() {
               className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobraziť web</span>
+              <span className="hidden sm:inline">Zobrazit web</span>
             </Link>
             <div className="h-6 w-px bg-gray-200"></div>
             <button
@@ -207,7 +251,7 @@ export default function AdminCMS() {
               className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
             >
               <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlásiť sa</span>
+              <span>Odhlasit sa</span>
             </button>
           </div>
         </aside>
@@ -215,15 +259,15 @@ export default function AdminCMS() {
         <main className="flex-1 p-6">
           <div className="max-w-[1400px] mx-auto space-y-6">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Obsah stránky</h2>
+              <h2 className="text-2xl font-semibold text-gray-900">Obsah stranky</h2>
               <p className="text-gray-500 text-sm mt-1">
-                Spravujte obsah homepage, bannery a obrázky
+                Spravujte hero carousel, kategorie, bannery a obrazky
               </p>
             </div>
 
             <div className="bg-white rounded-xl border border-gray-200/80">
-              <div className="border-b border-gray-200">
-                <nav className="flex gap-0 px-4" aria-label="Tabs">
+              <div className="border-b border-gray-200 overflow-x-auto">
+                <nav className="flex gap-0 px-4 min-w-max" aria-label="Tabs">
                   {tabs.map((tab) => {
                     const Icon = tab.icon;
                     const isActive = activeTab === tab.id;
@@ -231,7 +275,7 @@ export default function AdminCMS() {
                       <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 transition-colors ${
+                        className={`flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                           isActive
                             ? 'border-emerald-500 text-emerald-600'
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
@@ -252,27 +296,17 @@ export default function AdminCMS() {
                   </div>
                 ) : (
                   <>
-                    {activeTab === 'homepage' && (
-                      <HomepageTab
-                        sections={sections}
-                        onUpdate={loadData}
-                        editingSection={editingSection}
-                        setEditingSection={setEditingSection}
-                      />
+                    {activeTab === 'hero' && (
+                      <HeroSlidesTab slides={heroSlides} onUpdate={loadData} />
                     )}
-                    {activeTab === 'banners' && (
-                      <BannersTab
-                        banners={banners}
-                        onUpdate={loadData}
-                        editingBanner={editingBanner}
-                        setEditingBanner={setEditingBanner}
-                        showModal={showBannerModal}
-                        setShowModal={setShowBannerModal}
-                      />
+                    {activeTab === 'categories' && (
+                      <CategoriesTab categories={homepageCategories} onUpdate={loadData} />
                     )}
-                    {activeTab === 'media' && (
-                      <MediaTab mediaItems={mediaItems} onUpdate={loadData} />
+                    {activeTab === 'banners' && <BannersTab banners={banners} onUpdate={loadData} />}
+                    {activeTab === 'sections' && (
+                      <SectionsTab sections={sections} onUpdate={loadData} />
                     )}
+                    {activeTab === 'media' && <MediaTab mediaItems={mediaItems} onUpdate={loadData} />}
                   </>
                 )}
               </div>
@@ -284,57 +318,128 @@ export default function AdminCMS() {
   );
 }
 
-function HomepageTab({
-  sections,
+function HeroSlidesTab({
+  slides,
   onUpdate,
-  editingSection,
-  setEditingSection,
 }: {
-  sections: HomepageSection[];
+  slides: HeroSlide[];
   onUpdate: () => void;
-  editingSection: HomepageSection | null;
-  setEditingSection: (s: HomepageSection | null) => void;
 }) {
+  const [editingSlide, setEditingSlide] = useState<HeroSlide | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState<Partial<HomepageSection>>({});
+  const [formData, setFormData] = useState<Partial<HeroSlide>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
+  const [featuresText, setFeaturesText] = useState('');
+  const [specsText, setSpecsText] = useState('');
+
   useEffect(() => {
-    if (editingSection) {
-      setFormData(editingSection);
+    if (editingSlide) {
+      setFormData(editingSlide);
+      setFeaturesText(
+        (editingSlide.features || []).map((f) => f.text).join('\n')
+      );
+      setSpecsText(
+        (editingSlide.specs || []).map((s) => `${s.label}: ${s.value}`).join('\n')
+      );
+      setShowModal(true);
     }
-  }, [editingSection]);
+  }, [editingSlide]);
+
+  const openNewModal = () => {
+    setEditingSlide(null);
+    setFormData({
+      title_sk: '',
+      subtitle_sk: '',
+      badge_text: '',
+      image_url: '',
+      price: null,
+      original_price: null,
+      link_url: '',
+      link_text: '',
+      secondary_link_url: '',
+      secondary_link_text: '',
+      is_active: true,
+      sort_order: slides.length,
+      features: [],
+      specs: [],
+    });
+    setFeaturesText('');
+    setSpecsText('');
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingSlide(null);
+    setFormData({});
+    setFeaturesText('');
+    setSpecsText('');
+  };
 
   const handleSave = async () => {
-    if (!editingSection) return;
+    if (!formData.title_sk) {
+      toast.error('Zadajte nadpis');
+      return;
+    }
+
     setIsSaving(true);
 
-    try {
-      const { error } = await supabase
-        .from('homepage_sections')
-        .update({
-          title_sk: formData.title_sk,
-          subtitle_sk: formData.subtitle_sk,
-          description_sk: formData.description_sk,
-          badge_text: formData.badge_text,
-          image_url: formData.image_url,
-          link_url: formData.link_url,
-          link_text: formData.link_text,
-          content: formData.content,
-          is_active: formData.is_active,
-        })
-        .eq('id', editingSection.id);
+    const features = featuresText
+      .split('\n')
+      .filter((line) => line.trim())
+      .map((text) => ({ text: text.trim() }));
 
-      if (error) throw error;
-      toast.success('Sekcia bola uložená');
-      setEditingSection(null);
+    const specs = specsText
+      .split('\n')
+      .filter((line) => line.includes(':'))
+      .map((line) => {
+        const [label, ...valueParts] = line.split(':');
+        return { label: label.trim(), value: valueParts.join(':').trim() };
+      });
+
+    const dataToSave = {
+      ...formData,
+      features,
+      specs,
+    };
+
+    try {
+      if (editingSlide) {
+        const { error } = await supabase
+          .from('hero_slides')
+          .update(dataToSave)
+          .eq('id', editingSlide.id);
+        if (error) throw error;
+        toast.success('Slide bol aktualizovany');
+      } else {
+        const { error } = await supabase.from('hero_slides').insert(dataToSave);
+        if (error) throw error;
+        toast.success('Slide bol vytvoreny');
+      }
+      closeModal();
       onUpdate();
     } catch (error) {
-      console.error('Error saving section:', error);
-      toast.error('Chyba pri ukladaní');
+      console.error('Error saving slide:', error);
+      toast.error('Chyba pri ukladani');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string, title: string) => {
+    if (!confirm(`Naozaj chcete vymazat slide "${title}"?`)) return;
+
+    try {
+      const { error } = await supabase.from('hero_slides').delete().eq('id', id);
+      if (error) throw error;
+      toast.success('Slide bol vymazany');
+      onUpdate();
+    } catch (error) {
+      console.error('Error deleting slide:', error);
+      toast.error('Chyba pri mazani');
     }
   };
 
@@ -342,322 +447,664 @@ function HomepageTab({
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (!file.type.startsWith('image/')) {
-      toast.error('Vyberte obrázkový súbor');
-      return;
-    }
-
     setIsUploading(true);
     try {
       const fileExt = file.name.split('.').pop();
-      const fileName = `cms/${Date.now()}.${fileExt}`;
+      const fileName = `hero/${Date.now()}.${fileExt}`;
 
       const { error: uploadError } = await supabase.storage
         .from('images')
-        .upload(fileName, file, { cacheControl: '3600', upsert: false });
+        .upload(fileName, file, { cacheControl: '3600' });
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('images')
-        .getPublicUrl(fileName);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('images').getPublicUrl(fileName);
 
       setFormData({ ...formData, image_url: publicUrl });
-      toast.success('Obrázok bol nahratý');
+      toast.success('Obrazok nahraty');
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Chyba pri nahrávaní obrázka');
+      toast.error('Chyba pri nahravani');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
-  const getSectionLabel = (key: string) => {
-    const labels: Record<string, string> = {
-      hero: 'Hero sekcia (hlavný banner)',
-      promo_banner: 'Promo banner',
-    };
-    return labels[key] || key;
-  };
-
-  if (editingSection) {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900">
-              Upraviť: {getSectionLabel(editingSection.section_key)}
-            </h3>
-            <p className="text-sm text-gray-500">Upravte obsah tejto sekcie</p>
-          </div>
-          <button
-            onClick={() => setEditingSection(null)}
-            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Nadpis
-              </label>
-              <input
-                type="text"
-                value={formData.title_sk || ''}
-                onChange={(e) => setFormData({ ...formData, title_sk: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Podnadpis
-              </label>
-              <input
-                type="text"
-                value={formData.subtitle_sk || ''}
-                onChange={(e) => setFormData({ ...formData, subtitle_sk: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Badge/Štítok
-              </label>
-              <input
-                type="text"
-                value={formData.badge_text || ''}
-                onChange={(e) => setFormData({ ...formData, badge_text: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Popis
-              </label>
-              <textarea
-                rows={3}
-                value={formData.description_sk || ''}
-                onChange={(e) => setFormData({ ...formData, description_sk: e.target.value })}
-                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm resize-none"
-              />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Odkaz URL
-                </label>
-                <input
-                  type="text"
-                  value={formData.link_url || ''}
-                  onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Text tlačidla
-                </label>
-                <input
-                  type="text"
-                  value={formData.link_text || ''}
-                  onChange={(e) => setFormData({ ...formData, link_text: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
-                />
-              </div>
-            </div>
-
-            <label className="flex items-center gap-3 cursor-pointer pt-2">
-              <input
-                type="checkbox"
-                checked={formData.is_active ?? true}
-                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
-              />
-              <span className="text-sm text-gray-700">Aktívna sekcia</span>
-            </label>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Obrázok
-              </label>
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                className="hidden"
-              />
-              {formData.image_url ? (
-                <div className="relative group">
-                  <img
-                    src={formData.image_url}
-                    alt="Section image"
-                    className="w-full h-48 object-contain bg-gray-100 rounded-lg"
-                  />
-                  <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                    <button
-                      onClick={() => fileInputRef.current?.click()}
-                      className="p-2 bg-white rounded-lg text-gray-700 hover:bg-gray-100"
-                    >
-                      <Upload className="w-4 h-4" />
-                    </button>
-                    <button
-                      onClick={() => setFormData({ ...formData, image_url: null })}
-                      className="p-2 bg-white rounded-lg text-red-600 hover:bg-red-50"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={isUploading}
-                  className="w-full h-48 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-emerald-500 hover:bg-emerald-50/50 transition-colors"
-                >
-                  {isUploading ? (
-                    <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
-                  ) : (
-                    <>
-                      <Upload className="w-8 h-8 text-gray-400" />
-                      <span className="text-sm text-gray-500">Nahrať obrázok</span>
-                    </>
-                  )}
-                </button>
-              )}
-            </div>
-
-            {editingSection.section_key === 'hero' && (
-              <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                <h4 className="text-sm font-medium text-gray-700">Dodatočné nastavenia Hero sekcie</h4>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Cena</label>
-                    <input
-                      type="number"
-                      value={(formData.content as Record<string, unknown>)?.price as number || ''}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        content: { ...formData.content as Record<string, unknown>, price: parseFloat(e.target.value) || 0 }
-                      })}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-xs text-gray-500 mb-1">Pôvodná cena</label>
-                    <input
-                      type="number"
-                      value={(formData.content as Record<string, unknown>)?.original_price as number || ''}
-                      onChange={(e) => setFormData({
-                        ...formData,
-                        content: { ...formData.content as Record<string, unknown>, original_price: parseFloat(e.target.value) || 0 }
-                      })}
-                      className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                    />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-xs text-gray-500 mb-1">Text tlačidla kúpiť</label>
-                  <input
-                    type="text"
-                    value={(formData.content as Record<string, unknown>)?.buy_button_text as string || ''}
-                    onChange={(e) => setFormData({
-                      ...formData,
-                      content: { ...formData.content as Record<string, unknown>, buy_button_text: e.target.value }
-                    })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm"
-                  />
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-
-        <div className="flex justify-end gap-3 pt-4 border-t">
-          <button
-            onClick={() => setEditingSection(null)}
-            className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium"
-          >
-            Zrušiť
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={isSaving}
-            className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2"
-          >
-            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Uložiť zmeny
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-500">
-        Vyberte sekciu na úpravu obsahu homepage
-      </p>
+      <div className="flex justify-between items-center">
+        <p className="text-sm text-gray-500">
+          Spravujte slidy v hlavnom hero carouseli na homepage
+        </p>
+        <button
+          onClick={openNewModal}
+          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
+        >
+          <Plus className="w-4 h-4" />
+          Novy slide
+        </button>
+      </div>
 
       <div className="grid gap-4">
-        {sections.map((section) => (
+        {slides.map((slide) => (
           <div
-            key={section.id}
-            className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+            key={slide.id}
+            className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
           >
             <div className="flex items-center gap-4">
-              {section.image_url && (
+              <div className="text-gray-400 cursor-move">
+                <GripVertical className="w-5 h-5" />
+              </div>
+              {slide.image_url ? (
                 <img
-                  src={section.image_url}
+                  src={slide.image_url}
                   alt=""
-                  className="w-16 h-16 object-contain bg-white rounded-lg border"
+                  className="w-20 h-14 object-contain bg-white rounded-lg border"
                 />
+              ) : (
+                <div className="w-20 h-14 bg-gray-200 rounded-lg flex items-center justify-center">
+                  <ImageIcon className="w-6 h-6 text-gray-400" />
+                </div>
               )}
               <div>
-                <h4 className="font-medium text-gray-900">
-                  {getSectionLabel(section.section_key)}
-                </h4>
-                <p className="text-sm text-gray-500">
-                  {section.title_sk || 'Bez nadpisu'}
-                </p>
+                <h4 className="font-medium text-gray-900">{slide.title_sk}</h4>
+                {slide.subtitle_sk && (
+                  <p className="text-sm text-gray-500">{slide.subtitle_sk}</p>
+                )}
+                {slide.price && (
+                  <p className="text-xs text-emerald-600 font-medium mt-1">
+                    {slide.price.toLocaleString('sk-SK')} EUR
+                  </p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-2">
               <span
                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                  section.is_active
+                  slide.is_active
                     ? 'bg-emerald-50 text-emerald-700'
                     : 'bg-gray-200 text-gray-600'
                 }`}
               >
-                {section.is_active ? 'Aktívna' : 'Neaktívna'}
+                {slide.is_active ? 'Aktivny' : 'Neaktivny'}
               </span>
               <button
-                onClick={() => setEditingSection(section)}
+                onClick={() => setEditingSlide(slide)}
                 className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg"
               >
                 <Edit className="w-4 h-4" />
+              </button>
+              <button
+                onClick={() => handleDelete(slide.id, slide.title_sk)}
+                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg"
+              >
+                <Trash2 className="w-4 h-4" />
               </button>
             </div>
           </div>
         ))}
 
-        {sections.length === 0 && (
+        {slides.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            Žiadne sekcie na úpravu
+            Ziadne slidy. Vytvorte prvy slide kliknutim na tlacidlo vyssie.
           </div>
         )}
       </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {editingSlide ? 'Upravit slide' : 'Novy slide'}
+              </h2>
+              <button
+                onClick={closeModal}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4 overflow-y-auto max-h-[60vh]">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Nadpis *
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.title_sk || ''}
+                    onChange={(e) => setFormData({ ...formData, title_sk: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                    placeholder="iPhone 17 Pro"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Podnadpis
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.subtitle_sk || ''}
+                    onChange={(e) => setFormData({ ...formData, subtitle_sk: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                    placeholder="Titanium"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Badge/Stitok
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.badge_text || ''}
+                    onChange={(e) => setFormData({ ...formData, badge_text: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                    placeholder="NOVINKA 2026"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Cena</label>
+                    <input
+                      type="number"
+                      value={formData.price || ''}
+                      onChange={(e) =>
+                        setFormData({ ...formData, price: e.target.value ? parseFloat(e.target.value) : null })
+                      }
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                      placeholder="1299"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Povodna cena
+                    </label>
+                    <input
+                      type="number"
+                      value={formData.original_price || ''}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          original_price: e.target.value ? parseFloat(e.target.value) : null,
+                        })
+                      }
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                      placeholder="1399"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Obrazok
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                {formData.image_url ? (
+                  <div className="relative group">
+                    <img
+                      src={formData.image_url}
+                      alt=""
+                      className="w-full h-40 object-contain bg-gray-100 rounded-lg"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-2 bg-white rounded-lg"
+                      >
+                        <Upload className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setFormData({ ...formData, image_url: null })}
+                        className="p-2 bg-white rounded-lg text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="w-full h-40 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-emerald-500 hover:bg-emerald-50/50"
+                  >
+                    {isUploading ? (
+                      <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                    ) : (
+                      <>
+                        <Upload className="w-8 h-8 text-gray-400" />
+                        <span className="text-sm text-gray-500">Nahrat obrazok</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Features (kazdy riadok = jedna feature)
+                </label>
+                <textarea
+                  rows={4}
+                  value={featuresText}
+                  onChange={(e) => setFeaturesText(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm resize-none"
+                  placeholder="Cip A19 Bionic&#10;200MPx kamera&#10;Titanove telo"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Specifikacie (format: Label: Value)
+                </label>
+                <textarea
+                  rows={3}
+                  value={specsText}
+                  onChange={(e) => setSpecsText(e.target.value)}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm resize-none"
+                  placeholder="Procesor: A19 Bionic&#10;Kamera: 200 MPx"
+                />
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Hlavny odkaz URL
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.link_url || ''}
+                    onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                    placeholder="/product/xxx"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Text hlavneho tlacidla
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.link_text || ''}
+                    onChange={(e) => setFormData({ ...formData, link_text: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                    placeholder="Kupit teraz"
+                  />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Sekundarny odkaz URL
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.secondary_link_url || ''}
+                    onChange={(e) =>
+                      setFormData({ ...formData, secondary_link_url: e.target.value })
+                    }
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                    placeholder="/category/smartfony"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Text sekundarneho tlacidla
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.secondary_link_text || ''}
+                    onChange={(e) =>
+                      setFormData({ ...formData, secondary_link_text: e.target.value })
+                    }
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                    placeholder="Vsetky smartfony"
+                  />
+                </div>
+              </div>
+
+              <label className="flex items-center gap-3 cursor-pointer pt-2">
+                <input
+                  type="checkbox"
+                  checked={formData.is_active ?? true}
+                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                  className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                />
+                <span className="text-sm text-gray-700">Aktivny slide</span>
+              </label>
+            </div>
+            <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
+              <button
+                onClick={closeModal}
+                className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium"
+              >
+                Zrusit
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2"
+              >
+                {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                {editingSlide ? 'Ulozit zmeny' : 'Vytvorit slide'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function CategoriesTab({
+  categories,
+  onUpdate,
+}: {
+  categories: HomepageCategory[];
+  onUpdate: () => void;
+}) {
+  const [editingCategory, setEditingCategory] = useState<HomepageCategory | null>(null);
+  const [showModal, setShowModal] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState<Partial<HomepageCategory>>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    if (editingCategory) {
+      setFormData(editingCategory);
+      setShowModal(true);
+    }
+  }, [editingCategory]);
+
+  const openNewModal = () => {
+    setEditingCategory(null);
+    setFormData({
+      name_sk: '',
+      image_url: '',
+      link_url: '',
+      is_active: true,
+      sort_order: categories.length,
+    });
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingCategory(null);
+    setFormData({});
+  };
+
+  const handleSave = async () => {
+    if (!formData.name_sk || !formData.link_url) {
+      toast.error('Vyplnte nazov a odkaz');
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      if (editingCategory) {
+        const { error } = await supabase
+          .from('homepage_categories')
+          .update(formData)
+          .eq('id', editingCategory.id);
+        if (error) throw error;
+        toast.success('Kategoria bola aktualizovana');
+      } else {
+        const { error } = await supabase.from('homepage_categories').insert(formData);
+        if (error) throw error;
+        toast.success('Kategoria bola vytvorena');
+      }
+      closeModal();
+      onUpdate();
+    } catch (error) {
+      console.error('Error saving category:', error);
+      toast.error('Chyba pri ukladani');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDelete = async (id: string, name: string) => {
+    if (!confirm(`Naozaj chcete vymazat kategoriu "${name}"?`)) return;
+
+    try {
+      const { error } = await supabase.from('homepage_categories').delete().eq('id', id);
+      if (error) throw error;
+      toast.success('Kategoria bola vymazana');
+      onUpdate();
+    } catch (error) {
+      console.error('Error deleting category:', error);
+      toast.error('Chyba pri mazani');
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `categories/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(fileName, file, { cacheControl: '3600' });
+
+      if (uploadError) throw uploadError;
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('images').getPublicUrl(fileName);
+
+      setFormData({ ...formData, image_url: publicUrl });
+      toast.success('Obrazok nahraty');
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Chyba pri nahravani');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div className="flex justify-between items-center">
+        <p className="text-sm text-gray-500">
+          Spravujte kategorie zobrazene na homepage
+        </p>
+        <button
+          onClick={openNewModal}
+          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
+        >
+          <Plus className="w-4 h-4" />
+          Nova kategoria
+        </button>
+      </div>
+
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {categories.map((cat) => (
+          <div
+            key={cat.id}
+            className="relative group bg-gray-50 rounded-lg p-4 border border-gray-200"
+          >
+            {cat.image_url ? (
+              <img
+                src={cat.image_url}
+                alt={cat.name_sk}
+                className="w-16 h-16 object-contain mx-auto mb-3"
+              />
+            ) : (
+              <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-3">
+                <Grid3X3 className="w-6 h-6 text-gray-400" />
+              </div>
+            )}
+            <h4 className="font-medium text-sm text-center text-gray-900 truncate">
+              {cat.name_sk}
+            </h4>
+            <p className="text-xs text-gray-500 text-center truncate mt-1">{cat.link_url}</p>
+
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+              <button
+                onClick={() => setEditingCategory(cat)}
+                className="p-1.5 bg-white rounded text-gray-600 hover:text-emerald-600 shadow-sm"
+              >
+                <Edit className="w-3 h-3" />
+              </button>
+              <button
+                onClick={() => handleDelete(cat.id, cat.name_sk)}
+                className="p-1.5 bg-white rounded text-gray-600 hover:text-red-600 shadow-sm"
+              >
+                <Trash2 className="w-3 h-3" />
+              </button>
+            </div>
+
+            {!cat.is_active && (
+              <span className="absolute top-2 left-2 bg-gray-200 text-gray-600 text-xs px-1.5 py-0.5 rounded">
+                Skryty
+              </span>
+            )}
+          </div>
+        ))}
+
+        {categories.length === 0 && (
+          <div className="col-span-full text-center py-12 text-gray-500">
+            Ziadne kategorie. Vytvorte prvu kategoriu.
+          </div>
+        )}
+      </div>
+
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-hidden">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {editingCategory ? 'Upravit kategoriu' : 'Nova kategoria'}
+              </h2>
+              <button
+                onClick={closeModal}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Nazov *</label>
+                <input
+                  type="text"
+                  value={formData.name_sk || ''}
+                  onChange={(e) => setFormData({ ...formData, name_sk: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                  placeholder="Smartfony"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Odkaz URL *</label>
+                <input
+                  type="text"
+                  value={formData.link_url || ''}
+                  onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                  placeholder="/category/smartfony"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Obrazok</label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
+                {formData.image_url ? (
+                  <div className="relative group">
+                    <img
+                      src={formData.image_url}
+                      alt=""
+                      className="w-full h-32 object-contain bg-gray-100 rounded-lg"
+                    />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-2 bg-white rounded-lg"
+                      >
+                        <Upload className="w-4 h-4" />
+                      </button>
+                      <button
+                        onClick={() => setFormData({ ...formData, image_url: null })}
+                        className="p-2 bg-white rounded-lg text-red-600"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    disabled={isUploading}
+                    className="w-full h-32 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-emerald-500 hover:bg-emerald-50/50"
+                  >
+                    {isUploading ? (
+                      <Loader2 className="w-6 h-6 text-emerald-600 animate-spin" />
+                    ) : (
+                      <>
+                        <Upload className="w-6 h-6 text-gray-400" />
+                        <span className="text-sm text-gray-500">Nahrat obrazok</span>
+                      </>
+                    )}
+                  </button>
+                )}
+              </div>
+
+              <label className="flex items-center gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={formData.is_active ?? true}
+                  onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                  className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                />
+                <span className="text-sm text-gray-700">Aktivna kategoria</span>
+              </label>
+            </div>
+            <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
+              <button
+                onClick={closeModal}
+                className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium"
+              >
+                Zrusit
+              </button>
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2"
+              >
+                {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
+                {editingCategory ? 'Ulozit zmeny' : 'Vytvorit'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -665,24 +1112,14 @@ function HomepageTab({
 function BannersTab({
   banners,
   onUpdate,
-  editingBanner,
-  setEditingBanner,
-  showModal,
-  setShowModal,
 }: {
   banners: Banner[];
   onUpdate: () => void;
-  editingBanner: Banner | null;
-  setEditingBanner: (b: Banner | null) => void;
-  showModal: boolean;
-  setShowModal: (v: boolean) => void;
 }) {
+  const [editingBanner, setEditingBanner] = useState<Banner | null>(null);
+  const [showModal, setShowModal] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [formData, setFormData] = useState<Partial<Banner>>({
-    name: '',
-    placement: 'homepage_hero',
-    is_active: true,
-  });
+  const [formData, setFormData] = useState<Partial<Banner>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -693,9 +1130,27 @@ function BannersTab({
     }
   }, [editingBanner]);
 
+  const openNewModal = () => {
+    setEditingBanner(null);
+    setFormData({
+      name: '',
+      placement: 'homepage_hero',
+      is_active: true,
+      carousel_group: 'default',
+      carousel_interval: 5000,
+    });
+    setShowModal(true);
+  };
+
+  const closeModal = () => {
+    setShowModal(false);
+    setEditingBanner(null);
+    setFormData({});
+  };
+
   const handleSave = async () => {
     if (!formData.name) {
-      toast.error('Zadajte názov bannera');
+      toast.error('Zadajte nazov bannera');
       return;
     }
 
@@ -707,33 +1162,33 @@ function BannersTab({
           .update(formData)
           .eq('id', editingBanner.id);
         if (error) throw error;
-        toast.success('Banner bol aktualizovaný');
+        toast.success('Banner bol aktualizovany');
       } else {
         const { error } = await supabase.from('banners').insert(formData);
         if (error) throw error;
-        toast.success('Banner bol vytvorený');
+        toast.success('Banner bol vytvoreny');
       }
       closeModal();
       onUpdate();
     } catch (error) {
       console.error('Error saving banner:', error);
-      toast.error('Chyba pri ukladaní');
+      toast.error('Chyba pri ukladani');
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Naozaj chcete vymazať banner "${name}"?`)) return;
+    if (!confirm(`Naozaj chcete vymazat banner "${name}"?`)) return;
 
     try {
       const { error } = await supabase.from('banners').delete().eq('id', id);
       if (error) throw error;
-      toast.success('Banner bol vymazaný');
+      toast.success('Banner bol vymazany');
       onUpdate();
     } catch (error) {
       console.error('Error deleting banner:', error);
-      toast.error('Chyba pri mazaní');
+      toast.error('Chyba pri mazani');
     }
   };
 
@@ -752,49 +1207,37 @@ function BannersTab({
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('images')
-        .getPublicUrl(fileName);
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('images').getPublicUrl(fileName);
 
       setFormData({ ...formData, image_url: publicUrl });
-      toast.success('Obrázok nahratý');
+      toast.success('Obrazok nahraty');
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Chyba pri nahrávaní');
+      toast.error('Chyba pri nahravani');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingBanner(null);
-    setFormData({ name: '', placement: 'homepage_hero', is_active: true });
-  };
-
   const placementOptions = [
     { value: 'homepage_hero', label: 'Homepage - Hero carousel' },
-    { value: 'homepage_middle', label: 'Homepage - Stredná časť' },
-    { value: 'category_top', label: 'Kategórie - Vrchný banner' },
+    { value: 'homepage_middle', label: 'Homepage - Stredna cast' },
+    { value: 'category_top', label: 'Kategorie - Vrchny banner' },
   ];
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <p className="text-sm text-gray-500">
-          Spravujte reklamné bannery na stránke
-        </p>
+        <p className="text-sm text-gray-500">Spravujte reklamne bannery na stranke</p>
         <button
-          onClick={() => {
-            setEditingBanner(null);
-            setFormData({ name: '', placement: 'homepage_hero', is_active: true });
-            setShowModal(true);
-          }}
+          onClick={openNewModal}
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
         >
           <Plus className="w-4 h-4" />
-          Nový banner
+          Novy banner
         </button>
       </div>
 
@@ -819,27 +1262,21 @@ function BannersTab({
               <div>
                 <h4 className="font-medium text-gray-900">{banner.name}</h4>
                 <p className="text-sm text-gray-500">
-                  {placementOptions.find(p => p.value === banner.placement)?.label || banner.placement}
+                  {placementOptions.find((p) => p.value === banner.placement)?.label ||
+                    banner.placement}
                 </p>
-                {(banner.start_date || banner.end_date) && (
-                  <p className="text-xs text-gray-400 flex items-center gap-1 mt-1">
-                    <Calendar className="w-3 h-3" />
-                    {banner.start_date && new Date(banner.start_date).toLocaleDateString('sk-SK')}
-                    {' - '}
-                    {banner.end_date && new Date(banner.end_date).toLocaleDateString('sk-SK')}
-                  </p>
+                {banner.carousel_group && (
+                  <p className="text-xs text-emerald-600">Carousel: {banner.carousel_group}</p>
                 )}
               </div>
             </div>
             <div className="flex items-center gap-2">
               <span
                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                  banner.is_active
-                    ? 'bg-emerald-50 text-emerald-700'
-                    : 'bg-gray-200 text-gray-600'
+                  banner.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-200 text-gray-600'
                 }`}
               >
-                {banner.is_active ? 'Aktívny' : 'Neaktívny'}
+                {banner.is_active ? 'Aktivny' : 'Neaktivny'}
               </span>
               <button
                 onClick={() => setEditingBanner(banner)}
@@ -859,7 +1296,7 @@ function BannersTab({
 
         {banners.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            Žiadne bannery. Vytvorte prvý banner kliknutím na tlačidlo vyššie.
+            Ziadne bannery. Vytvorte prvy banner kliknutim na tlacidlo vyssie.
           </div>
         )}
       </div>
@@ -868,24 +1305,27 @@ function BannersTab({
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-semibold text-gray-900">
-                  {editingBanner ? 'Upraviť banner' : 'Nový banner'}
-                </h2>
-              </div>
-              <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {editingBanner ? 'Upravit banner' : 'Novy banner'}
+              </h2>
+              <button
+                onClick={closeModal}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+              >
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="p-6 space-y-4 overflow-y-auto max-h-[60vh]">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Názov bannera *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Nazov bannera *
+                </label>
                 <input
                   type="text"
                   value={formData.name || ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
-                  placeholder="napr. Vianočná akcia 2026"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                  placeholder="napr. Vianocna akcia 2026"
                 />
               </div>
 
@@ -912,16 +1352,6 @@ function BannersTab({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Podnadpis</label>
-                <textarea
-                  rows={2}
-                  value={formData.subtitle_sk || ''}
-                  onChange={(e) => setFormData({ ...formData, subtitle_sk: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm resize-none"
-                />
-              </div>
-
-              <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Umiestnenie</label>
                 <div className="relative">
                   <select
@@ -929,25 +1359,77 @@ function BannersTab({
                     onChange={(e) => setFormData({ ...formData, placement: e.target.value })}
                     className="w-full appearance-none px-4 py-2.5 border border-gray-200 rounded-lg bg-white text-sm"
                   >
-                    {placementOptions.map(opt => (
-                      <option key={opt.value} value={opt.value}>{opt.label}</option>
+                    {placementOptions.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
                     ))}
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Carousel skupina
+                  </label>
+                  <input
+                    type="text"
+                    value={formData.carousel_group || ''}
+                    onChange={(e) => setFormData({ ...formData, carousel_group: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                    placeholder="default"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Interval (ms)
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.carousel_interval || 5000}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        carousel_interval: parseInt(e.target.value) || 5000,
+                      })
+                    }
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                    placeholder="5000"
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Obrázok bannera</label>
-                <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Obrazok bannera
+                </label>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
                 {formData.image_url ? (
                   <div className="relative group">
-                    <img src={formData.image_url} alt="" className="w-full h-40 object-cover bg-gray-100 rounded-lg" />
+                    <img
+                      src={formData.image_url}
+                      alt=""
+                      className="w-full h-40 object-cover bg-gray-100 rounded-lg"
+                    />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                      <button onClick={() => fileInputRef.current?.click()} className="p-2 bg-white rounded-lg">
+                      <button
+                        onClick={() => fileInputRef.current?.click()}
+                        className="p-2 bg-white rounded-lg"
+                      >
                         <Upload className="w-4 h-4" />
                       </button>
-                      <button onClick={() => setFormData({ ...formData, image_url: null })} className="p-2 bg-white rounded-lg text-red-600">
+                      <button
+                        onClick={() => setFormData({ ...formData, image_url: null })}
+                        className="p-2 bg-white rounded-lg text-red-600"
+                      >
                         <Trash2 className="w-4 h-4" />
                       </button>
                     </div>
@@ -958,35 +1440,16 @@ function BannersTab({
                     disabled={isUploading}
                     className="w-full h-40 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-emerald-500 hover:bg-emerald-50/50"
                   >
-                    {isUploading ? <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" /> : (
+                    {isUploading ? (
+                      <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                    ) : (
                       <>
                         <Upload className="w-8 h-8 text-gray-400" />
-                        <span className="text-sm text-gray-500">Nahrať obrázok</span>
+                        <span className="text-sm text-gray-500">Nahrat obrazok</span>
                       </>
                     )}
                   </button>
                 )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Dátum od</label>
-                  <input
-                    type="date"
-                    value={formData.start_date?.split('T')[0] || ''}
-                    onChange={(e) => setFormData({ ...formData, start_date: e.target.value ? `${e.target.value}T00:00:00Z` : null })}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Dátum do</label>
-                  <input
-                    type="date"
-                    value={formData.end_date?.split('T')[0] || ''}
-                    onChange={(e) => setFormData({ ...formData, end_date: e.target.value ? `${e.target.value}T23:59:59Z` : null })}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
-                  />
-                </div>
               </div>
 
               <label className="flex items-center gap-3 cursor-pointer pt-2">
@@ -996,21 +1459,330 @@ function BannersTab({
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                   className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                 />
-                <span className="text-sm text-gray-700">Aktívny banner</span>
+                <span className="text-sm text-gray-700">Aktivny banner</span>
               </label>
             </div>
             <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
-              <button onClick={closeModal} className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">
-                Zrušiť
+              <button
+                onClick={closeModal}
+                className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium"
+              >
+                Zrusit
               </button>
-              <button onClick={handleSave} disabled={isSaving} className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2">
+              <button
+                onClick={handleSave}
+                disabled={isSaving}
+                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2"
+              >
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                {editingBanner ? 'Uložiť zmeny' : 'Vytvoriť banner'}
+                {editingBanner ? 'Ulozit zmeny' : 'Vytvorit banner'}
               </button>
             </div>
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function SectionsTab({
+  sections,
+  onUpdate,
+}: {
+  sections: HomepageSection[];
+  onUpdate: () => void;
+}) {
+  const [editingSection, setEditingSection] = useState<HomepageSection | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [formData, setFormData] = useState<Partial<HomepageSection>>({});
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isUploading, setIsUploading] = useState(false);
+
+  useEffect(() => {
+    if (editingSection) {
+      setFormData(editingSection);
+    }
+  }, [editingSection]);
+
+  const handleSave = async () => {
+    if (!editingSection) return;
+    setIsSaving(true);
+
+    try {
+      const { error } = await supabase
+        .from('homepage_sections')
+        .update({
+          title_sk: formData.title_sk,
+          subtitle_sk: formData.subtitle_sk,
+          description_sk: formData.description_sk,
+          badge_text: formData.badge_text,
+          image_url: formData.image_url,
+          link_url: formData.link_url,
+          link_text: formData.link_text,
+          is_active: formData.is_active,
+        })
+        .eq('id', editingSection.id);
+
+      if (error) throw error;
+      toast.success('Sekcia bola ulozena');
+      setEditingSection(null);
+      onUpdate();
+    } catch (error) {
+      console.error('Error saving section:', error);
+      toast.error('Chyba pri ukladani');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `cms/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(fileName, file, { cacheControl: '3600' });
+
+      if (uploadError) throw uploadError;
+
+      const {
+        data: { publicUrl },
+      } = supabase.storage.from('images').getPublicUrl(fileName);
+
+      setFormData({ ...formData, image_url: publicUrl });
+      toast.success('Obrazok nahraty');
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Chyba pri nahravani');
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const getSectionLabel = (key: string) => {
+    const labels: Record<string, string> = {
+      hero: 'Hero sekcia (hlavny banner)',
+      promo_banner: 'Promo banner',
+    };
+    return labels[key] || key;
+  };
+
+  if (editingSection) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-semibold text-gray-900">
+              Upravit: {getSectionLabel(editingSection.section_key)}
+            </h3>
+          </div>
+          <button
+            onClick={() => setEditingSection(null)}
+            className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          <div className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Nadpis</label>
+              <input
+                type="text"
+                value={formData.title_sk || ''}
+                onChange={(e) => setFormData({ ...formData, title_sk: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Podnadpis</label>
+              <input
+                type="text"
+                value={formData.subtitle_sk || ''}
+                onChange={(e) => setFormData({ ...formData, subtitle_sk: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Badge</label>
+              <input
+                type="text"
+                value={formData.badge_text || ''}
+                onChange={(e) => setFormData({ ...formData, badge_text: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Popis</label>
+              <textarea
+                rows={3}
+                value={formData.description_sk || ''}
+                onChange={(e) => setFormData({ ...formData, description_sk: e.target.value })}
+                className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm resize-none"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Odkaz URL</label>
+                <input
+                  type="text"
+                  value={formData.link_url || ''}
+                  onChange={(e) => setFormData({ ...formData, link_url: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Text tlacidla
+                </label>
+                <input
+                  type="text"
+                  value={formData.link_text || ''}
+                  onChange={(e) => setFormData({ ...formData, link_text: e.target.value })}
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                />
+              </div>
+            </div>
+
+            <label className="flex items-center gap-3 cursor-pointer pt-2">
+              <input
+                type="checkbox"
+                checked={formData.is_active ?? true}
+                onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
+                className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+              />
+              <span className="text-sm text-gray-700">Aktivna sekcia</span>
+            </label>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Obrazok</label>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+            {formData.image_url ? (
+              <div className="relative group">
+                <img
+                  src={formData.image_url}
+                  alt=""
+                  className="w-full h-48 object-contain bg-gray-100 rounded-lg"
+                />
+                <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-2 bg-white rounded-lg"
+                  >
+                    <Upload className="w-4 h-4" />
+                  </button>
+                  <button
+                    onClick={() => setFormData({ ...formData, image_url: null })}
+                    className="p-2 bg-white rounded-lg text-red-600"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="w-full h-48 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-emerald-500 hover:bg-emerald-50/50"
+              >
+                {isUploading ? (
+                  <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                ) : (
+                  <>
+                    <Upload className="w-8 h-8 text-gray-400" />
+                    <span className="text-sm text-gray-500">Nahrat obrazok</span>
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        </div>
+
+        <div className="flex justify-end gap-3 pt-4 border-t">
+          <button
+            onClick={() => setEditingSection(null)}
+            className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium"
+          >
+            Zrusit
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={isSaving}
+            className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2"
+          >
+            {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+            Ulozit zmeny
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-gray-500">Vyberte sekciu na upravu obsahu</p>
+
+      <div className="grid gap-4">
+        {sections.map((section) => (
+          <div
+            key={section.id}
+            className="flex items-center justify-between p-4 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+          >
+            <div className="flex items-center gap-4">
+              {section.image_url && (
+                <img
+                  src={section.image_url}
+                  alt=""
+                  className="w-16 h-16 object-contain bg-white rounded-lg border"
+                />
+              )}
+              <div>
+                <h4 className="font-medium text-gray-900">
+                  {getSectionLabel(section.section_key)}
+                </h4>
+                <p className="text-sm text-gray-500">{section.title_sk || 'Bez nadpisu'}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
+                  section.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-200 text-gray-600'
+                }`}
+              >
+                {section.is_active ? 'Aktivna' : 'Neaktivna'}
+              </span>
+              <button
+                onClick={() => setEditingSection(section)}
+                className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg"
+              >
+                <Edit className="w-4 h-4" />
+              </button>
+            </div>
+          </div>
+        ))}
+
+        {sections.length === 0 && (
+          <div className="text-center py-12 text-gray-500">Ziadne sekcie na upravu</div>
+        )}
+      </div>
     </div>
   );
 }
@@ -1027,16 +1799,15 @@ function MediaTab({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const folders = [
-    { value: 'all', label: 'Všetky' },
+    { value: 'all', label: 'Vsetky' },
     { value: 'banners', label: 'Bannery' },
     { value: 'cms', label: 'Obsah' },
     { value: 'products', label: 'Produkty' },
-    { value: 'general', label: 'Ostatné' },
+    { value: 'general', label: 'Ostatne' },
   ];
 
-  const filteredMedia = selectedFolder === 'all'
-    ? mediaItems
-    : mediaItems.filter(m => m.folder === selectedFolder);
+  const filteredMedia =
+    selectedFolder === 'all' ? mediaItems : mediaItems.filter((m) => m.folder === selectedFolder);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
@@ -1054,9 +1825,9 @@ function MediaTab({
 
         if (uploadError) throw uploadError;
 
-        const { data: { publicUrl } } = supabase.storage
-          .from('images')
-          .getPublicUrl(fileName);
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from('images').getPublicUrl(fileName);
 
         await supabase.from('media_library').insert({
           filename: file.name,
@@ -1067,11 +1838,11 @@ function MediaTab({
           folder: 'general',
         });
       }
-      toast.success('Súbory boli nahraté');
+      toast.success('Subory boli nahrate');
       onUpdate();
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Chyba pri nahrávaní');
+      toast.error('Chyba pri nahravani');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -1079,39 +1850,39 @@ function MediaTab({
   };
 
   const handleDelete = async (item: MediaItem) => {
-    if (!confirm(`Vymazať "${item.filename}"?`)) return;
+    if (!confirm(`Vymazat "${item.filename}"?`)) return;
 
     try {
       await supabase.storage.from('images').remove([item.storage_path]);
       await supabase.from('media_library').delete().eq('id', item.id);
-      toast.success('Súbor bol vymazaný');
+      toast.success('Subor bol vymazany');
       onUpdate();
     } catch (error) {
       console.error('Delete error:', error);
-      toast.error('Chyba pri mazaní');
+      toast.error('Chyba pri mazani');
     }
   };
 
   const copyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
-    toast.success('URL skopírovaná do schránky');
+    toast.success('URL skopirovana do schranky');
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <p className="text-sm text-gray-500">
-            Knižnica všetkých obrázkov a súborov
-          </p>
+          <p className="text-sm text-gray-500">Kniznica vsetkych obrazkov a suborov</p>
           <div className="relative">
             <select
               value={selectedFolder}
               onChange={(e) => setSelectedFolder(e.target.value)}
               className="appearance-none pl-3 pr-8 py-1.5 border border-gray-200 rounded-lg text-sm bg-white"
             >
-              {folders.map(f => (
-                <option key={f.value} value={f.value}>{f.label}</option>
+              {folders.map((f) => (
+                <option key={f.value} value={f.value}>
+                  {f.label}
+                </option>
               ))}
             </select>
             <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
@@ -1131,8 +1902,12 @@ function MediaTab({
             disabled={isUploading}
             className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-50"
           >
-            {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-            Nahrať súbory
+            {isUploading ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Upload className="w-4 h-4" />
+            )}
+            Nahrat subory
           </button>
         </div>
       </div>
@@ -1154,14 +1929,14 @@ function MediaTab({
                 <button
                   onClick={() => copyUrl(item.url)}
                   className="p-1.5 bg-white rounded text-gray-700 hover:bg-gray-100"
-                  title="Kopírovať URL"
+                  title="Kopirovat URL"
                 >
                   <Eye className="w-3 h-3" />
                 </button>
                 <button
                   onClick={() => handleDelete(item)}
                   className="p-1.5 bg-white rounded text-red-600 hover:bg-red-50"
-                  title="Vymazať"
+                  title="Vymazat"
                 >
                   <Trash2 className="w-3 h-3" />
                 </button>
@@ -1172,7 +1947,7 @@ function MediaTab({
 
         {filteredMedia.length === 0 && (
           <div className="col-span-full text-center py-12 text-gray-500">
-            Žiadne súbory v tejto zložke
+            Ziadne subory v tejto zlozke
           </div>
         )}
       </div>
