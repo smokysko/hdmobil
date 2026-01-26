@@ -23,6 +23,7 @@ import {
   ChevronRight,
   Loader2,
   FileText,
+  Palette,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { toast } from "sonner";
@@ -198,6 +199,7 @@ export default function AdminCustomers() {
     { href: "/admin/orders", icon: ShoppingCart, label: "Objednavky" },
     { href: "/admin/customers", icon: Users, label: "Zakaznici" },
     { href: "/admin/invoices", icon: FileText, label: "Faktury" },
+    { href: "/admin/cms", icon: Palette, label: "Obsah stranky" },
     { href: "/admin/settings", icon: Settings, label: "Nastavenia" },
   ];
 

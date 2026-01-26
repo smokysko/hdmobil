@@ -9,6 +9,7 @@ import {
   LogOut,
   ExternalLink,
   FileText,
+  Palette,
 } from 'lucide-react';
 
 export default function AdminSettings() {
@@ -54,6 +55,7 @@ export default function AdminSettings() {
     { href: '/admin/orders', icon: ShoppingCart, label: 'Objednávky' },
     { href: '/admin/customers', icon: Users, label: 'Zákazníci' },
     { href: '/admin/invoices', icon: FileText, label: 'Faktúry' },
+    { href: '/admin/cms', icon: Palette, label: 'Obsah stránky' },
     { href: '/admin/settings', icon: Settings, label: 'Nastavenia' },
   ];
 
