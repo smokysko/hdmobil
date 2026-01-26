@@ -107,7 +107,7 @@ export default function AdminInvoices() {
       const offset = (page - 1) * pageSize;
       let query = supabase
         .from("invoices")
-        .select("*, order:orders(order_number)", { count: "exact" })
+        .select("*, order:orders!invoices_order_id_fkey(order_number)", { count: "exact" })
         .order("issue_date", { ascending: false });
 
       if (filterStatus !== "all") {
