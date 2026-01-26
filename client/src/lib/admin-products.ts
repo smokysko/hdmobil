@@ -1,4 +1,5 @@
 import { supabase } from './supabase';
+import { nanoid } from 'nanoid';
 
 export interface AdminProduct {
   id: string;
@@ -189,4 +190,64 @@ export async function toggleProductStatus(id: string, isActive: boolean): Promis
   }
 
   return { success: true };
+}
+
+export async function uploadProductImage(file: File): Promise<{ success: boolean; url?: string; error?: string }> {
+  const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg';
+  const fileName = `${nanoid()}.${fileExt}`;
+  const filePath = `products/${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('images')
+    .upload(filePath, file, {
+      cacheControl: '3600',
+      upsert: false,
+    });
+
+  if (uploadError) {
+    console.error('Error uploading image:', uploadError);
+    return { success: false, error: uploadError.message };
+  }
+
+  const { data: urlData } = supabase.storage
+    .from('images')
+    .getPublicUrl(filePath);
+
+  return { success: true, url: urlData.publicUrl };
+}
+
+export async function deleteProductImage(imageUrl: string): Promise<{ success: boolean; error?: string }> {
+  const path = imageUrl.split('/images/')[1];
+  if (!path) {
+    return { success: false, error: 'Invalid image URL' };
+  }
+
+  const { error } = await supabase.storage
+    .from('images')
+    .remove([path]);
+
+  if (error) {
+    console.error('Error deleting image:', error);
+    return { success: false, error: error.message };
+  }
+
+  return { success: true };
+}
+
+export async function getProductById(id: string): Promise<AdminProduct | null> {
+  const { data, error } = await supabase
+    .from('products')
+    .select(`
+      *,
+      category:categories(id, slug, name_sk)
+    `)
+    .eq('id', id)
+    .maybeSingle();
+
+  if (error) {
+    console.error('Error fetching product:', error);
+    return null;
+  }
+
+  return data;
 }
