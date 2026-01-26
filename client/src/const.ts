@@ -1,4 +1,5 @@
-export { COOKIE_NAME, ONE_YEAR_MS } from "@shared/const";
+export const COOKIE_NAME = "hdmobil_session";
+export const ONE_YEAR_MS = 365 * 24 * 60 * 60 * 1000;
 
 // Generate login URL at runtime so redirect URI reflects the current origin.
 export const getLoginUrl = () => {

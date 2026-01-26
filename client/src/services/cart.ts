@@ -199,5 +199,5 @@ export async function getCartRecommendations(cartId: string): Promise<Product[]>
     ).values()
   );
 
-  return uniqueAccessories.slice(0, 5) as Product[];
+  return uniqueAccessories.slice(0, 5) as unknown as Product[];
 }

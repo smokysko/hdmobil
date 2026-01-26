@@ -241,7 +241,7 @@ export async function getRecommendedAccessories(productId: string, limit = 4): P
   if (directAccessories && directAccessories.length > 0) {
     return directAccessories
       .filter((item) => item.accessory)
-      .map((item) => mapDbProductToProduct(item.accessory as DbProduct));
+      .map((item) => mapDbProductToProduct(item.accessory as unknown as DbProduct));
   }
 
   const { data: product } = await supabase

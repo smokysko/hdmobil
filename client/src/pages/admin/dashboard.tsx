@@ -185,7 +185,8 @@ export default function AdminDashboard() {
 
       const categoryRevenue: Record<string, number> = {};
       orderItems.forEach((item) => {
-        const catId = (item.products as { category_id: string } | null)?.category_id;
+        const products = item.products as unknown as { category_id: string } | null;
+        const catId = products?.category_id;
         if (catId) {
           categoryRevenue[catId] =
             (categoryRevenue[catId] || 0) + (parseFloat(String(item.line_total)) || 0);
