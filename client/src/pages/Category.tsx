@@ -1,10 +1,31 @@
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
-import { getProducts, getCategories, Product, Category } from "@/lib/products";
+import {
+  getProducts,
+  getCategories,
+  getSaleProducts,
+  getNewProducts,
+  Product,
+  Category,
+} from "@/lib/products";
 import { useRoute } from "wouter";
 import { useEffect, useState } from "react";
-import NotFound from "./NotFound";
+
+const SPECIAL_CATEGORIES: Record<string, { name: string; description: string }> = {
+  akcia: {
+    name: "Vypredaj",
+    description: "Produkty v akcii za znizene ceny",
+  },
+  novinky: {
+    name: "Novinky",
+    description: "Najnovsie produkty v nasej ponuke",
+  },
+  all: {
+    name: "Vsetky produkty",
+    description: "Kompletna ponuka produktov",
+  },
+};
 
 export default function CategoryPage() {
   const [, params] = useRoute("/category/:id");
@@ -14,13 +35,23 @@ export default function CategoryPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const isSpecialCategory = categorySlug in SPECIAL_CATEGORIES;
+
   useEffect(() => {
     async function loadData() {
       setIsLoading(true);
-      const [prods, cats] = await Promise.all([
-        getProducts({ categorySlug }),
-        getCategories(),
-      ]);
+
+      let prods: Product[] = [];
+
+      if (categorySlug === "akcia") {
+        prods = await getSaleProducts(50);
+      } else if (categorySlug === "novinky") {
+        prods = await getNewProducts(50);
+      } else {
+        prods = await getProducts({ categorySlug });
+      }
+
+      const cats = await getCategories();
       setProducts(prods);
       setCategories(cats);
       setIsLoading(false);
@@ -29,10 +60,10 @@ export default function CategoryPage() {
   }, [categorySlug]);
 
   const category = categories.find((c) => c.slug === categorySlug);
+  const specialCategory = SPECIAL_CATEGORIES[categorySlug];
 
-  if (!isLoading && !category && categorySlug !== "all") return <NotFound />;
-
-  const categoryName = category ? category.name : "Vsetky produkty";
+  const categoryName = category?.name || specialCategory?.name || categorySlug;
+  const categoryDescription = specialCategory?.description;
 
   return (
     <Layout>
@@ -44,9 +75,14 @@ export default function CategoryPage() {
             </h1>
             <div className="h-1 w-20 bg-primary mx-auto rounded-full mb-6"></div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Preskumajte nasu premiovu kolekciu {categoryName.toLowerCase()}.
-              Navrhnute pre vykon a styl.
+              {categoryDescription ||
+                `Preskumajte nasu premiovu kolekciu ${categoryName.toLowerCase()}.`}
             </p>
+            {!isLoading && (
+              <p className="text-sm text-muted-foreground mt-4">
+                {products.length} produktov
+              </p>
+            )}
           </div>
 
           {isLoading ? (

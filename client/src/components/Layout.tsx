@@ -27,69 +27,64 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   const [location] = useLocation();
 
   const navItems = [
-    { 
-      name: "Smartfóny", 
-      href: "/category/smartphones",
+    {
+      name: "Smartfony",
+      href: "/category/smartfony",
       subcategories: [
-        { name: "Apple iPhone", href: "/category/smartphones/apple" },
-        { name: "Samsung Galaxy", href: "/category/smartphones/samsung" },
-        { name: "Xiaomi", href: "/category/smartphones/xiaomi" },
-        { name: "Google Pixel", href: "/category/smartphones/google" },
-        { name: "Odolné telefóny", href: "/category/smartphones/rugged" },
-        { name: "Príslušenstvo", href: "/category/accessories" }
+        { name: "Apple iPhone", href: "/category/smartfony?brand=apple" },
+        { name: "Samsung Galaxy", href: "/category/smartfony?brand=samsung" },
+        { name: "Xiaomi", href: "/category/smartfony?brand=xiaomi" },
+        { name: "Google Pixel", href: "/category/smartfony?brand=google" },
+        { name: "Odolne telefony", href: "/category/smartfony?type=rugged" },
       ]
     },
-    { 
-      name: "Tablety", 
-      href: "/category/tablets",
+    {
+      name: "Tablety",
+      href: "/category/tablety",
       subcategories: [
-        { name: "iPad", href: "/category/tablets/ipad" },
-        { name: "Android tablety", href: "/category/tablets/android" },
-        { name: "Grafické tablety", href: "/category/tablets/graphic" },
-        { name: "Čítačky kníh", href: "/category/tablets/ereaders" }
+        { name: "iPad", href: "/category/tablety?brand=apple" },
+        { name: "Android tablety", href: "/category/tablety?os=android" },
+        { name: "Graficke tablety", href: "/category/tablety?type=graphic" },
       ]
     },
-    { 
-      name: "Notebooky", 
-      href: "/category/laptops",
+    {
+      name: "Notebooky",
+      href: "/category/notebooky",
       subcategories: [
-        { name: "MacBook", href: "/category/laptops/macbook" },
-        { name: "Herné notebooky", href: "/category/laptops/gaming" },
-        { name: "Kancelárske", href: "/category/laptops/office" },
-        { name: "Ultrabooky", href: "/category/laptops/ultrabook" },
-        { name: "Príslušenstvo k PC", href: "/category/laptops/accessories" }
+        { name: "MacBook", href: "/category/notebooky?brand=apple" },
+        { name: "Herne notebooky", href: "/category/notebooky?type=gaming" },
+        { name: "Kancelarske", href: "/category/notebooky?type=office" },
+        { name: "Ultrabooky", href: "/category/notebooky?type=ultrabook" },
       ]
     },
-    { 
-      name: "Audio", 
+    {
+      name: "Audio",
       href: "/category/audio",
       subcategories: [
-        { name: "Bezdrôtové slúchadlá", href: "/category/audio/wireless" },
-        { name: "Bluetooth reproduktory", href: "/category/audio/speakers" },
-        { name: "Soundbary", href: "/category/audio/soundbars" },
-        { name: "Hi-Fi systémy", href: "/category/audio/hifi" }
+        { name: "Bezdrotove sluchadla", href: "/category/audio?type=wireless" },
+        { name: "Bluetooth reproduktory", href: "/category/audio?type=speakers" },
+        { name: "Soundbary", href: "/category/audio?type=soundbar" },
       ]
     },
-    { 
-      name: "Príslušenstvo", 
-      href: "/category/accessories",
+    {
+      name: "Prislusenstvo",
+      href: "/category/prislusenstvo",
       subcategories: [
-        { name: "Puzdrá a kryty", href: "/category/accessories/cases" },
-        { name: "Ochranné sklá", href: "/category/accessories/glass" },
-        { name: "Nabíjačky a káble", href: "/category/accessories/chargers" },
-        { name: "Powerbanky", href: "/category/accessories/powerbanks" },
-        { name: "Držiaky do auta", href: "/category/accessories/car-holders" }
+        { name: "Puzdra a kryty", href: "/category/prislusenstvo?type=cases" },
+        { name: "Ochranne skla", href: "/category/prislusenstvo?type=glass" },
+        { name: "Nabijacky a kable", href: "/category/prislusenstvo?type=chargers" },
+        { name: "Powerbanky", href: "/category/prislusenstvo?type=powerbanks" },
+        { name: "Drziaky do auta", href: "/category/prislusenstvo?type=car-holders" }
       ]
     },
-    { 
-      name: "Náhradné diely", 
-      href: "/category/spare-parts",
+    {
+      name: "Nahradne diely",
+      href: "/category/nahradne-diely",
       subcategories: [
-        { name: "Displeje", href: "/category/spare-parts/displays" },
-        { name: "Batérie", href: "/category/spare-parts/batteries" },
-        { name: "Konektory", href: "/category/spare-parts/connectors" },
-        { name: "Kamery", href: "/category/spare-parts/cameras" },
-        { name: "Náradie", href: "/category/spare-parts/tools" }
+        { name: "Displeje", href: "/category/nahradne-diely?type=displays" },
+        { name: "Baterie", href: "/category/nahradne-diely?type=batteries" },
+        { name: "Konektory", href: "/category/nahradne-diely?type=connectors" },
+        { name: "Kamery", href: "/category/nahradne-diely?type=cameras" },
       ]
     },
   ];
@@ -248,15 +243,15 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 
                 {/* Special Links */}
                 <NavigationMenuItem className="ml-auto">
-                  <Link href="/category/sale">
+                  <Link href="/category/akcia">
                     <div className="flex items-center gap-1 cursor-pointer hover:bg-secondary/50 px-4 py-2 rounded-md text-sm font-bold text-primary uppercase tracking-wide">
                       <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                      Výpredaj
+                      Vypredaj
                     </div>
                   </Link>
                 </NavigationMenuItem>
                 <NavigationMenuItem>
-                  <Link href="/category/new">
+                  <Link href="/category/novinky">
                     <div className="cursor-pointer hover:bg-secondary/50 px-4 py-2 rounded-md text-sm font-bold text-primary uppercase tracking-wide">
                       Novinky
                     </div>
@@ -314,11 +309,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div>
               <h3 className="font-bold text-lg mb-6 text-background">Nakupovanie</h3>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><Link href="/category/smartphones"><span className="hover:text-primary cursor-pointer transition-colors">Smartfóny</span></Link></li>
-                <li><Link href="/category/tablets"><span className="hover:text-primary cursor-pointer transition-colors">Tablety</span></Link></li>
-                <li><Link href="/category/laptops"><span className="hover:text-primary cursor-pointer transition-colors">Notebooky</span></Link></li>
-                <li><Link href="/category/spare-parts"><span className="hover:text-primary cursor-pointer transition-colors">Náhradné diely</span></Link></li>
-                <li><Link href="/category/sale"><span className="hover:text-primary cursor-pointer transition-colors">Výpredaj</span></Link></li>
+                <li><Link href="/category/smartfony"><span className="hover:text-primary cursor-pointer transition-colors">Smartfony</span></Link></li>
+                <li><Link href="/category/tablety"><span className="hover:text-primary cursor-pointer transition-colors">Tablety</span></Link></li>
+                <li><Link href="/category/notebooky"><span className="hover:text-primary cursor-pointer transition-colors">Notebooky</span></Link></li>
+                <li><Link href="/category/nahradne-diely"><span className="hover:text-primary cursor-pointer transition-colors">Nahradne diely</span></Link></li>
+                <li><Link href="/category/akcia"><span className="hover:text-primary cursor-pointer transition-colors">Vypredaj</span></Link></li>
               </ul>
             </div>
 
