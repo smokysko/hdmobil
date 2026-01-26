@@ -30,9 +30,9 @@ export default function AdminLogin() {
 
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
-          setError('Nespravny email alebo heslo');
+          setError('Nesprávny email alebo heslo');
         } else if (error.message.includes('Email not confirmed')) {
-          setError('Email nie je potvrdeny. Skontrolujte svoju emailovu schranku.');
+          setError('Email nie je potvrdený. Skontrolujte svoju emailovú schránku.');
         } else {
           setError(error.message);
         }
@@ -42,7 +42,7 @@ export default function AdminLogin() {
         window.location.href = '/admin/dashboard';
       }
     } catch (err) {
-      setError('Nastala chyba pri prihlasovani. Skuste to znova.');
+      setError('Nastala chyba pri prihlasovaní. Skúste to znova.');
       setLoading(false);
     }
   };

@@ -141,7 +141,7 @@ export default function AdminInvoices() {
       }
     } catch (err) {
       console.error("Error fetching invoices:", err);
-      toast.error("Nepodarilo sa nacitat faktury");
+      toast.error("Nepodarilo sa načítať faktúry");
     } finally {
       setLoading(false);
     }
@@ -189,17 +189,17 @@ export default function AdminInvoices() {
       const result = await response.json();
 
       if (result.success) {
-        toast.success("Faktura bola oznacena ako zaplatena");
+        toast.success("Faktúra bola označená ako zaplatená");
         fetchInvoices();
         if (selectedInvoice?.id === invoiceId) {
           setSelectedInvoice({ ...selectedInvoice, status: "paid" });
         }
       } else {
-        toast.error(result.error || "Nepodarilo sa aktualizovat fakturu");
+        toast.error(result.error || "Nepodarilo sa aktualizovať faktúru");
       }
     } catch (err) {
       console.error("Error marking invoice as paid:", err);
-      toast.error("Nepodarilo sa aktualizovat fakturu");
+      toast.error("Nepodarilo sa aktualizovať faktúru");
     }
   }
 
@@ -224,11 +224,11 @@ export default function AdminInvoices() {
   });
 
   const navItems = [
-    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehlad" },
+    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehľad" },
     { href: "/admin/products", icon: Package, label: "Produkty" },
-    { href: "/admin/orders", icon: ShoppingCart, label: "Objednavky" },
-    { href: "/admin/customers", icon: Users, label: "Zakaznici" },
-    { href: "/admin/invoices", icon: FileText, label: "Faktury" },
+    { href: "/admin/orders", icon: ShoppingCart, label: "Objednávky" },
+    { href: "/admin/customers", icon: Users, label: "Zákazníci" },
+    { href: "/admin/invoices", icon: FileText, label: "Faktúry" },
     { href: "/admin/settings", icon: Settings, label: "Nastavenia" },
   ];
 
@@ -251,19 +251,19 @@ export default function AdminInvoices() {
       issued: {
         bg: "bg-amber-50",
         text: "text-amber-700",
-        label: "Vystavena",
+        label: "Vystavená",
         icon: Clock,
       },
       paid: {
         bg: "bg-emerald-50",
         text: "text-emerald-700",
-        label: "Zaplatena",
+        label: "Zaplatená",
         icon: CheckCircle,
       },
       cancelled: {
         bg: "bg-gray-100",
         text: "text-gray-600",
-        label: "Stornovana",
+        label: "Stornovaná",
         icon: XCircle,
       },
     };
@@ -308,7 +308,7 @@ export default function AdminInvoices() {
               className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobrazit web</span>
+              <span className="hidden sm:inline">Zobraziť web</span>
             </Link>
             <div className="h-6 w-px bg-gray-200"></div>
             <button
@@ -356,7 +356,7 @@ export default function AdminInvoices() {
               className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
             >
               <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlasit sa</span>
+              <span>Odhlásiť sa</span>
             </button>
           </div>
         </aside>
@@ -365,9 +365,9 @@ export default function AdminInvoices() {
           <div className="max-w-[1400px] mx-auto space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900">Faktury</h2>
+                <h2 className="text-2xl font-semibold text-gray-900">Faktúry</h2>
                 <p className="text-gray-500 text-sm mt-1">
-                  Spravujte faktury a sledujte platby ({totalCount} celkom)
+                  Spravujte faktúry a sledujte platby ({totalCount} celkom)
                 </p>
               </div>
             </div>
@@ -395,7 +395,7 @@ export default function AdminInvoices() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {stats.issued}
                     </p>
-                    <p className="text-sm text-gray-500">Vystavene</p>
+                    <p className="text-sm text-gray-500">Vystavené</p>
                   </div>
                 </div>
               </div>
@@ -411,7 +411,7 @@ export default function AdminInvoices() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {stats.paid}
                     </p>
-                    <p className="text-sm text-gray-500">Zaplatene</p>
+                    <p className="text-sm text-gray-500">Zaplatené</p>
                   </div>
                 </div>
               </div>
@@ -437,7 +437,7 @@ export default function AdminInvoices() {
                     <p className="text-xl font-semibold text-gray-900">
                       {stats.totalRevenue.toLocaleString()}
                     </p>
-                    <p className="text-sm text-gray-500">EUR trzby</p>
+                    <p className="text-sm text-gray-500">EUR tržby</p>
                   </div>
                 </div>
               </div>
@@ -449,7 +449,7 @@ export default function AdminInvoices() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Hladat podla cisla faktury, odberatela alebo VS..."
+                    placeholder="Hľadať podľa čísla faktúry, odberateľa alebo VS..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
@@ -464,10 +464,10 @@ export default function AdminInvoices() {
                     }}
                     className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm bg-white"
                   >
-                    <option value="all">Vsetky stavy</option>
-                    <option value="issued">Vystavene</option>
-                    <option value="paid">Zaplatene</option>
-                    <option value="cancelled">Stornovane</option>
+                    <option value="all">Všetky stavy</option>
+                    <option value="issued">Vystavené</option>
+                    <option value="paid">Zaplatené</option>
+                    <option value="cancelled">Stornované</option>
                   </select>
                   <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                 </div>
@@ -485,19 +485,19 @@ export default function AdminInvoices() {
                     <thead>
                       <tr className="border-b border-gray-100 bg-gray-50/50">
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Cislo faktury
+                          Číslo faktúry
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Odberatel
+                          Odberateľ
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Objednavka
+                          Objednávka
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Datum vystavenia
+                          Dátum vystavenia
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Splatnost
+                          Splatnosť
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Suma
@@ -582,7 +582,7 @@ export default function AdminInvoices() {
                             colSpan={8}
                             className="px-5 py-12 text-center text-gray-500"
                           >
-                            Ziadne faktury
+                            Žiadne faktúry
                           </td>
                         </tr>
                       )}
@@ -593,13 +593,13 @@ export default function AdminInvoices() {
 
               <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
                 <p className="text-sm text-gray-500">
-                  Zobrazenych{" "}
+                  Zobrazených{" "}
                   <span className="font-medium text-gray-700">
                     {filteredInvoices.length}
                   </span>{" "}
                   z{" "}
                   <span className="font-medium text-gray-700">{totalCount}</span>{" "}
-                  faktur
+                  faktúr
                 </p>
                 {totalPages > 1 && (
                   <div className="flex items-center gap-2">
@@ -647,7 +647,7 @@ export default function AdminInvoices() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                   <div>
                     <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                      Odberatel
+                      Odberateľ
                     </h4>
                     <div className="bg-gray-50 rounded-lg p-4 space-y-1 text-sm">
                       <p className="font-medium text-gray-900">
@@ -667,7 +667,7 @@ export default function AdminInvoices() {
 
                   <div>
                     <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                      Datumy
+                      Dátumy
                     </h4>
                     <div className="bg-gray-50 rounded-lg p-4 space-y-3 text-sm">
                       <div className="flex justify-between">
