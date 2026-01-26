@@ -178,7 +178,7 @@ export default function ProductDetail() {
                     {product.rating.toFixed(1)}
                   </span>
                   <span className="text-muted-foreground text-xs">
-                    ({product.reviews} recenzii)
+                    ({product.reviews} recenzií)
                   </span>
                 </div>
               </div>
@@ -249,7 +249,7 @@ export default function ProductDetail() {
                   disabled={product.stock <= 0}
                 >
                   <ShoppingCart className="mr-2 h-5 w-5" />
-                  {product.stock > 0 ? "PRIDAT DO KOSIKA" : "VYPREDANE"}
+                  {product.stock > 0 ? "PRIDAŤ DO KOŠÍKA" : "VYPREDANÉ"}
                 </Button>
                 <Button
                   variant="outline"
@@ -264,13 +264,13 @@ export default function ProductDetail() {
                 <div className="flex items-center gap-3">
                   <Truck className="h-5 w-5 text-primary" />
                   <span className="text-sm font-medium">
-                    Expresna doprava zdarma
+                    Expresná doprava zdarma
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Shield className="h-5 w-5 text-primary" />
                   <span className="text-sm font-medium">
-                    2-rocna oficialna zaruka
+                    2-ročná oficiálna záruka
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
@@ -278,13 +278,13 @@ export default function ProductDetail() {
                   <span className="text-sm font-medium">
                     {product.stock > 0
                       ? `Skladom (${product.stock} ks)`
-                      : "Momentalne nedostupne"}
+                      : "Momentálne nedostupné"}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary" />
                   <span className="text-sm font-medium">
-                    30-dnova garancia vratenia penazi
+                    30-dňová garancia vrátenia peňazí
                   </span>
                 </div>
               </div>
@@ -298,10 +298,10 @@ export default function ProductDetail() {
           <div className="container">
             <div className="mb-8">
               <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                Odporucane prislusenstvo
+                Odporúčané príslušenstvo
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Doplnky ktore sa hodia k vasmu produktu
+                Doplnky, ktoré sa hodia k vášmu produktu
               </p>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -318,10 +318,10 @@ export default function ProductDetail() {
           <div className="container">
             <div className="mb-8">
               <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                Podobne produkty
+                Podobné produkty
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Dalsie produkty z kategorie {product.category}
+                Ďalšie produkty z kategórie {product.category}
               </p>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
