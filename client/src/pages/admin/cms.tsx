@@ -77,7 +77,6 @@ export default function AdminCMS() {
   const [location, navigate] = useLocation();
   const [activeTab, setActiveTab] = useState<TabType>('homepage');
   const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
 
   const [sections, setSections] = useState<HomepageSection[]>([]);
   const [banners, setBanners] = useState<Banner[]>([]);
@@ -112,7 +111,7 @@ export default function AdminCMS() {
       if (mediaRes.data) setMediaItems(mediaRes.data);
     } catch (error) {
       console.error('Error loading CMS data:', error);
-      toast.error('Chyba pri nacitavani dat');
+      toast.error('Chyba pri načítavaní dát');
     } finally {
       setIsLoading(false);
     }
@@ -124,19 +123,19 @@ export default function AdminCMS() {
   };
 
   const navItems = [
-    { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Prehlad' },
+    { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Prehľad' },
     { href: '/admin/products', icon: Package, label: 'Produkty' },
-    { href: '/admin/orders', icon: ShoppingCart, label: 'Objednavky' },
-    { href: '/admin/customers', icon: Users, label: 'Zakaznici' },
-    { href: '/admin/invoices', icon: FileText, label: 'Faktury' },
-    { href: '/admin/cms', icon: Palette, label: 'Obsah stranky' },
+    { href: '/admin/orders', icon: ShoppingCart, label: 'Objednávky' },
+    { href: '/admin/customers', icon: Users, label: 'Zákazníci' },
+    { href: '/admin/invoices', icon: FileText, label: 'Faktúry' },
+    { href: '/admin/cms', icon: Palette, label: 'Obsah stránky' },
     { href: '/admin/settings', icon: Settings, label: 'Nastavenia' },
   ];
 
   const tabs = [
-    { id: 'homepage' as TabType, label: 'Uvod stranky', icon: Home },
+    { id: 'homepage' as TabType, label: 'Úvod stránky', icon: Home },
     { id: 'banners' as TabType, label: 'Bannery', icon: ImageIcon },
-    { id: 'media' as TabType, label: 'Kniznica medii', icon: FolderOpen },
+    { id: 'media' as TabType, label: 'Knižnica médií', icon: FolderOpen },
   ];
 
   return (
@@ -160,7 +159,7 @@ export default function AdminCMS() {
               className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobrazit web</span>
+              <span className="hidden sm:inline">Zobraziť web</span>
             </Link>
             <div className="h-6 w-px bg-gray-200"></div>
             <button
@@ -208,7 +207,7 @@ export default function AdminCMS() {
               className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
             >
               <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlasit sa</span>
+              <span>Odhlásiť sa</span>
             </button>
           </div>
         </aside>
@@ -216,9 +215,9 @@ export default function AdminCMS() {
         <main className="flex-1 p-6">
           <div className="max-w-[1400px] mx-auto space-y-6">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Obsah stranky</h2>
+              <h2 className="text-2xl font-semibold text-gray-900">Obsah stránky</h2>
               <p className="text-gray-500 text-sm mt-1">
-                Spravujte obsah homepage, bannery a obrazky
+                Spravujte obsah homepage, bannery a obrázky
               </p>
             </div>
 
@@ -328,12 +327,12 @@ function HomepageTab({
         .eq('id', editingSection.id);
 
       if (error) throw error;
-      toast.success('Sekcia bola ulozena');
+      toast.success('Sekcia bola uložená');
       setEditingSection(null);
       onUpdate();
     } catch (error) {
       console.error('Error saving section:', error);
-      toast.error('Chyba pri ukladani');
+      toast.error('Chyba pri ukladaní');
     } finally {
       setIsSaving(false);
     }
@@ -344,7 +343,7 @@ function HomepageTab({
     if (!file) return;
 
     if (!file.type.startsWith('image/')) {
-      toast.error('Vyberte obrazkovy subor');
+      toast.error('Vyberte obrázkový súbor');
       return;
     }
 
@@ -364,10 +363,10 @@ function HomepageTab({
         .getPublicUrl(fileName);
 
       setFormData({ ...formData, image_url: publicUrl });
-      toast.success('Obrazok bol nahraty');
+      toast.success('Obrázok bol nahratý');
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Chyba pri nahravani obrazka');
+      toast.error('Chyba pri nahrávaní obrázka');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -376,7 +375,7 @@ function HomepageTab({
 
   const getSectionLabel = (key: string) => {
     const labels: Record<string, string> = {
-      hero: 'Hero sekcia (hlavny banner)',
+      hero: 'Hero sekcia (hlavný banner)',
       promo_banner: 'Promo banner',
     };
     return labels[key] || key;
@@ -388,7 +387,7 @@ function HomepageTab({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
-              Upravit: {getSectionLabel(editingSection.section_key)}
+              Upraviť: {getSectionLabel(editingSection.section_key)}
             </h3>
             <p className="text-sm text-gray-500">Upravte obsah tejto sekcie</p>
           </div>
@@ -428,7 +427,7 @@ function HomepageTab({
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Badge/Stitok
+                Badge/Štítok
               </label>
               <input
                 type="text"
@@ -464,7 +463,7 @@ function HomepageTab({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Text tlacidla
+                  Text tlačidla
                 </label>
                 <input
                   type="text"
@@ -482,14 +481,14 @@ function HomepageTab({
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                 className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
               />
-              <span className="text-sm text-gray-700">Aktivna sekcia</span>
+              <span className="text-sm text-gray-700">Aktívna sekcia</span>
             </label>
           </div>
 
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Obrazok
+                Obrázok
               </label>
               <input
                 ref={fileInputRef}
@@ -531,7 +530,7 @@ function HomepageTab({
                   ) : (
                     <>
                       <Upload className="w-8 h-8 text-gray-400" />
-                      <span className="text-sm text-gray-500">Nahrat obrazok</span>
+                      <span className="text-sm text-gray-500">Nahrať obrázok</span>
                     </>
                   )}
                 </button>
@@ -540,7 +539,7 @@ function HomepageTab({
 
             {editingSection.section_key === 'hero' && (
               <div className="bg-gray-50 rounded-lg p-4 space-y-3">
-                <h4 className="text-sm font-medium text-gray-700">Dodatocne nastavenia Hero sekcie</h4>
+                <h4 className="text-sm font-medium text-gray-700">Dodatočné nastavenia Hero sekcie</h4>
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs text-gray-500 mb-1">Cena</label>
@@ -555,7 +554,7 @@ function HomepageTab({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-500 mb-1">Povodna cena</label>
+                    <label className="block text-xs text-gray-500 mb-1">Pôvodná cena</label>
                     <input
                       type="number"
                       value={(formData.content as Record<string, unknown>)?.original_price as number || ''}
@@ -568,7 +567,7 @@ function HomepageTab({
                   </div>
                 </div>
                 <div>
-                  <label className="block text-xs text-gray-500 mb-1">Text tlacidla kupit</label>
+                  <label className="block text-xs text-gray-500 mb-1">Text tlačidla kúpiť</label>
                   <input
                     type="text"
                     value={(formData.content as Record<string, unknown>)?.buy_button_text as string || ''}
@@ -589,7 +588,7 @@ function HomepageTab({
             onClick={() => setEditingSection(null)}
             className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium"
           >
-            Zrusit
+            Zrušiť
           </button>
           <button
             onClick={handleSave}
@@ -597,7 +596,7 @@ function HomepageTab({
             className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2"
           >
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Ulozit zmeny
+            Uložiť zmeny
           </button>
         </div>
       </div>
@@ -607,7 +606,7 @@ function HomepageTab({
   return (
     <div className="space-y-4">
       <p className="text-sm text-gray-500">
-        Vyberte sekciu na upravu obsahu homepage
+        Vyberte sekciu na úpravu obsahu homepage
       </p>
 
       <div className="grid gap-4">
@@ -641,7 +640,7 @@ function HomepageTab({
                     : 'bg-gray-200 text-gray-600'
                 }`}
               >
-                {section.is_active ? 'Aktivna' : 'Neaktivna'}
+                {section.is_active ? 'Aktívna' : 'Neaktívna'}
               </span>
               <button
                 onClick={() => setEditingSection(section)}
@@ -655,7 +654,7 @@ function HomepageTab({
 
         {sections.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            Ziadne sekcie na upravu
+            Žiadne sekcie na úpravu
           </div>
         )}
       </div>
@@ -696,7 +695,7 @@ function BannersTab({
 
   const handleSave = async () => {
     if (!formData.name) {
-      toast.error('Zadajte nazov bannera');
+      toast.error('Zadajte názov bannera');
       return;
     }
 
@@ -708,33 +707,33 @@ function BannersTab({
           .update(formData)
           .eq('id', editingBanner.id);
         if (error) throw error;
-        toast.success('Banner bol aktualizovany');
+        toast.success('Banner bol aktualizovaný');
       } else {
         const { error } = await supabase.from('banners').insert(formData);
         if (error) throw error;
-        toast.success('Banner bol vytvoreny');
+        toast.success('Banner bol vytvorený');
       }
       closeModal();
       onUpdate();
     } catch (error) {
       console.error('Error saving banner:', error);
-      toast.error('Chyba pri ukladani');
+      toast.error('Chyba pri ukladaní');
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Naozaj chcete vymazat banner "${name}"?`)) return;
+    if (!confirm(`Naozaj chcete vymazať banner "${name}"?`)) return;
 
     try {
       const { error } = await supabase.from('banners').delete().eq('id', id);
       if (error) throw error;
-      toast.success('Banner bol vymazany');
+      toast.success('Banner bol vymazaný');
       onUpdate();
     } catch (error) {
       console.error('Error deleting banner:', error);
-      toast.error('Chyba pri mazani');
+      toast.error('Chyba pri mazaní');
     }
   };
 
@@ -758,10 +757,10 @@ function BannersTab({
         .getPublicUrl(fileName);
 
       setFormData({ ...formData, image_url: publicUrl });
-      toast.success('Obrazok nahraty');
+      toast.success('Obrázok nahratý');
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Chyba pri nahravani');
+      toast.error('Chyba pri nahrávaní');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -776,15 +775,15 @@ function BannersTab({
 
   const placementOptions = [
     { value: 'homepage_hero', label: 'Homepage - Hero carousel' },
-    { value: 'homepage_middle', label: 'Homepage - Stredna cast' },
-    { value: 'category_top', label: 'Kategorie - Vrchny banner' },
+    { value: 'homepage_middle', label: 'Homepage - Stredná časť' },
+    { value: 'category_top', label: 'Kategórie - Vrchný banner' },
   ];
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <p className="text-sm text-gray-500">
-          Spravujte reklamne bannery na stranke
+          Spravujte reklamné bannery na stránke
         </p>
         <button
           onClick={() => {
@@ -795,7 +794,7 @@ function BannersTab({
           className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
         >
           <Plus className="w-4 h-4" />
-          Novy banner
+          Nový banner
         </button>
       </div>
 
@@ -840,7 +839,7 @@ function BannersTab({
                     : 'bg-gray-200 text-gray-600'
                 }`}
               >
-                {banner.is_active ? 'Aktivny' : 'Neaktivny'}
+                {banner.is_active ? 'Aktívny' : 'Neaktívny'}
               </span>
               <button
                 onClick={() => setEditingBanner(banner)}
@@ -860,7 +859,7 @@ function BannersTab({
 
         {banners.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            Ziadne bannery. Vytvorte prvy banner kliknutim na tlacidlo vyssie.
+            Žiadne bannery. Vytvorte prvý banner kliknutím na tlačidlo vyššie.
           </div>
         )}
       </div>
@@ -871,7 +870,7 @@ function BannersTab({
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
               <div>
                 <h2 className="text-xl font-semibold text-gray-900">
-                  {editingBanner ? 'Upravit banner' : 'Novy banner'}
+                  {editingBanner ? 'Upraviť banner' : 'Nový banner'}
                 </h2>
               </div>
               <button onClick={closeModal} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
@@ -880,13 +879,13 @@ function BannersTab({
             </div>
             <div className="p-6 space-y-4 overflow-y-auto max-h-[60vh]">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Nazov bannera *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Názov bannera *</label>
                 <input
                   type="text"
                   value={formData.name || ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
-                  placeholder="napr. Vianocna akcia 2026"
+                  placeholder="napr. Vianočná akcia 2026"
                 />
               </div>
 
@@ -939,7 +938,7 @@ function BannersTab({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Obrazok bannera</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Obrázok bannera</label>
                 <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageUpload} className="hidden" />
                 {formData.image_url ? (
                   <div className="relative group">
@@ -962,7 +961,7 @@ function BannersTab({
                     {isUploading ? <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" /> : (
                       <>
                         <Upload className="w-8 h-8 text-gray-400" />
-                        <span className="text-sm text-gray-500">Nahrat obrazok</span>
+                        <span className="text-sm text-gray-500">Nahrať obrázok</span>
                       </>
                     )}
                   </button>
@@ -971,7 +970,7 @@ function BannersTab({
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Datum od</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Dátum od</label>
                   <input
                     type="date"
                     value={formData.start_date?.split('T')[0] || ''}
@@ -980,7 +979,7 @@ function BannersTab({
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Datum do</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">Dátum do</label>
                   <input
                     type="date"
                     value={formData.end_date?.split('T')[0] || ''}
@@ -997,16 +996,16 @@ function BannersTab({
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                   className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
                 />
-                <span className="text-sm text-gray-700">Aktivny banner</span>
+                <span className="text-sm text-gray-700">Aktívny banner</span>
               </label>
             </div>
             <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
               <button onClick={closeModal} className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium">
-                Zrusit
+                Zrušiť
               </button>
               <button onClick={handleSave} disabled={isSaving} className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2">
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                {editingBanner ? 'Ulozit zmeny' : 'Vytvorit banner'}
+                {editingBanner ? 'Uložiť zmeny' : 'Vytvoriť banner'}
               </button>
             </div>
           </div>
@@ -1028,11 +1027,11 @@ function MediaTab({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const folders = [
-    { value: 'all', label: 'Vsetky' },
+    { value: 'all', label: 'Všetky' },
     { value: 'banners', label: 'Bannery' },
     { value: 'cms', label: 'Obsah' },
     { value: 'products', label: 'Produkty' },
-    { value: 'general', label: 'Ostatne' },
+    { value: 'general', label: 'Ostatné' },
   ];
 
   const filteredMedia = selectedFolder === 'all'
@@ -1068,11 +1067,11 @@ function MediaTab({
           folder: 'general',
         });
       }
-      toast.success('Subory boli nahrate');
+      toast.success('Súbory boli nahraté');
       onUpdate();
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Chyba pri nahravani');
+      toast.error('Chyba pri nahrávaní');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -1080,22 +1079,22 @@ function MediaTab({
   };
 
   const handleDelete = async (item: MediaItem) => {
-    if (!confirm(`Vymazat "${item.filename}"?`)) return;
+    if (!confirm(`Vymazať "${item.filename}"?`)) return;
 
     try {
       await supabase.storage.from('images').remove([item.storage_path]);
       await supabase.from('media_library').delete().eq('id', item.id);
-      toast.success('Subor bol vymazany');
+      toast.success('Súbor bol vymazaný');
       onUpdate();
     } catch (error) {
       console.error('Delete error:', error);
-      toast.error('Chyba pri mazani');
+      toast.error('Chyba pri mazaní');
     }
   };
 
   const copyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
-    toast.success('URL skopirovana do schranky');
+    toast.success('URL skopírovaná do schránky');
   };
 
   return (
@@ -1103,7 +1102,7 @@ function MediaTab({
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
           <p className="text-sm text-gray-500">
-            Kniznica vsetkych obrazkov a suborov
+            Knižnica všetkých obrázkov a súborov
           </p>
           <div className="relative">
             <select
@@ -1133,7 +1132,7 @@ function MediaTab({
             className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-50"
           >
             {isUploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Upload className="w-4 h-4" />}
-            Nahrat subory
+            Nahrať súbory
           </button>
         </div>
       </div>
@@ -1155,14 +1154,14 @@ function MediaTab({
                 <button
                   onClick={() => copyUrl(item.url)}
                   className="p-1.5 bg-white rounded text-gray-700 hover:bg-gray-100"
-                  title="Kopirovat URL"
+                  title="Kopírovať URL"
                 >
                   <Eye className="w-3 h-3" />
                 </button>
                 <button
                   onClick={() => handleDelete(item)}
                   className="p-1.5 bg-white rounded text-red-600 hover:bg-red-50"
-                  title="Vymazat"
+                  title="Vymazať"
                 >
                   <Trash2 className="w-3 h-3" />
                 </button>
@@ -1173,7 +1172,7 @@ function MediaTab({
 
         {filteredMedia.length === 0 && (
           <div className="col-span-full text-center py-12 text-gray-500">
-            Ziadne subory v tejto zlozke
+            Žiadne súbory v tejto zložke
           </div>
         )}
       </div>
