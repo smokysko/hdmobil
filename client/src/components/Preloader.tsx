@@ -59,7 +59,7 @@ export default function Preloader({ images, onComplete }: PreloaderProps) {
     >
       <div className="relative flex flex-col items-center">
         <div className="mb-8 relative scale-150 animate-pulse">
-           <img src="/images/logo_final.png" alt="HDmobil Logo" className="h-16 w-auto object-contain" />
+           <img src="/images/hdmobil_logo_blue.jpg" alt="HDmobil Logo" className="h-16 w-auto object-contain" />
         </div>
         
         <div className="w-64 h-1 bg-secondary rounded-full overflow-hidden">
