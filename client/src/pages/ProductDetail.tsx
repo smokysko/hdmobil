@@ -1,12 +1,20 @@
 import Layout from "@/components/Layout";
+import ProductCard from "@/components/ProductCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCart } from "@/contexts/CartContext";
-import { getProductById, Product } from "@/lib/products";
+import {
+  getProductById,
+  getRecommendedAccessories,
+  getRelatedProducts,
+  Product,
+} from "@/lib/products";
 import {
   Check,
+  ChevronLeft,
+  ChevronRight,
   Minus,
   Plus,
   Share2,
@@ -24,21 +32,45 @@ export default function ProductDetail() {
   const id = params?.id || "";
 
   const [product, setProduct] = useState<Product | null>(null);
+  const [accessories, setAccessories] = useState<Product[]>([]);
+  const [relatedProducts, setRelatedProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
 
   useEffect(() => {
     async function loadProduct() {
       setIsLoading(true);
+      setSelectedImageIndex(0);
       const prod = await getProductById(id);
       setProduct(prod);
+
+      if (prod) {
+        const [acc, related] = await Promise.all([
+          getRecommendedAccessories(prod.id, 4),
+          getRelatedProducts(prod.id, prod.categoryId, 4),
+        ]);
+        setAccessories(acc);
+        setRelatedProducts(related);
+      }
+
       setIsLoading(false);
     }
     if (id) {
       loadProduct();
     }
   }, [id]);
+
+  const galleryImages = product?.gallery?.length ? product.gallery : [product?.image || ''];
+
+  const nextImage = () => {
+    setSelectedImageIndex((prev) => (prev + 1) % galleryImages.length);
+  };
+
+  const prevImage = () => {
+    setSelectedImageIndex((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  };
 
   const handleAddToCart = () => {
     if (product) {
@@ -88,23 +120,48 @@ export default function ProductDetail() {
                 </Badge>
               )}
               <img
-                src={product.image}
+                src={galleryImages[selectedImageIndex]}
                 alt={product.name}
                 className="h-full w-full object-contain drop-shadow-lg transition-transform duration-700 hover:scale-105"
               />
+              {galleryImages.length > 1 && (
+                <>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background"
+                    onClick={prevImage}
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 rounded-full bg-background/80 backdrop-blur-sm hover:bg-background"
+                    onClick={nextImage}
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                </>
+              )}
             </div>
             <div className="grid grid-cols-4 gap-4">
-              {[...Array(4)].map((_, i) => (
-                <div
+              {galleryImages.slice(0, 4).map((img, i) => (
+                <button
                   key={i}
-                  className={`aspect-square cursor-pointer rounded-xl border bg-secondary/30 p-3 transition-all hover:border-primary hover:shadow-sm ${i === 0 ? "border-primary ring-1 ring-primary/30" : "border-border"}`}
+                  onClick={() => setSelectedImageIndex(i)}
+                  className={`aspect-square cursor-pointer rounded-xl border bg-secondary/30 p-3 transition-all hover:border-primary hover:shadow-sm ${
+                    i === selectedImageIndex
+                      ? "border-primary ring-1 ring-primary/30"
+                      : "border-border"
+                  }`}
                 >
                   <img
-                    src={product.image}
+                    src={img}
                     alt={`${product.name} view ${i + 1}`}
                     className="h-full w-full object-contain"
                   />
-                </div>
+                </button>
               ))}
             </div>
           </div>
@@ -235,6 +292,46 @@ export default function ProductDetail() {
           </div>
         </div>
       </div>
+
+      {accessories.length > 0 && (
+        <section className="py-12 bg-secondary/30 border-t border-border">
+          <div className="container">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight text-foreground">
+                Odporucane prislusenstvo
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Doplnky ktore sa hodia k vasmu produktu
+              </p>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {accessories.map((acc) => (
+                <ProductCard key={acc.id} product={acc} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {relatedProducts.length > 0 && (
+        <section className="py-12 bg-background border-t border-border">
+          <div className="container">
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold tracking-tight text-foreground">
+                Podobne produkty
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
+                Dalsie produkty z kategorie {product.category}
+              </p>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+              {relatedProducts.map((rel) => (
+                <ProductCard key={rel.id} product={rel} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
     </Layout>
   );
 }

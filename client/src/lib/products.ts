@@ -35,8 +35,10 @@ export interface Product {
   rating: number;
   reviews: number;
   image: string;
+  gallery: string[];
   category: string;
   categorySlug: string;
+  categoryId: string;
   isNew: boolean;
   isSale: boolean;
   salePrice?: number;
@@ -56,6 +58,8 @@ export interface Category {
 
 function mapDbProductToProduct(db: DbProduct): Product {
   const isSale = db.original_price !== null && db.original_price > db.price_with_vat;
+  const mainImage = db.main_image_url || '/images/products/placeholder.png';
+  const gallery = db.gallery_urls?.length ? db.gallery_urls : [mainImage];
 
   return {
     id: db.id,
@@ -63,9 +67,11 @@ function mapDbProductToProduct(db: DbProduct): Product {
     price: db.original_price || db.price_with_vat,
     rating: 4.5 + Math.random() * 0.5,
     reviews: Math.floor(Math.random() * 300) + 50,
-    image: db.main_image_url || '/images/products/placeholder.png',
+    image: mainImage,
+    gallery,
     category: db.category?.name_sk || 'Uncategorized',
     categorySlug: db.category?.slug || 'all',
+    categoryId: db.category_id || '',
     isNew: db.is_new,
     isSale,
     salePrice: isSale ? db.price_with_vat : undefined,
@@ -217,4 +223,82 @@ export async function getSaleProducts(limit = 4): Promise<Product[]> {
 
 export async function searchProducts(query: string): Promise<Product[]> {
   return getProducts({ search: query });
+}
+
+export async function getRecommendedAccessories(productId: string, limit = 4): Promise<Product[]> {
+  const { data: directAccessories } = await supabase
+    .from('product_accessories')
+    .select(`
+      accessory:accessory_id(
+        *,
+        category:categories(id, slug, name_sk)
+      )
+    `)
+    .eq('product_id', productId)
+    .order('sort_order')
+    .limit(limit);
+
+  if (directAccessories && directAccessories.length > 0) {
+    return directAccessories
+      .filter((item) => item.accessory)
+      .map((item) => mapDbProductToProduct(item.accessory as DbProduct));
+  }
+
+  const { data: product } = await supabase
+    .from('products')
+    .select('category_id')
+    .eq('id', productId)
+    .maybeSingle();
+
+  if (!product?.category_id) return [];
+
+  const { data: rules } = await supabase
+    .from('category_accessory_rules')
+    .select('accessory_category_id')
+    .eq('source_category_id', product.category_id)
+    .order('priority');
+
+  if (!rules || rules.length === 0) return [];
+
+  const accessoryCategoryIds = rules.map((r) => r.accessory_category_id);
+
+  const { data: accessories, error } = await supabase
+    .from('products')
+    .select(`
+      *,
+      category:categories(id, slug, name_sk)
+    `)
+    .in('category_id', accessoryCategoryIds)
+    .eq('is_active', true)
+    .neq('id', productId)
+    .order('is_featured', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching accessories:', error);
+    return [];
+  }
+
+  return (accessories || []).map(mapDbProductToProduct);
+}
+
+export async function getRelatedProducts(productId: string, categoryId: string, limit = 4): Promise<Product[]> {
+  const { data, error } = await supabase
+    .from('products')
+    .select(`
+      *,
+      category:categories(id, slug, name_sk)
+    `)
+    .eq('category_id', categoryId)
+    .eq('is_active', true)
+    .neq('id', productId)
+    .order('is_featured', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching related products:', error);
+    return [];
+  }
+
+  return (data || []).map(mapDbProductToProduct);
 }
