@@ -188,7 +188,7 @@ export default function AdminCMS() {
         <div className="max-w-[1600px] mx-auto px-6 py-3 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link href="/admin/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <span className="text-white font-bold text-sm">HD</span>
               </div>
               <div>
@@ -210,7 +210,7 @@ export default function AdminCMS() {
               onClick={handleLogout}
               className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
                 A
               </div>
               <span className="text-sm font-medium hidden sm:inline">Admin</span>
@@ -231,12 +231,12 @@ export default function AdminCMS() {
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
                     isActive
-                      ? 'bg-emerald-50 text-emerald-700 font-medium'
+                      ? 'bg-blue-50 text-blue-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 ${isActive ? 'text-emerald-600' : 'text-gray-400'}`}
+                    className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-gray-400'}`}
                     strokeWidth={1.5}
                   />
                   <span>{item.label}</span>
@@ -277,7 +277,7 @@ export default function AdminCMS() {
                         onClick={() => setActiveTab(tab.id)}
                         className={`flex items-center gap-2 px-4 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${
                           isActive
-                            ? 'border-emerald-500 text-emerald-600'
+                            ? 'border-blue-500 text-blue-600'
                             : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                         }`}
                       >
@@ -292,7 +292,7 @@ export default function AdminCMS() {
               <div className="p-6">
                 {isLoading ? (
                   <div className="flex items-center justify-center py-20">
-                    <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+                    <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                   </div>
                 ) : (
                   <>
@@ -481,7 +481,7 @@ function HeroSlidesTab({
         </p>
         <button
           onClick={openNewModal}
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
         >
           <Plus className="w-4 h-4" />
           Novy slide
@@ -515,7 +515,7 @@ function HeroSlidesTab({
                   <p className="text-sm text-gray-500">{slide.subtitle_sk}</p>
                 )}
                 {slide.price && (
-                  <p className="text-xs text-emerald-600 font-medium mt-1">
+                  <p className="text-xs text-blue-600 font-medium mt-1">
                     {slide.price.toLocaleString('sk-SK')} EUR
                   </p>
                 )}
@@ -525,7 +525,7 @@ function HeroSlidesTab({
               <span
                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
                   slide.is_active
-                    ? 'bg-emerald-50 text-emerald-700'
+                    ? 'bg-blue-50 text-blue-700'
                     : 'bg-gray-200 text-gray-600'
                 }`}
               >
@@ -533,7 +533,7 @@ function HeroSlidesTab({
               </span>
               <button
                 onClick={() => setEditingSlide(slide)}
-                className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg"
+                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
               >
                 <Edit className="w-4 h-4" />
               </button>
@@ -679,10 +679,10 @@ function HeroSlidesTab({
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading}
-                    className="w-full h-40 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-emerald-500 hover:bg-emerald-50/50"
+                    className="w-full h-40 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50/50"
                   >
                     {isUploading ? (
-                      <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                      <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
                     ) : (
                       <>
                         <Upload className="w-8 h-8 text-gray-400" />
@@ -782,7 +782,7 @@ function HeroSlidesTab({
                   type="checkbox"
                   checked={formData.is_active ?? true}
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700">Aktivny slide</span>
               </label>
@@ -797,7 +797,7 @@ function HeroSlidesTab({
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2"
+                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2"
               >
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                 {editingSlide ? 'Ulozit zmeny' : 'Vytvorit slide'}
@@ -931,7 +931,7 @@ function CategoriesTab({
         </p>
         <button
           onClick={openNewModal}
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
         >
           <Plus className="w-4 h-4" />
           Nova kategoria
@@ -963,7 +963,7 @@ function CategoriesTab({
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
               <button
                 onClick={() => setEditingCategory(cat)}
-                className="p-1.5 bg-white rounded text-gray-600 hover:text-emerald-600 shadow-sm"
+                className="p-1.5 bg-white rounded text-gray-600 hover:text-blue-600 shadow-sm"
               >
                 <Edit className="w-3 h-3" />
               </button>
@@ -1062,10 +1062,10 @@ function CategoriesTab({
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading}
-                    className="w-full h-32 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-emerald-500 hover:bg-emerald-50/50"
+                    className="w-full h-32 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50/50"
                   >
                     {isUploading ? (
-                      <Loader2 className="w-6 h-6 text-emerald-600 animate-spin" />
+                      <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
                     ) : (
                       <>
                         <Upload className="w-6 h-6 text-gray-400" />
@@ -1081,7 +1081,7 @@ function CategoriesTab({
                   type="checkbox"
                   checked={formData.is_active ?? true}
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700">Aktivna kategoria</span>
               </label>
@@ -1096,7 +1096,7 @@ function CategoriesTab({
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2"
+                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2"
               >
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                 {editingCategory ? 'Ulozit zmeny' : 'Vytvorit'}
@@ -1234,7 +1234,7 @@ function BannersTab({
         <p className="text-sm text-gray-500">Spravujte reklamne bannery na stranke</p>
         <button
           onClick={openNewModal}
-          className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
+          className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
         >
           <Plus className="w-4 h-4" />
           Novy banner
@@ -1266,21 +1266,21 @@ function BannersTab({
                     banner.placement}
                 </p>
                 {banner.carousel_group && (
-                  <p className="text-xs text-emerald-600">Carousel: {banner.carousel_group}</p>
+                  <p className="text-xs text-blue-600">Carousel: {banner.carousel_group}</p>
                 )}
               </div>
             </div>
             <div className="flex items-center gap-2">
               <span
                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                  banner.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-200 text-gray-600'
+                  banner.is_active ? 'bg-blue-50 text-blue-700' : 'bg-gray-200 text-gray-600'
                 }`}
               >
                 {banner.is_active ? 'Aktivny' : 'Neaktivny'}
               </span>
               <button
                 onClick={() => setEditingBanner(banner)}
-                className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg"
+                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
               >
                 <Edit className="w-4 h-4" />
               </button>
@@ -1438,10 +1438,10 @@ function BannersTab({
                   <button
                     onClick={() => fileInputRef.current?.click()}
                     disabled={isUploading}
-                    className="w-full h-40 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-emerald-500 hover:bg-emerald-50/50"
+                    className="w-full h-40 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50/50"
                   >
                     {isUploading ? (
-                      <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                      <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
                     ) : (
                       <>
                         <Upload className="w-8 h-8 text-gray-400" />
@@ -1457,7 +1457,7 @@ function BannersTab({
                   type="checkbox"
                   checked={formData.is_active ?? true}
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                  className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                  className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <span className="text-sm text-gray-700">Aktivny banner</span>
               </label>
@@ -1472,7 +1472,7 @@ function BannersTab({
               <button
                 onClick={handleSave}
                 disabled={isSaving}
-                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2"
+                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2"
               >
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                 {editingBanner ? 'Ulozit zmeny' : 'Vytvorit banner'}
@@ -1660,7 +1660,7 @@ function SectionsTab({
                 type="checkbox"
                 checked={formData.is_active ?? true}
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
               <span className="text-sm text-gray-700">Aktivna sekcia</span>
             </label>
@@ -1701,10 +1701,10 @@ function SectionsTab({
               <button
                 onClick={() => fileInputRef.current?.click()}
                 disabled={isUploading}
-                className="w-full h-48 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-emerald-500 hover:bg-emerald-50/50"
+                className="w-full h-48 border-2 border-dashed border-gray-200 rounded-lg flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50/50"
               >
                 {isUploading ? (
-                  <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                  <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
                 ) : (
                   <>
                     <Upload className="w-8 h-8 text-gray-400" />
@@ -1726,7 +1726,7 @@ function SectionsTab({
           <button
             onClick={handleSave}
             disabled={isSaving}
-            className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium flex items-center gap-2"
+            className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2"
           >
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             Ulozit zmeny
@@ -1764,14 +1764,14 @@ function SectionsTab({
             <div className="flex items-center gap-2">
               <span
                 className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                  section.is_active ? 'bg-emerald-50 text-emerald-700' : 'bg-gray-200 text-gray-600'
+                  section.is_active ? 'bg-blue-50 text-blue-700' : 'bg-gray-200 text-gray-600'
                 }`}
               >
                 {section.is_active ? 'Aktivna' : 'Neaktivna'}
               </span>
               <button
                 onClick={() => setEditingSection(section)}
-                className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg"
+                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg"
               >
                 <Edit className="w-4 h-4" />
               </button>
@@ -1900,7 +1900,7 @@ function MediaTab({
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={isUploading}
-            className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-50"
+            className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm disabled:opacity-50"
           >
             {isUploading ? (
               <Loader2 className="w-4 h-4 animate-spin" />

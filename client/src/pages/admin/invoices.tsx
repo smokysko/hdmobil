@@ -257,8 +257,8 @@ export default function AdminInvoices() {
         icon: Clock,
       },
       paid: {
-        bg: "bg-emerald-50",
-        text: "text-emerald-700",
+        bg: "bg-blue-50",
+        text: "text-blue-700",
         label: "Zaplatená",
         icon: CheckCircle,
       },
@@ -289,7 +289,7 @@ export default function AdminInvoices() {
         <div className="max-w-[1600px] mx-auto px-6 py-3 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link href="/admin/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <span className="text-white font-bold text-sm">HD</span>
               </div>
               <div>
@@ -317,7 +317,7 @@ export default function AdminInvoices() {
               onClick={handleLogout}
               className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
                 A
               </div>
               <span className="text-sm font-medium hidden sm:inline">Admin</span>
@@ -338,12 +338,12 @@ export default function AdminInvoices() {
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
                     isActive
-                      ? "bg-emerald-50 text-emerald-700 font-medium"
+                      ? "bg-blue-50 text-blue-700 font-medium"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 ${isActive ? "text-emerald-600" : "text-gray-400"}`}
+                    className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-400"}`}
                     strokeWidth={1.5}
                   />
                   <span>{item.label}</span>
@@ -403,9 +403,9 @@ export default function AdminInvoices() {
               </div>
               <div className="bg-white rounded-xl border border-gray-200/80 p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
                     <CheckCircle
-                      className="w-5 h-5 text-emerald-600"
+                      className="w-5 h-5 text-blue-600"
                       strokeWidth={1.5}
                     />
                   </div>
@@ -432,8 +432,8 @@ export default function AdminInvoices() {
               </div>
               <div className="bg-white rounded-xl border border-gray-200/80 p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
-                    <Euro className="w-5 h-5 text-emerald-600" strokeWidth={1.5} />
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <Euro className="w-5 h-5 text-blue-600" strokeWidth={1.5} />
                   </div>
                   <div>
                     <p className="text-xl font-semibold text-gray-900">
@@ -454,7 +454,7 @@ export default function AdminInvoices() {
                     placeholder="Hľadať podľa čísla faktúry, odberateľa alebo VS..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                   />
                 </div>
                 <div className="relative">
@@ -464,7 +464,7 @@ export default function AdminInvoices() {
                       setFilterStatus(e.target.value);
                       setPage(1);
                     }}
-                    className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm bg-white"
+                    className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
                   >
                     <option value="all">Všetky stavy</option>
                     <option value="issued">Vystavené</option>
@@ -479,7 +479,7 @@ export default function AdminInvoices() {
             <div className="bg-white rounded-xl border border-gray-200/80 overflow-hidden">
               {loading ? (
                 <div className="flex items-center justify-center py-20">
-                  <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -521,7 +521,7 @@ export default function AdminInvoices() {
                           <td className="px-5 py-4">
                             <button
                               onClick={() => selectInvoice(invoice)}
-                              className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
+                              className="text-sm font-medium text-blue-600 hover:text-blue-700"
                             >
                               {invoice.invoice_number}
                             </button>
@@ -540,7 +540,7 @@ export default function AdminInvoices() {
                             {invoice.order ? (
                               <Link
                                 href={`/admin/orders?id=${invoice.order_id}`}
-                                className="text-sm text-emerald-600 hover:text-emerald-700"
+                                className="text-sm text-blue-600 hover:text-blue-700"
                               >
                                 {invoice.order.order_number}
                               </Link>
@@ -570,7 +570,7 @@ export default function AdminInvoices() {
                               </button>
                               <button
                                 onClick={() => downloadInvoice(invoice.id)}
-                                className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                               >
                                 <Download className="w-4 h-4" />
                               </button>
@@ -720,7 +720,7 @@ export default function AdminInvoices() {
                       {selectedInvoice.paid_at && (
                         <div className="flex justify-between">
                           <span className="text-gray-600">Zaplatené:</span>
-                          <span className="font-medium text-emerald-600">
+                          <span className="font-medium text-blue-600">
                             {new Date(selectedInvoice.paid_at).toLocaleDateString(
                               "sk-SK"
                             )}
@@ -843,7 +843,7 @@ export default function AdminInvoices() {
                             >
                               Celkom:
                             </td>
-                            <td className="px-4 py-3 text-right font-bold text-lg text-emerald-600">
+                            <td className="px-4 py-3 text-right font-bold text-lg text-blue-600">
                               {parseFloat(
                                 String(selectedInvoice.total)
                               ).toLocaleString()}{" "}
@@ -860,7 +860,7 @@ export default function AdminInvoices() {
                   {selectedInvoice.status === "issued" && (
                     <button
                       onClick={() => markAsPaid(selectedInvoice.id)}
-                      className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors shadow-lg shadow-emerald-500/20"
+                      className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-lg shadow-blue-500/20"
                     >
                       <CheckCircle className="w-4 h-4" />
                       Označiť ako zaplatenú

@@ -133,7 +133,7 @@ export default function AccountPage() {
           {/* Main Content */}
           <div className="lg:col-span-3 space-y-6">
             {/* Welcome Card */}
-            <div className="bg-gradient-to-r from-primary to-emerald-600 rounded-xl p-6 text-white">
+            <div className="bg-gradient-to-r from-primary to-blue-600 rounded-xl p-6 text-white">
               <h1 className="text-2xl font-bold mb-2">Vitajte späť, {userName}!</h1>
               <p className="opacity-90">Tu nájdete prehľad vašich objednávok a nastavení účtu.</p>
             </div>

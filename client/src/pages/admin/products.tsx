@@ -283,7 +283,7 @@ export default function AdminProducts() {
         <div className="max-w-[1600px] mx-auto px-6 py-3 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link href="/admin/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <span className="text-white font-bold text-sm">HD</span>
               </div>
               <div>
@@ -305,7 +305,7 @@ export default function AdminProducts() {
               onClick={handleLogout}
               className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
                 A
               </div>
               <span className="text-sm font-medium hidden sm:inline">
@@ -328,12 +328,12 @@ export default function AdminProducts() {
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
                     isActive
-                      ? 'bg-emerald-50 text-emerald-700 font-medium'
+                      ? 'bg-blue-50 text-blue-700 font-medium'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 ${isActive ? 'text-emerald-600' : 'text-gray-400'}`}
+                    className={`w-5 h-5 ${isActive ? 'text-blue-600' : 'text-gray-400'}`}
                     strokeWidth={1.5}
                   />
                   <span>{item.label}</span>
@@ -367,7 +367,7 @@ export default function AdminProducts() {
               </div>
               <button
                 onClick={openCreateModal}
-                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-emerald-500/20"
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-blue-500/20"
               >
                 <Plus className="w-5 h-5" />
                 Nový produkt
@@ -383,7 +383,7 @@ export default function AdminProducts() {
                     placeholder="Hladat podla nazvu alebo SKU..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                   />
                 </div>
                 <div className="flex gap-3">
@@ -391,7 +391,7 @@ export default function AdminProducts() {
                     <select
                       value={statusFilter}
                       onChange={(e) => setStatusFilter(e.target.value)}
-                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm bg-white"
+                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
                     >
                       <option value="all">Vsetky stavy</option>
                       <option value="active">Aktivne</option>
@@ -403,7 +403,7 @@ export default function AdminProducts() {
                     <select
                       value={categoryFilter}
                       onChange={(e) => setCategoryFilter(e.target.value)}
-                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm bg-white"
+                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
                     >
                       <option value="all">Vsetky kategorie</option>
                       {categories.map((cat) => (
@@ -421,7 +421,7 @@ export default function AdminProducts() {
             <div className="bg-white rounded-xl border border-gray-200/80 overflow-hidden">
               {isLoading ? (
                 <div className="flex items-center justify-center py-20">
-                  <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -489,7 +489,7 @@ export default function AdminProducts() {
                           </td>
                           <td className="px-5 py-4">
                             <span
-                              className={`text-sm font-medium ${product.stock_quantity > 0 ? 'text-emerald-600' : 'text-red-600'}`}
+                              className={`text-sm font-medium ${product.stock_quantity > 0 ? 'text-blue-600' : 'text-red-600'}`}
                             >
                               {product.stock_quantity > 0
                                 ? `${product.stock_quantity} ks`
@@ -503,12 +503,12 @@ export default function AdminProducts() {
                               }
                               className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium cursor-pointer transition-colors ${
                                 product.is_active
-                                  ? 'bg-emerald-50 text-emerald-700 hover:bg-emerald-100'
+                                  ? 'bg-blue-50 text-blue-700 hover:bg-blue-100'
                                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                               }`}
                             >
                               <span
-                                className={`w-1.5 h-1.5 rounded-full ${product.is_active ? 'bg-emerald-500' : 'bg-gray-400'}`}
+                                className={`w-1.5 h-1.5 rounded-full ${product.is_active ? 'bg-blue-500' : 'bg-gray-400'}`}
                               ></span>
                               {product.is_active ? 'Aktivny' : 'Neaktivny'}
                             </button>
@@ -523,7 +523,7 @@ export default function AdminProducts() {
                               </Link>
                               <button
                                 onClick={() => openEditModal(product)}
-                                className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                               >
                                 <Edit className="w-4 h-4" />
                               </button>
@@ -621,10 +621,10 @@ export default function AdminProducts() {
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         disabled={isUploading}
-                        className="w-full aspect-square border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-emerald-500 hover:bg-emerald-50/50 transition-colors"
+                        className="w-full aspect-square border-2 border-dashed border-gray-200 rounded-xl flex flex-col items-center justify-center gap-2 hover:border-blue-500 hover:bg-blue-50/50 transition-colors"
                       >
                         {isUploading ? (
-                          <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                          <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
                         ) : (
                           <>
                             <Upload className="w-8 h-8 text-gray-400" />
@@ -648,7 +648,7 @@ export default function AdminProducts() {
                         onChange={(e) =>
                           setFormData({ ...formData, name_sk: e.target.value })
                         }
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                       />
                     </div>
                     <div>
@@ -662,7 +662,7 @@ export default function AdminProducts() {
                         onChange={(e) =>
                           setFormData({ ...formData, sku: e.target.value })
                         }
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                       />
                     </div>
                   </div>
@@ -676,7 +676,7 @@ export default function AdminProducts() {
                         onChange={(e) =>
                           setFormData({ ...formData, category_id: e.target.value })
                         }
-                        className="w-full appearance-none px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 bg-white text-sm"
+                        className="w-full appearance-none px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-sm"
                       >
                         <option value="">Vyberte kategóriu</option>
                         {categories.map((cat) => (
@@ -704,7 +704,7 @@ export default function AdminProducts() {
                     onChange={(e) =>
                       setFormData({ ...formData, price_with_vat: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                   />
                 </div>
                 <div>
@@ -719,7 +719,7 @@ export default function AdminProducts() {
                     onChange={(e) =>
                       setFormData({ ...formData, original_price: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                   />
                 </div>
                 <div>
@@ -733,7 +733,7 @@ export default function AdminProducts() {
                     onChange={(e) =>
                       setFormData({ ...formData, stock_quantity: e.target.value })
                     }
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                   />
                 </div>
               </div>
@@ -749,7 +749,7 @@ export default function AdminProducts() {
                   onChange={(e) =>
                     setFormData({ ...formData, description_sk: e.target.value })
                   }
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 resize-none text-sm"
+                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none text-sm"
                 ></textarea>
               </div>
 
@@ -761,7 +761,7 @@ export default function AdminProducts() {
                     onChange={(e) =>
                       setFormData({ ...formData, is_active: e.target.checked })
                     }
-                    className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700">Aktívny</span>
                 </label>
@@ -772,7 +772,7 @@ export default function AdminProducts() {
                     onChange={(e) =>
                       setFormData({ ...formData, is_new: e.target.checked })
                     }
-                    className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700">Novinka</span>
                 </label>
@@ -783,7 +783,7 @@ export default function AdminProducts() {
                     onChange={(e) =>
                       setFormData({ ...formData, is_featured: e.target.checked })
                     }
-                    className="w-5 h-5 rounded border-gray-300 text-emerald-600 focus:ring-emerald-500"
+                    className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                   />
                   <span className="text-sm text-gray-700">Odporúčaný</span>
                 </label>
@@ -799,7 +799,7 @@ export default function AdminProducts() {
               <button
                 onClick={handleSaveProduct}
                 disabled={isSaving}
-                className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center gap-2"
+                className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-lg shadow-blue-500/20 disabled:opacity-50 flex items-center gap-2"
               >
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                 {editMode ? 'Uložiť zmeny' : 'Vytvoriť produkt'}

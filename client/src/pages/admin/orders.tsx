@@ -83,7 +83,7 @@ const ORDER_STATUSES = [
   { value: "confirmed", label: "Potvrdená", color: "blue" },
   { value: "processing", label: "Spracováva sa", color: "blue" },
   { value: "shipped", label: "Odoslaná", color: "violet" },
-  { value: "delivered", label: "Doručená", color: "emerald" },
+  { value: "delivered", label: "Doručená", color: "green" },
   { value: "cancelled", label: "Zrušená", color: "red" },
 ];
 
@@ -303,10 +303,10 @@ export default function AdminOrders() {
         dot: "bg-violet-500",
       },
       delivered: {
-        bg: "bg-emerald-50",
-        text: "text-emerald-700",
+        bg: "bg-blue-50",
+        text: "text-blue-700",
         label: "Doručená",
-        dot: "bg-emerald-500",
+        dot: "bg-blue-500",
       },
       cancelled: {
         bg: "bg-red-50",
@@ -328,7 +328,7 @@ export default function AdminOrders() {
 
   const getPaymentBadge = (payment: string) => {
     return payment === "paid" ? (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
         <CheckCircle className="w-3 h-3" />
         Zaplatené
       </span>
@@ -348,7 +348,7 @@ export default function AdminOrders() {
         <div className="max-w-[1600px] mx-auto px-6 py-3 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link href="/admin/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
                 <span className="text-white font-bold text-sm">HD</span>
               </div>
               <div>
@@ -376,7 +376,7 @@ export default function AdminOrders() {
               onClick={handleLogout}
               className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
                 A
               </div>
               <span className="text-sm font-medium hidden sm:inline">Admin</span>
@@ -397,12 +397,12 @@ export default function AdminOrders() {
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
                     isActive
-                      ? "bg-emerald-50 text-emerald-700 font-medium"
+                      ? "bg-blue-50 text-blue-700 font-medium"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 ${isActive ? "text-emerald-600" : "text-gray-400"}`}
+                    className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-400"}`}
                     strokeWidth={1.5}
                   />
                   <span>{item.label}</span>
@@ -480,9 +480,9 @@ export default function AdminOrders() {
               </div>
               <div className="bg-white rounded-xl border border-gray-200/80 p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
                     <CheckCircle
-                      className="w-5 h-5 text-emerald-600"
+                      className="w-5 h-5 text-blue-600"
                       strokeWidth={1.5}
                     />
                   </div>
@@ -505,7 +505,7 @@ export default function AdminOrders() {
                     placeholder="Hľadať podľa čísla objednávky alebo mena..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
+                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                   />
                 </div>
                 <div className="flex gap-3">
@@ -516,7 +516,7 @@ export default function AdminOrders() {
                         setFilterStatus(e.target.value);
                         setPage(1);
                       }}
-                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm bg-white"
+                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
                     >
                       <option value="all">Všetky stavy</option>
                       <option value="pending">Čakajúce</option>
@@ -535,7 +535,7 @@ export default function AdminOrders() {
                         setFilterPayment(e.target.value);
                         setPage(1);
                       }}
-                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm bg-white"
+                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
                     >
                       <option value="all">Všetky platby</option>
                       <option value="paid">Zaplatené</option>
@@ -550,7 +550,7 @@ export default function AdminOrders() {
             <div className="bg-white rounded-xl border border-gray-200/80 overflow-hidden">
               {loading ? (
                 <div className="flex items-center justify-center py-20">
-                  <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+                  <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
                 </div>
               ) : (
                 <div className="overflow-x-auto">
@@ -592,7 +592,7 @@ export default function AdminOrders() {
                           <td className="px-5 py-4">
                             <button
                               onClick={() => setSelectedOrder(order)}
-                              className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
+                              className="text-sm font-medium text-blue-600 hover:text-blue-700"
                             >
                               {order.order_number}
                             </button>
@@ -633,7 +633,7 @@ export default function AdminOrders() {
                               {order.invoice_id ? (
                                 <button
                                   onClick={() => downloadInvoice(order.id)}
-                                  className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors"
+                                  className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
                                 >
                                   <Download className="w-4 h-4" />
                                 </button>
@@ -641,7 +641,7 @@ export default function AdminOrders() {
                                 <button
                                   onClick={() => generateInvoice(order.id)}
                                   disabled={generatingInvoice}
-                                  className="p-2 text-gray-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-colors disabled:opacity-50"
+                                  className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
                                 >
                                   <FileText className="w-4 h-4" />
                                 </button>
@@ -768,7 +768,7 @@ export default function AdminOrders() {
                       <p className="text-gray-600">
                         {selectedOrder.shipping_country}
                       </p>
-                      <p className="text-emerald-600 mt-2 font-medium">
+                      <p className="text-blue-600 mt-2 font-medium">
                         {selectedOrder.shipping_method_name}
                       </p>
                     </div>
@@ -923,7 +923,7 @@ export default function AdminOrders() {
                           >
                             Celkom:
                           </td>
-                          <td className="px-4 py-3 text-right font-bold text-lg text-emerald-600">
+                          <td className="px-4 py-3 text-right font-bold text-lg text-blue-600">
                             {parseFloat(String(selectedOrder.total)).toLocaleString()}{" "}
                             EUR
                           </td>
@@ -952,7 +952,7 @@ export default function AdminOrders() {
                         updateOrderStatus(selectedOrder.id, e.target.value)
                       }
                       disabled={updatingStatus}
-                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm bg-white disabled:opacity-50"
+                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white disabled:opacity-50"
                     >
                       {ORDER_STATUSES.map((s) => (
                         <option key={s.value} value={s.value}>

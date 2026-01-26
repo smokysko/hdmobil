@@ -261,10 +261,10 @@ export default function AdminDashboard() {
         dot: "bg-violet-500",
       },
       delivered: {
-        bg: "bg-emerald-50",
-        text: "text-emerald-700",
+        bg: "bg-blue-50",
+        text: "text-blue-700",
         label: "Doručená",
-        dot: "bg-emerald-500",
+        dot: "bg-blue-500",
       },
       cancelled: {
         bg: "bg-red-50",
@@ -303,7 +303,7 @@ export default function AdminDashboard() {
       <header className="bg-white border-b border-gray-200/80 sticky top-0 z-40 backdrop-blur-sm bg-white/95">
         <div className="max-w-[1600px] mx-auto px-6 py-3 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg shadow-emerald-500/20">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
               <span className="text-white font-bold text-sm">HD</span>
             </div>
             <div>
@@ -330,7 +330,7 @@ export default function AdminDashboard() {
               onClick={handleLogout}
               className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <div className="w-8 h-8 bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
                 A
               </div>
               <span className="text-sm font-medium hidden sm:inline">Admin</span>
@@ -351,12 +351,12 @@ export default function AdminDashboard() {
                   href={item.href}
                   className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
                     isActive
-                      ? "bg-emerald-50 text-emerald-700 font-medium"
+                      ? "bg-blue-50 text-blue-700 font-medium"
                       : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                   }`}
                 >
                   <Icon
-                    className={`w-5 h-5 ${isActive ? "text-emerald-600" : "text-gray-400"}`}
+                    className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-400"}`}
                     strokeWidth={1.5}
                   />
                   <span>{item.label}</span>
@@ -393,7 +393,7 @@ export default function AdminDashboard() {
 
             {loading ? (
               <div className="flex items-center justify-center py-20">
-                <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
               </div>
             ) : stats ? (
               <>
@@ -408,9 +408,9 @@ export default function AdminDashboard() {
                           {stats.totalOrders}
                         </p>
                       </div>
-                      <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
+                      <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
                         <ShoppingCart
-                          className="w-6 h-6 text-emerald-600"
+                          className="w-6 h-6 text-blue-600"
                           strokeWidth={1.5}
                         />
                       </div>
@@ -427,8 +427,8 @@ export default function AdminDashboard() {
                           EUR
                         </p>
                       </div>
-                      <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
-                        <Euro className="w-6 h-6 text-emerald-600" strokeWidth={1.5} />
+                      <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+                        <Euro className="w-6 h-6 text-blue-600" strokeWidth={1.5} />
                       </div>
                     </div>
                   </div>
@@ -442,8 +442,8 @@ export default function AdminDashboard() {
                           {stats.totalCustomers}
                         </p>
                       </div>
-                      <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
-                        <Users className="w-6 h-6 text-emerald-600" strokeWidth={1.5} />
+                      <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center">
+                        <Users className="w-6 h-6 text-blue-600" strokeWidth={1.5} />
                       </div>
                     </div>
                   </div>
@@ -468,9 +468,9 @@ export default function AdminDashboard() {
                   <div className="xl:col-span-2 bg-white rounded-xl border border-gray-200/80 p-5">
                     <div className="flex items-center justify-between mb-6">
                       <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                        <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
                           <BarChart3
-                            className="w-5 h-5 text-emerald-600"
+                            className="w-5 h-5 text-blue-600"
                             strokeWidth={1.5}
                           />
                         </div>
@@ -495,7 +495,7 @@ export default function AdminDashboard() {
                           >
                             <div className="w-full flex flex-col items-center justify-end h-[200px]">
                               <div
-                                className="w-full max-w-[40px] bg-gradient-to-t from-emerald-500 to-emerald-400 rounded-t-md transition-all hover:from-emerald-600 hover:to-emerald-500"
+                                className="w-full max-w-[40px] bg-gradient-to-t from-blue-500 to-blue-400 rounded-t-md transition-all hover:from-blue-600 hover:to-blue-500"
                                 style={{ height: `${Math.max(height, 2)}%` }}
                                 title={`${item.revenue.toLocaleString()} EUR`}
                               />
@@ -509,9 +509,9 @@ export default function AdminDashboard() {
 
                   <div className="bg-white rounded-xl border border-gray-200/80 p-5">
                     <div className="flex items-center gap-3 mb-6">
-                      <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
                         <PieChartIcon
-                          className="w-5 h-5 text-emerald-600"
+                          className="w-5 h-5 text-blue-600"
                           strokeWidth={1.5}
                         />
                       </div>
@@ -618,7 +618,7 @@ export default function AdminDashboard() {
                         </h3>
                         <Link
                           href="/admin/orders"
-                          className="flex items-center gap-1 text-emerald-600 hover:text-emerald-700 text-sm font-medium"
+                          className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium"
                         >
                           Zobraziť všetky
                           <ChevronRight className="w-4 h-4" />
@@ -658,7 +658,7 @@ export default function AdminDashboard() {
                               <td className="px-5 py-4">
                                 <Link
                                   href={`/admin/orders?id=${order.id}`}
-                                  className="text-sm font-medium text-emerald-600 hover:text-emerald-700"
+                                  className="text-sm font-medium text-blue-600 hover:text-blue-700"
                                 >
                                   {order.order_number}
                                 </Link>
