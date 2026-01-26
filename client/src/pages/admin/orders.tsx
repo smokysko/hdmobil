@@ -78,12 +78,12 @@ interface OrderStats {
 }
 
 const ORDER_STATUSES = [
-  { value: "pending", label: "Cakajuca", color: "amber" },
-  { value: "confirmed", label: "Potvrdena", color: "blue" },
-  { value: "processing", label: "Spracovava sa", color: "blue" },
-  { value: "shipped", label: "Odoslana", color: "violet" },
-  { value: "delivered", label: "Dorucena", color: "emerald" },
-  { value: "cancelled", label: "Zrusena", color: "red" },
+  { value: "pending", label: "Čakajúca", color: "amber" },
+  { value: "confirmed", label: "Potvrdená", color: "blue" },
+  { value: "processing", label: "Spracováva sa", color: "blue" },
+  { value: "shipped", label: "Odoslaná", color: "violet" },
+  { value: "delivered", label: "Doručená", color: "emerald" },
+  { value: "cancelled", label: "Zrušená", color: "red" },
 ];
 
 export default function AdminOrders() {
@@ -168,7 +168,7 @@ export default function AdminOrders() {
       }
     } catch (err) {
       console.error("Error fetching orders:", err);
-      toast.error("Nepodarilo sa nacitat objednavky");
+      toast.error("Nepodarilo sa načítať objednávky");
     } finally {
       setLoading(false);
     }
@@ -191,14 +191,14 @@ export default function AdminOrders() {
 
       if (error) throw error;
 
-      toast.success("Stav objednavky bol aktualizovany");
+      toast.success("Stav objednávky bol aktualizovaný");
       fetchOrders();
       if (selectedOrder?.id === orderId) {
         setSelectedOrder({ ...selectedOrder, status: newStatus });
       }
     } catch (err) {
       console.error("Error updating order:", err);
-      toast.error("Nepodarilo sa aktualizovat stav");
+      toast.error("Nepodarilo sa aktualizovať stav");
     } finally {
       setUpdatingStatus(false);
     }
@@ -222,14 +222,14 @@ export default function AdminOrders() {
       const result = await response.json();
 
       if (result.success) {
-        toast.success("Faktura bola vytvorena");
+        toast.success("Faktúra bola vytvorená");
         fetchOrders();
       } else {
-        toast.error(result.error || "Nepodarilo sa vytvorit fakturu");
+        toast.error(result.error || "Nepodarilo sa vytvoriť faktúru");
       }
     } catch (err) {
       console.error("Error generating invoice:", err);
-      toast.error("Nepodarilo sa vytvorit fakturu");
+      toast.error("Nepodarilo sa vytvoriť faktúru");
     } finally {
       setGeneratingInvoice(false);
     }
@@ -241,7 +241,7 @@ export default function AdminOrders() {
       window.open(url, "_blank");
     } catch (err) {
       console.error("Error downloading invoice:", err);
-      toast.error("Nepodarilo sa stiahnut fakturu");
+      toast.error("Nepodarilo sa stiahnuť faktúru");
     }
   }
 
@@ -263,11 +263,11 @@ export default function AdminOrders() {
   });
 
   const navItems = [
-    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehlad" },
+    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehľad" },
     { href: "/admin/products", icon: Package, label: "Produkty" },
-    { href: "/admin/orders", icon: ShoppingCart, label: "Objednavky" },
-    { href: "/admin/customers", icon: Users, label: "Zakaznici" },
-    { href: "/admin/invoices", icon: FileText, label: "Faktury" },
+    { href: "/admin/orders", icon: ShoppingCart, label: "Objednávky" },
+    { href: "/admin/customers", icon: Users, label: "Zákazníci" },
+    { href: "/admin/invoices", icon: FileText, label: "Faktúry" },
     { href: "/admin/settings", icon: Settings, label: "Nastavenia" },
   ];
 
@@ -279,37 +279,37 @@ export default function AdminOrders() {
       pending: {
         bg: "bg-amber-50",
         text: "text-amber-700",
-        label: "Cakajuca",
+        label: "Čakajúca",
         dot: "bg-amber-500",
       },
       confirmed: {
         bg: "bg-blue-50",
         text: "text-blue-700",
-        label: "Potvrdena",
+        label: "Potvrdená",
         dot: "bg-blue-500",
       },
       processing: {
         bg: "bg-blue-50",
         text: "text-blue-700",
-        label: "Spracovava sa",
+        label: "Spracováva sa",
         dot: "bg-blue-500",
       },
       shipped: {
         bg: "bg-violet-50",
         text: "text-violet-700",
-        label: "Odoslana",
+        label: "Odoslaná",
         dot: "bg-violet-500",
       },
       delivered: {
         bg: "bg-emerald-50",
         text: "text-emerald-700",
-        label: "Dorucena",
+        label: "Doručená",
         dot: "bg-emerald-500",
       },
       cancelled: {
         bg: "bg-red-50",
         text: "text-red-700",
-        label: "Zrusena",
+        label: "Zrušená",
         dot: "bg-red-500",
       },
     };
@@ -328,12 +328,12 @@ export default function AdminOrders() {
     return payment === "paid" ? (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
         <CheckCircle className="w-3 h-3" />
-        Zaplatene
+        Zaplatené
       </span>
     ) : (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700">
         <AlertCircle className="w-3 h-3" />
-        Nezaplatene
+        Nezaplatené
       </span>
     );
   };
@@ -367,7 +367,7 @@ export default function AdminOrders() {
               className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobrazit web</span>
+              <span className="hidden sm:inline">Zobraziť web</span>
             </Link>
             <div className="h-6 w-px bg-gray-200"></div>
             <button
@@ -415,7 +415,7 @@ export default function AdminOrders() {
               className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
             >
               <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlasit sa</span>
+              <span>Odhlásiť sa</span>
             </button>
           </div>
         </aside>
@@ -425,10 +425,10 @@ export default function AdminOrders() {
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-semibold text-gray-900">
-                  Objednavky
+                  Objednávky
                 </h2>
                 <p className="text-gray-500 text-sm mt-1">
-                  Spravujte objednavky a sledujte ich stav ({totalCount} celkom)
+                  Spravujte objednávky a sledujte ich stav ({totalCount} celkom)
                 </p>
               </div>
             </div>
@@ -443,7 +443,7 @@ export default function AdminOrders() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {stats.pending}
                     </p>
-                    <p className="text-sm text-gray-500">Cakajuce</p>
+                    <p className="text-sm text-gray-500">Čakajúce</p>
                   </div>
                 </div>
               </div>
@@ -459,7 +459,7 @@ export default function AdminOrders() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {stats.processing}
                     </p>
-                    <p className="text-sm text-gray-500">Spracovavane</p>
+                    <p className="text-sm text-gray-500">Spracovávané</p>
                   </div>
                 </div>
               </div>
@@ -472,7 +472,7 @@ export default function AdminOrders() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {stats.shipped}
                     </p>
-                    <p className="text-sm text-gray-500">Odoslane</p>
+                    <p className="text-sm text-gray-500">Odoslané</p>
                   </div>
                 </div>
               </div>
@@ -488,7 +488,7 @@ export default function AdminOrders() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {stats.delivered}
                     </p>
-                    <p className="text-sm text-gray-500">Dorucene</p>
+                    <p className="text-sm text-gray-500">Doručené</p>
                   </div>
                 </div>
               </div>
@@ -500,7 +500,7 @@ export default function AdminOrders() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Hladat podla cisla objednavky alebo mena..."
+                    placeholder="Hľadať podľa čísla objednávky alebo mena..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm"
@@ -516,13 +516,13 @@ export default function AdminOrders() {
                       }}
                       className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm bg-white"
                     >
-                      <option value="all">Vsetky stavy</option>
-                      <option value="pending">Cakajuce</option>
-                      <option value="confirmed">Potvrdene</option>
-                      <option value="processing">Spracovavane</option>
-                      <option value="shipped">Odoslane</option>
-                      <option value="delivered">Dorucene</option>
-                      <option value="cancelled">Zrusene</option>
+                      <option value="all">Všetky stavy</option>
+                      <option value="pending">Čakajúce</option>
+                      <option value="confirmed">Potvrdené</option>
+                      <option value="processing">Spracovávané</option>
+                      <option value="shipped">Odoslané</option>
+                      <option value="delivered">Doručené</option>
+                      <option value="cancelled">Zrušené</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
@@ -535,9 +535,9 @@ export default function AdminOrders() {
                       }}
                       className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 text-sm bg-white"
                     >
-                      <option value="all">Vsetky platby</option>
-                      <option value="paid">Zaplatene</option>
-                      <option value="pending">Nezaplatene</option>
+                      <option value="all">Všetky platby</option>
+                      <option value="paid">Zaplatené</option>
+                      <option value="pending">Nezaplatené</option>
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
                   </div>
@@ -556,13 +556,13 @@ export default function AdminOrders() {
                     <thead>
                       <tr className="border-b border-gray-100 bg-gray-50/50">
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Objednavka
+                          Objednávka
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Zakaznik
+                          Zákazník
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Polozky
+                          Položky
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Suma
@@ -574,7 +574,7 @@ export default function AdminOrders() {
                           Platba
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Datum
+                          Dátum
                         </th>
                         <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Akcie
@@ -654,7 +654,7 @@ export default function AdminOrders() {
                             colSpan={8}
                             className="px-5 py-12 text-center text-gray-500"
                           >
-                            Ziadne objednavky
+                            Žiadne objednávky
                           </td>
                         </tr>
                       )}
@@ -665,13 +665,13 @@ export default function AdminOrders() {
 
               <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
                 <p className="text-sm text-gray-500">
-                  Zobrazenych{" "}
+                  Zobrazených{" "}
                   <span className="font-medium text-gray-700">
                     {filteredOrders.length}
                   </span>{" "}
                   z{" "}
                   <span className="font-medium text-gray-700">{totalCount}</span>{" "}
-                  objednavok
+                  objednávok
                 </p>
                 {totalPages > 1 && (
                   <div className="flex items-center gap-2">
@@ -702,10 +702,10 @@ export default function AdminOrders() {
                 <div className="flex items-center justify-between mb-6">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900">
-                      Detail objednavky {selectedOrder.order_number}
+                      Detail objednávky {selectedOrder.order_number}
                     </h3>
                     <p className="text-sm text-gray-500">
-                      Vytvorena{" "}
+                      Vytvorená{" "}
                       {new Date(selectedOrder.created_at).toLocaleString("sk-SK")}
                     </p>
                   </div>
@@ -720,7 +720,7 @@ export default function AdminOrders() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                   <div>
                     <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                      Fakturacne udaje
+                      Fakturačné údaje
                     </h4>
                     <div className="bg-gray-50 rounded-lg p-4 space-y-1 text-sm">
                       <p className="font-medium text-gray-900">
@@ -750,7 +750,7 @@ export default function AdminOrders() {
 
                   <div>
                     <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                      Dorucovacie udaje
+                      Doručovacie údaje
                     </h4>
                     <div className="bg-gray-50 rounded-lg p-4 space-y-1 text-sm">
                       <p className="font-medium text-gray-900">
@@ -778,7 +778,7 @@ export default function AdminOrders() {
                     </h4>
                     <div className="bg-gray-50 rounded-lg p-4 space-y-3 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Sposob platby:</span>
+                        <span className="text-gray-600">Spôsob platby:</span>
                         <span className="font-medium">
                           {selectedOrder.payment_method_name}
                         </span>
@@ -788,12 +788,12 @@ export default function AdminOrders() {
                         {getPaymentBadge(selectedOrder.payment_status)}
                       </div>
                       <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Stav objednavky:</span>
+                        <span className="text-gray-600">Stav objednávky:</span>
                         {getStatusBadge(selectedOrder.status)}
                       </div>
                       {selectedOrder.tracking_number && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Sledovacie cislo:</span>
+                          <span className="text-gray-600">Sledovacie číslo:</span>
                           <span className="font-medium">
                             {selectedOrder.tracking_number}
                           </span>
@@ -805,7 +805,7 @@ export default function AdminOrders() {
 
                 <div className="mb-6">
                   <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                    Polozky objednavky
+                    Položky objednávky
                   </h4>
                   <div className="bg-gray-50 rounded-lg overflow-hidden">
                     <table className="w-full">
@@ -818,7 +818,7 @@ export default function AdminOrders() {
                             Cena
                           </th>
                           <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                            Mnozstvo
+                            Množstvo
                           </th>
                           <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
                             Spolu
@@ -865,7 +865,7 @@ export default function AdminOrders() {
                       <tfoot className="border-t-2 border-gray-200">
                         <tr>
                           <td colSpan={3} className="px-4 py-2 text-right text-gray-600">
-                            Medzisucet:
+                            Medzisúčet:
                           </td>
                           <td className="px-4 py-2 text-right font-medium">
                             {parseFloat(String(selectedOrder.subtotal)).toLocaleString()}{" "}
@@ -903,7 +903,7 @@ export default function AdminOrders() {
                               colSpan={3}
                               className="px-4 py-2 text-right text-gray-600"
                             >
-                              Zlava:
+                              Zľava:
                             </td>
                             <td className="px-4 py-2 text-right font-medium text-red-600">
                               -
@@ -934,7 +934,7 @@ export default function AdminOrders() {
                 {selectedOrder.customer_note && (
                   <div className="mb-6">
                     <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
-                      Poznamka zakaznika
+                      Poznámka zákazníka
                     </h4>
                     <p className="text-sm text-gray-600 bg-amber-50 p-3 rounded-lg">
                       {selectedOrder.customer_note}
@@ -967,7 +967,7 @@ export default function AdminOrders() {
                       className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
                     >
                       <Download className="w-4 h-4" />
-                      Stiahnut fakturu
+                      Stiahnuť faktúru
                     </button>
                   ) : (
                     <button
@@ -980,7 +980,7 @@ export default function AdminOrders() {
                       ) : (
                         <FileText className="w-4 h-4" />
                       )}
-                      Vytvorit fakturu
+                      Vytvoriť faktúru
                     </button>
                   )}
                 </div>

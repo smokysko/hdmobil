@@ -705,7 +705,7 @@ export default function AdminDashboard() {
               </>
             ) : (
               <div className="text-center py-20 text-gray-500">
-                Nepodarilo sa nacitat data
+                Nepodarilo sa načítať dáta
               </div>
             )}
           </div>

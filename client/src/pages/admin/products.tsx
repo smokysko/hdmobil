@@ -575,7 +575,7 @@ export default function AdminProducts() {
                 className="px-5 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors shadow-lg shadow-emerald-500/20 disabled:opacity-50 flex items-center gap-2"
               >
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                Vytvorit produkt
+                Vytvoriť produkt
               </button>
             </div>
           </div>

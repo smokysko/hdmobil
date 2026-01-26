@@ -671,7 +671,7 @@ export default function AdminInvoices() {
                     </h4>
                     <div className="bg-gray-50 rounded-lg p-4 space-y-3 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Datum vystavenia:</span>
+                        <span className="text-gray-600">Dátum vystavenia:</span>
                         <span className="font-medium">
                           {new Date(selectedInvoice.issue_date).toLocaleDateString(
                             "sk-SK"
@@ -679,7 +679,7 @@ export default function AdminInvoices() {
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Datum splatnosti:</span>
+                        <span className="text-gray-600">Dátum splatnosti:</span>
                         <span className="font-medium">
                           {new Date(selectedInvoice.due_date).toLocaleDateString(
                             "sk-SK"
@@ -687,7 +687,7 @@ export default function AdminInvoices() {
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Datum dodania:</span>
+                        <span className="text-gray-600">Dátum dodania:</span>
                         <span className="font-medium">
                           {new Date(selectedInvoice.delivery_date).toLocaleDateString(
                             "sk-SK"
@@ -703,7 +703,7 @@ export default function AdminInvoices() {
                     </h4>
                     <div className="bg-gray-50 rounded-lg p-4 space-y-3 text-sm">
                       <div className="flex justify-between">
-                        <span className="text-gray-600">Sposob platby:</span>
+                        <span className="text-gray-600">Spôsob platby:</span>
                         <span className="font-medium">
                           {selectedInvoice.payment_method}
                         </span>
@@ -717,7 +717,7 @@ export default function AdminInvoices() {
                       </div>
                       {selectedInvoice.paid_at && (
                         <div className="flex justify-between">
-                          <span className="text-gray-600">Zaplatene:</span>
+                          <span className="text-gray-600">Zaplatené:</span>
                           <span className="font-medium text-emerald-600">
                             {new Date(selectedInvoice.paid_at).toLocaleDateString(
                               "sk-SK"
@@ -731,7 +731,7 @@ export default function AdminInvoices() {
 
                 <div className="mb-6">
                   <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                    Polozky faktury
+                    Položky faktúry
                   </h4>
                   {loadingItems ? (
                     <div className="flex items-center justify-center py-8">
@@ -795,7 +795,7 @@ export default function AdminInvoices() {
                               colSpan={4}
                               className="px-4 py-2 text-right text-gray-600"
                             >
-                              Zaklad dane:
+                              Základ dane:
                             </td>
                             <td className="px-4 py-2 text-right font-medium">
                               {parseFloat(
@@ -861,7 +861,7 @@ export default function AdminInvoices() {
                       className="flex items-center gap-2 px-4 py-2.5 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 font-medium transition-colors shadow-lg shadow-emerald-500/20"
                     >
                       <CheckCircle className="w-4 h-4" />
-                      Oznacit ako zaplatenu
+                      Označiť ako zaplatenú
                     </button>
                   )}
                   <button
@@ -869,7 +869,7 @@ export default function AdminInvoices() {
                     className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
                   >
                     <Download className="w-4 h-4" />
-                    Stiahnut PDF
+                    Stiahnuť PDF
                   </button>
                 </div>
               </div>
