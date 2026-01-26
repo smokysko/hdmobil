@@ -67,7 +67,7 @@ function App() {
 
   // Critical images to preload
   const criticalImages = [
-    "/images/logo_new.png",
+    "/images/logo_final.png",
     "/images/hero_iphone17_v1.png",
     "/images/categories/cat_smartphone.png",
     "/images/categories/cat_tablet.png",
