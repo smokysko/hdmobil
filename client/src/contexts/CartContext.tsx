@@ -47,21 +47,21 @@ export function CartProvider({ children }: { children: ReactNode }) {
     setItems((prev) => {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
-        toast.success(`Mnozstvo aktualizovane: ${product.name}`);
+        toast.success(`Množstvo aktualizované: ${product.name}`);
         return prev.map((item) =>
           item.id === product.id
             ? { ...item, quantity: item.quantity + 1 }
             : item
         );
       }
-      toast.success(`Pridane do kosika: ${product.name}`);
+      toast.success(`Produkt bol pridaný do košíka: ${product.name}`);
       return [...prev, { ...product, quantity: 1 }];
     });
   }, []);
 
   const removeFromCart = useCallback((productId: string) => {
     setItems((prev) => prev.filter((item) => item.id !== productId));
-    toast.info("Polozka odstranena z kosika");
+    toast.info("Položka odstránená z košíka");
   }, []);
 
   const updateQuantity = useCallback((productId: string, quantity: number) => {
