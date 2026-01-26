@@ -14,16 +14,16 @@ import { useEffect, useState } from "react";
 
 const SPECIAL_CATEGORIES: Record<string, { name: string; description: string }> = {
   akcia: {
-    name: "Vypredaj",
-    description: "Produkty v akcii za znizene ceny",
+    name: "Výpredaj",
+    description: "Produkty v akcii za znížené ceny",
   },
   novinky: {
     name: "Novinky",
-    description: "Najnovsie produkty v nasej ponuke",
+    description: "Najnovšie produkty v našej ponuke",
   },
   all: {
-    name: "Vsetky produkty",
-    description: "Kompletna ponuka produktov",
+    name: "Všetky produkty",
+    description: "Kompletná ponuka produktov",
   },
 };
 
@@ -76,7 +76,7 @@ export default function CategoryPage() {
             <div className="h-1 w-20 bg-primary mx-auto rounded-full mb-6"></div>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               {categoryDescription ||
-                `Preskumajte nasu premiovu kolekciu ${categoryName.toLowerCase()}.`}
+                `Preskúmajte našu prémiovú kolekciu ${categoryName.toLowerCase()}.`}
             </p>
             {!isLoading && (
               <p className="text-sm text-muted-foreground mt-4">
@@ -104,7 +104,7 @@ export default function CategoryPage() {
           ) : (
             <div className="flex flex-col items-center justify-center py-20 text-center">
               <p className="text-xl text-muted-foreground">
-                V tejto kategorii sa nenasli ziadne produkty.
+                V tejto kategórii sa nenašli žiadne produkty.
               </p>
             </div>
           )}
