@@ -54,13 +54,13 @@ const statusColors: Record<string, string> = {
 };
 
 const statusLabels: Record<string, string> = {
-  pending: "Cakajuce",
-  confirmed: "Potvrdene",
-  processing: "Spracovane",
-  shipped: "Odoslane",
-  delivered: "Dorucene",
-  cancelled: "Zrusene",
-  returned: "Vratene",
+  pending: "Čakajúce",
+  confirmed: "Potvrdené",
+  processing: "Spracované",
+  shipped: "Odoslané",
+  delivered: "Doručené",
+  cancelled: "Zrušené",
+  returned: "Vrátené",
 };
 
 const categoryColors = [
@@ -205,7 +205,7 @@ export default function AdminDashboard() {
       })).filter(c => c.value > 0);
 
       if (salesByCategory.length === 0) {
-        salesByCategory.push({ name: "Bez kategorii", value: 100, color: "#9ca3af" });
+        salesByCategory.push({ name: "Bez kategórií", value: 100, color: "#9ca3af" });
       }
 
       setStats({
@@ -238,37 +238,37 @@ export default function AdminDashboard() {
       pending: {
         bg: "bg-amber-50",
         text: "text-amber-700",
-        label: "Cakajuca",
+        label: "Čakajúca",
         dot: "bg-amber-500",
       },
       confirmed: {
         bg: "bg-blue-50",
         text: "text-blue-700",
-        label: "Potvrdena",
+        label: "Potvrdená",
         dot: "bg-blue-500",
       },
       processing: {
         bg: "bg-blue-50",
         text: "text-blue-700",
-        label: "Spracovava sa",
+        label: "Spracováva sa",
         dot: "bg-blue-500",
       },
       shipped: {
         bg: "bg-violet-50",
         text: "text-violet-700",
-        label: "Odoslana",
+        label: "Odoslaná",
         dot: "bg-violet-500",
       },
       delivered: {
         bg: "bg-emerald-50",
         text: "text-emerald-700",
-        label: "Dorucena",
+        label: "Doručená",
         dot: "bg-emerald-500",
       },
       cancelled: {
         bg: "bg-red-50",
         text: "text-red-700",
-        label: "Zrusena",
+        label: "Zrušená",
         dot: "bg-red-500",
       },
     };
@@ -284,11 +284,11 @@ export default function AdminDashboard() {
   };
 
   const navItems = [
-    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehlad" },
+    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehľad" },
     { href: "/admin/products", icon: Package, label: "Produkty" },
-    { href: "/admin/orders", icon: ShoppingCart, label: "Objednavky" },
-    { href: "/admin/customers", icon: Users, label: "Zakaznici" },
-    { href: "/admin/invoices", icon: FileText, label: "Faktury" },
+    { href: "/admin/orders", icon: ShoppingCart, label: "Objednávky" },
+    { href: "/admin/customers", icon: Users, label: "Zákazníci" },
+    { href: "/admin/invoices", icon: FileText, label: "Faktúry" },
     { href: "/admin/settings", icon: Settings, label: "Nastavenia" },
   ];
 
@@ -321,7 +321,7 @@ export default function AdminDashboard() {
               className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobrazit web</span>
+              <span className="hidden sm:inline">Zobraziť web</span>
             </Link>
             <div className="h-6 w-px bg-gray-200"></div>
             <button
@@ -369,7 +369,7 @@ export default function AdminDashboard() {
               className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
             >
               <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlasit sa</span>
+              <span>Odhlásiť sa</span>
             </button>
           </div>
         </aside>
@@ -378,14 +378,14 @@ export default function AdminDashboard() {
           <div className="max-w-[1400px] mx-auto space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900">Prehlad</h2>
+                <h2 className="text-2xl font-semibold text-gray-900">Prehľad</h2>
                 <p className="text-gray-500 text-sm mt-1">
-                  Vitajte spat! Tu je prehlad vasho obchodu.
+                  Vitajte späť! Tu je prehľad vášho obchodu.
                 </p>
               </div>
               <div className="text-sm text-gray-500">
-                Posledna aktualizacia:{" "}
-                <span className="font-medium text-gray-700">prave teraz</span>
+                Posledná aktualizácia:{" "}
+                <span className="font-medium text-gray-700">práve teraz</span>
               </div>
             </div>
 
@@ -400,7 +400,7 @@ export default function AdminDashboard() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="text-gray-500 text-sm font-medium">
-                          Celkove objednavky
+                          Celkové objednávky
                         </p>
                         <p className="text-2xl font-semibold text-gray-900 mt-2">
                           {stats.totalOrders}
@@ -417,7 +417,7 @@ export default function AdminDashboard() {
                   <div className="bg-white rounded-xl border border-gray-200/80 p-5 hover:shadow-lg hover:shadow-gray-200/50 transition-all duration-300">
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
-                        <p className="text-gray-500 text-sm font-medium">Trzby</p>
+                        <p className="text-gray-500 text-sm font-medium">Tržby</p>
                         <p className="text-2xl font-semibold text-gray-900 mt-2">
                           {stats.totalRevenue.toLocaleString("sk-SK", {
                             minimumFractionDigits: 2,
@@ -434,7 +434,7 @@ export default function AdminDashboard() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="text-gray-500 text-sm font-medium">
-                          Zakaznici
+                          Zákazníci
                         </p>
                         <p className="text-2xl font-semibold text-gray-900 mt-2">
                           {stats.totalCustomers}
@@ -449,7 +449,7 @@ export default function AdminDashboard() {
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <p className="text-gray-500 text-sm font-medium">
-                          Cakajuce platby
+                          Čakajúce platby
                         </p>
                         <p className="text-2xl font-semibold text-gray-900 mt-2">
                           {stats.pendingPayments}
@@ -474,10 +474,10 @@ export default function AdminDashboard() {
                         </div>
                         <div>
                           <h3 className="font-semibold text-gray-900">
-                            Trzby za rok {new Date().getFullYear()}
+                            Tržby za rok {new Date().getFullYear()}
                           </h3>
                           <p className="text-sm text-gray-500">
-                            Mesacny prehlad trzieb
+                            Mesačný prehľad tržieb
                           </p>
                         </div>
                       </div>
@@ -515,9 +515,9 @@ export default function AdminDashboard() {
                       </div>
                       <div>
                         <h3 className="font-semibold text-gray-900">
-                          Predaj podla kategorii
+                          Predaj podľa kategórií
                         </h3>
-                        <p className="text-sm text-gray-500">Rozdelenie trzieb</p>
+                        <p className="text-sm text-gray-500">Rozdelenie tržieb</p>
                       </div>
                     </div>
                     <div className="flex justify-center">
@@ -575,7 +575,7 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
                   <div className="bg-white rounded-xl border border-gray-200/80 p-5">
                     <h3 className="font-semibold text-gray-900 mb-4">
-                      Stav objednavok
+                      Stav objednávok
                     </h3>
                     <div className="space-y-3">
                       {stats.ordersByStatus.map((status, idx) => (
@@ -602,7 +602,7 @@ export default function AdminDashboard() {
                       ))}
                       {stats.ordersByStatus.length === 0 && (
                         <p className="text-sm text-gray-500 text-center py-4">
-                          Ziadne objednavky
+                          Žiadne objednávky
                         </p>
                       )}
                     </div>
@@ -612,13 +612,13 @@ export default function AdminDashboard() {
                     <div className="p-5 border-b border-gray-100">
                       <div className="flex justify-between items-center">
                         <h3 className="font-semibold text-gray-900">
-                          Posledne objednavky
+                          Posledné objednávky
                         </h3>
                         <Link
                           href="/admin/orders"
                           className="flex items-center gap-1 text-emerald-600 hover:text-emerald-700 text-sm font-medium"
                         >
-                          Zobrazit vsetky
+                          Zobraziť všetky
                           <ChevronRight className="w-4 h-4" />
                         </Link>
                       </div>
@@ -628,13 +628,13 @@ export default function AdminDashboard() {
                         <thead>
                           <tr className="border-b border-gray-100">
                             <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Objednavka
+                              Objednávka
                             </th>
                             <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Zakaznik
+                              Zákazník
                             </th>
                             <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Polozky
+                              Položky
                             </th>
                             <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                               Suma
@@ -643,7 +643,7 @@ export default function AdminDashboard() {
                               Stav
                             </th>
                             <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                              Datum
+                              Dátum
                             </th>
                           </tr>
                         </thead>
@@ -693,7 +693,7 @@ export default function AdminDashboard() {
                                 colSpan={6}
                                 className="px-5 py-8 text-center text-gray-500"
                               >
-                                Ziadne objednavky
+                                Žiadne objednávky
                               </td>
                             </tr>
                           )}
