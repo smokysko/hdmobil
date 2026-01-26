@@ -65,9 +65,7 @@ export default function AdminSettings() {
         <div className="max-w-[1600px] mx-auto px-6 py-3 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link href="/admin/dashboard" className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-500/20">
-                <span className="text-white font-bold text-sm">HD</span>
-              </div>
+              <img src="/images/hdmobil_logo_blue.jpg" alt="HDmobil Logo" className="h-10 w-auto object-contain" />
               <div>
                 <h1 className="text-lg font-semibold text-gray-900">HDmobil</h1>
                 <p className="text-xs text-gray-500">Admin Panel</p>
