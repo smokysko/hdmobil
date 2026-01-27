@@ -118,10 +118,10 @@ export default function HeroCarousel({
                     </h1>
 
                     {slideFeatures.length > 0 && (
-                      <div className="flex flex-col gap-2 text-sm text-muted-foreground border-l-2 border-primary/30 pl-4 my-3">
+                      <div className="flex flex-col gap-1.5 md:gap-2 text-xs md:text-sm lg:text-base text-muted-foreground border-l-2 border-primary/30 pl-3 md:pl-4 my-2 md:my-3">
                         {slideFeatures.map((feature, idx) => (
-                          <div key={idx} className="flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4 text-primary" />
+                          <div key={idx} className="flex items-center gap-1.5 md:gap-2">
+                            <CheckCircle2 className="w-3 h-3 md:w-4 md:h-4 text-primary flex-shrink-0" />
                             <span>{feature.text}</span>
                           </div>
                         ))}
@@ -129,23 +129,23 @@ export default function HeroCarousel({
                     )}
 
                     {slide.price && (
-                      <div className="flex items-end gap-4 mb-2">
-                        <div className="text-3xl font-bold text-foreground">
+                      <div className="flex items-end gap-2 md:gap-4 mb-2">
+                        <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-foreground">
                           {slide.price.toLocaleString('sk-SK')} EUR
                         </div>
                         {slide.original_price && slide.original_price > slide.price && (
-                          <div className="text-lg text-muted-foreground line-through mb-1">
+                          <div className="text-sm md:text-lg lg:text-xl text-muted-foreground line-through mb-0.5 md:mb-1">
                             {slide.original_price.toLocaleString('sk-SK')} EUR
                           </div>
                         )}
                       </div>
                     )}
 
-                    <div className="flex flex-wrap gap-3">
+                    <div className="flex flex-wrap gap-2 md:gap-3">
                       {slide.link_url && slide.link_text && (
                         <Button
                           size="lg"
-                          className="h-12 px-8 font-bold text-base shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
+                          className="h-10 md:h-12 px-5 md:px-8 font-bold text-sm md:text-base shadow-lg shadow-primary/20 hover:shadow-primary/40 transition-all"
                           asChild
                         >
                           <Link href={slide.link_url}>{slide.link_text}</Link>
@@ -155,7 +155,7 @@ export default function HeroCarousel({
                         <Button
                           size="lg"
                           variant="outline"
-                          className="h-12 px-6 font-medium border-2"
+                          className="h-10 md:h-12 px-4 md:px-6 font-medium text-sm md:text-base border-2"
                           asChild
                         >
                           <Link href={slide.secondary_link_url}>{slide.secondary_link_text}</Link>
