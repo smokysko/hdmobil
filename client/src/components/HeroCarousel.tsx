@@ -95,7 +95,7 @@ export default function HeroCarousel({
                 color: slide.text_color || undefined,
               }}
             >
-              <div className="container relative z-10 py-2 lg:py-4 h-full flex flex-col justify-start">
+              <div className="container relative z-10 py-2 lg:py-4 h-full flex flex-col justify-center">
                 <div className="grid lg:grid-cols-12 gap-4 items-center">
                   <div className="lg:col-span-5 space-y-4 order-2 lg:order-1">
                     {slide.badge_text && (
