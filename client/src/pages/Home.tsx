@@ -343,12 +343,12 @@ export default function Home() {
                 </div>
               </div>
 
-              <div className="relative h-64 md:h-80 lg:h-96 flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-blue-500/10 rounded-full blur-3xl opacity-40 scale-75"></div>
+              <div className="relative h-72 md:h-96 lg:h-[28rem] flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-blue-500/10 rounded-full blur-3xl opacity-40 scale-90"></div>
                 <img
                   src={promo.image_url || DEFAULT_PROMO.image_url}
                   alt={promo.title_sk || DEFAULT_PROMO.title_sk || 'Promo'}
-                  className="relative z-10 w-full max-w-md object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-105"
+                  className="relative z-10 w-full max-w-xl object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-105"
                 />
               </div>
             </div>
