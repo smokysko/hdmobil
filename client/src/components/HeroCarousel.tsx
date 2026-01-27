@@ -164,10 +164,10 @@ export default function HeroCarousel({
                     </div>
                   </div>
 
-                  <div className="lg:col-span-7 relative flex justify-center items-center order-1 lg:order-2 min-h-[150px] lg:min-h-[200px]">
+                  <div className="lg:col-span-7 relative flex justify-center items-center order-1 lg:order-2 min-h-[300px] lg:min-h-[450px]">
                     <div className="absolute inset-0 bg-gradient-to-tr from-primary/5 to-transparent rounded-full blur-3xl opacity-60 transform scale-75"></div>
 
-                    <div className="relative z-10 w-full max-w-[340px] h-[200px] flex items-center justify-center">
+                    <div className="relative z-10 w-full max-w-[500px] lg:max-w-[600px] h-[300px] lg:h-[450px] flex items-center justify-center">
                       {slide.image_url && (
                         <img
                           src={slide.image_url}
