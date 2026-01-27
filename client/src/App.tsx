@@ -26,6 +26,7 @@ import CustomerLogin from "./pages/auth/login";
 import CustomerRegister from "./pages/auth/register";
 import AccountPage from "./pages/account/index";
 import OrdersPage from "./pages/account/orders";
+import Search from "./pages/Search";
 import Preloader from "./components/Preloader";
 import { useState } from "react";
 
@@ -39,6 +40,7 @@ function Router() {
       <Route path="/cart" component={Cart} />
       <Route path="/checkout" component={Checkout} />
       <Route path="/success" component={Success} />
+      <Route path="/vyhladavanie" component={Search} />
       {/* Customer auth routes */}
       <Route path="/auth/login" component={CustomerLogin} />
       <Route path="/auth/register" component={CustomerRegister} />

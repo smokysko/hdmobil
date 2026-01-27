@@ -5,8 +5,8 @@ import { useState } from "react";
 import { Link, useLocation } from "wouter";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
+import SearchBar from "./SearchBar";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -149,18 +149,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </Link>
 
             {/* Central Search Bar - Prominent & Functional */}
-            <div className="hidden md:flex flex-1 max-w-2xl mx-auto relative">
-              <div className="relative w-full flex">
-                <Input
-                  type="search"
-                  placeholder="Čo hľadáte? (napr. iPhone 15, slúchadlá...)"
-                  className="h-11 w-full rounded-l-md border-border bg-secondary/30 pl-4 pr-12 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all"
-                />
-                <Button className="h-11 rounded-l-none rounded-r-md px-6 font-bold tracking-wide">
-                  <Search className="h-5 w-5 mr-2" />
-                  Hľadať
-                </Button>
-              </div>
+            <div className="hidden md:flex flex-1 max-w-2xl mx-auto">
+              <SearchBar variant="desktop" />
             </div>
 
             {/* Right Actions */}
@@ -264,16 +254,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         
         {/* Mobile Search - Visible only on mobile below header */}
         <div className="md:hidden p-4 border-t border-border bg-background">
-          <div className="relative w-full flex">
-            <Input
-              type="search"
-              placeholder="Hľadať produkty..."
-              className="h-10 w-full rounded-l-md border-border bg-secondary/30 pl-4"
-            />
-            <Button size="icon" className="h-10 w-12 rounded-l-none rounded-r-md">
-              <Search className="h-4 w-4" />
-            </Button>
-          </div>
+          <SearchBar variant="mobile" />
         </div>
       </header>
 
