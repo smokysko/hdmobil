@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { getProducts, Product } from '@/lib/products';
 import { supabase } from '@/lib/supabase';
-import { ArrowRight, ShieldCheck, Truck, RotateCcw, Headphones } from 'lucide-react';
+import { ArrowRight, ShieldCheck, Truck, RotateCcw, Headphones, Zap, Monitor, Sparkles, ChevronRight } from 'lucide-react';
 import { Link } from 'wouter';
 import { useEffect, useRef, useState } from 'react';
 
@@ -52,14 +52,20 @@ const TRUST_BAR_ICONS: Record<string, React.ComponentType<{ className?: string }
 };
 
 const DEFAULT_PROMO = {
-  badge_text: 'VYPREDAJ',
-  title_sk: 'Upgrade pre vasu domacu kancelariu',
+  badge_text: 'Tip pre vas',
+  title_sk: 'Produktivita na novej urovni',
   description_sk:
-    'Zvyste svoju produktivitu s nasou ponukou monitorov, dokovacich stanic a prislusenstva. Teraz so zlavou az 30%.',
+    'Objavte nasu ponuku notebookov, monitorov a prislusenstva pre vasu domacu kancelariu.',
   image_url: '/images/categories/cat_laptop.png',
   link_url: '/category/notebooky',
-  link_text: 'Pozret ponuku',
+  link_text: 'Prezriet kolekciu',
 };
+
+const PROMO_FEATURES = [
+  { icon: Zap, text: 'Rychle dodanie do 24 hodin' },
+  { icon: Monitor, text: 'Siroky vyber zariadeni' },
+  { icon: ShieldCheck, text: 'Zaruka az 3 roky' },
+];
 
 const DEFAULT_TRUST_BAR: TrustBarItem[] = [
   { icon: 'Truck', title: 'Doprava do 24h', description: 'Pri objednavke do 15:00' },
@@ -281,36 +287,68 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="py-12">
+      <section className="py-16 bg-gradient-to-b from-background to-secondary/20">
         <div className="container">
-          <div className="relative overflow-hidden rounded-xl bg-foreground text-background px-6 py-12 md:px-12 lg:py-16">
-            <div className="grid md:grid-cols-2 gap-8 items-center relative z-10">
-              <div>
-                <Badge className="mb-4 bg-primary text-primary-foreground font-bold px-3 py-1 rounded-sm">
-                  {promo.badge_text || DEFAULT_PROMO.badge_text}
-                </Badge>
-                <h2 className="text-3xl md:text-4xl font-bold tracking-tight mb-4">
-                  {(promo.title_sk || DEFAULT_PROMO.title_sk)?.split(' ').slice(0, 3).join(' ')}{' '}
-                  <br />
-                  <span className="text-primary">
-                    {(promo.title_sk || DEFAULT_PROMO.title_sk)?.split(' ').slice(3).join(' ')}
-                  </span>
-                </h2>
-                <p className="text-muted-foreground mb-8 max-w-md">
-                  {promo.description_sk || DEFAULT_PROMO.description_sk}
-                </p>
-                <Button size="lg" className="font-bold rounded-md" asChild>
-                  <Link href={promo.link_url || DEFAULT_PROMO.link_url}>
-                    {promo.link_text || DEFAULT_PROMO.link_text}
-                  </Link>
-                </Button>
+          <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white px-6 py-12 md:px-12 lg:px-16 lg:py-16">
+            <div className="absolute inset-0 overflow-hidden">
+              <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3"></div>
+              <div className="absolute bottom-0 left-0 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl translate-y-1/2 -translate-x-1/3"></div>
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full">
+                <div className="absolute top-10 left-10 w-2 h-2 bg-primary/30 rounded-full"></div>
+                <div className="absolute top-20 right-20 w-1.5 h-1.5 bg-white/20 rounded-full"></div>
+                <div className="absolute bottom-16 left-1/4 w-1 h-1 bg-primary/40 rounded-full"></div>
               </div>
-              <div className="relative h-64 md:h-full min-h-[200px] flex items-center justify-center">
-                <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-transparent rounded-full blur-3xl opacity-30"></div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-center relative z-10">
+              <div className="space-y-6">
+                <div className="inline-flex items-center gap-2 text-primary text-sm font-medium">
+                  <Sparkles className="w-4 h-4" />
+                  <span>{promo.badge_text || DEFAULT_PROMO.badge_text}</span>
+                </div>
+
+                <div>
+                  <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
+                    {promo.title_sk || DEFAULT_PROMO.title_sk}
+                  </h2>
+                  <p className="text-slate-400 mt-4 text-base md:text-lg max-w-md leading-relaxed">
+                    {promo.description_sk || DEFAULT_PROMO.description_sk}
+                  </p>
+                </div>
+
+                <div className="space-y-3 py-2">
+                  {PROMO_FEATURES.map((feature, idx) => (
+                    <div key={idx} className="flex items-center gap-3 text-slate-300">
+                      <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
+                        <feature.icon className="w-4 h-4 text-primary" />
+                      </div>
+                      <span className="text-sm">{feature.text}</span>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex flex-wrap items-center gap-4 pt-2">
+                  <Button size="lg" className="font-semibold rounded-lg group" asChild>
+                    <Link href={promo.link_url || DEFAULT_PROMO.link_url}>
+                      {promo.link_text || DEFAULT_PROMO.link_text}
+                      <ChevronRight className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" />
+                    </Link>
+                  </Button>
+                  <Link
+                    href="/category/all"
+                    className="text-sm text-slate-400 hover:text-white transition-colors"
+                  >
+                    Vsetky produkty
+                  </Link>
+                </div>
+              </div>
+
+              <div className="relative h-64 md:h-80 lg:h-96 flex items-center justify-center">
+                <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-blue-500/10 rounded-full blur-3xl opacity-40 scale-75"></div>
                 <img
                   src={promo.image_url || DEFAULT_PROMO.image_url}
                   alt={promo.title_sk || DEFAULT_PROMO.title_sk || 'Promo'}
-                  className="relative z-10 w-full max-w-sm object-contain drop-shadow-2xl transform -rotate-6 hover:rotate-0 transition-transform duration-500"
+                  className="relative z-10 w-full max-w-md object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-105"
                 />
               </div>
             </div>
