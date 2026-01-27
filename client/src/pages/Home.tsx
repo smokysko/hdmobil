@@ -52,26 +52,26 @@ const TRUST_BAR_ICONS: Record<string, React.ComponentType<{ className?: string }
 };
 
 const DEFAULT_PROMO = {
-  badge_text: 'Tip pre vas',
-  title_sk: 'Produktivita na novej urovni',
+  badge_text: 'Tip pre vás',
+  title_sk: 'Produktivita na novej úrovni',
   description_sk:
-    'Objavte nasu ponuku notebookov, monitorov a prislusenstva pre vasu domacu kancelariu.',
+    'Objavte našu ponuku notebookov, monitorov a príslušenstva pre vašu domácu kanceláriu.',
   image_url: '/images/categories/cat_laptop.png',
   link_url: '/category/notebooky',
-  link_text: 'Prezriet kolekciu',
+  link_text: 'Prezrieť kolekciu',
 };
 
 const PROMO_FEATURES = [
-  { icon: Zap, text: 'Rychle dodanie do 24 hodin' },
-  { icon: Monitor, text: 'Siroky vyber zariadeni' },
-  { icon: ShieldCheck, text: 'Zaruka az 3 roky' },
+  { icon: Zap, text: 'Rýchle dodanie do 24 hodín' },
+  { icon: Monitor, text: 'Široký výber zariadení' },
+  { icon: ShieldCheck, text: 'Záruka až 3 roky' },
 ];
 
 const DEFAULT_TRUST_BAR: TrustBarItem[] = [
-  { icon: 'Truck', title: 'Doprava do 24h', description: 'Pri objednavke do 15:00' },
-  { icon: 'ShieldCheck', title: 'Autorizovany predajca', description: '100% originalne produkty' },
-  { icon: 'RotateCcw', title: 'Vratenie do 14 dni', description: 'Bez udania dovodu' },
-  { icon: 'Headphones', title: 'Odborna podpora', description: 'Po-Pia 8:00 - 17:00' },
+  { icon: 'Truck', title: 'Doprava do 24h', description: 'Pri objednávke do 15:00' },
+  { icon: 'ShieldCheck', title: 'Autorizovaný predajca', description: '100% originálne produkty' },
+  { icon: 'RotateCcw', title: 'Vrátenie do 14 dní', description: 'Bez udania dôvodu' },
+  { icon: 'Headphones', title: 'Odborná podpora', description: 'Po-Pia 8:00 - 17:00' },
 ];
 
 const DEFAULT_CATEGORIES = [
@@ -199,7 +199,7 @@ export default function Home() {
             <HeroCarousel slides={heroSlides} autoRotateInterval={5000} height="100%" />
           ) : (
             <div className="container py-8 text-center text-muted-foreground">
-              <p>Ziadne hero slidy</p>
+              <p>Žiadne hero slidy</p>
             </div>
           )}
         </section>
@@ -229,9 +229,9 @@ export default function Home() {
       <section className="py-12 bg-background">
         <div className="container">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold tracking-tight">Popularne kategorie</h2>
+            <h2 className="text-2xl font-bold tracking-tight">Populárne kategórie</h2>
             <Link href="/category/all" className="text-sm font-medium text-primary hover:underline">
-              Zobrazit vsetky
+              Zobraziť všetky
             </Link>
           </div>
 
@@ -262,13 +262,13 @@ export default function Home() {
           <div className="mb-8 flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                Najnovsie v ponuke
+                Najnovšie v ponuke
               </h2>
-              <p className="text-sm text-muted-foreground mt-1">Cerstvo naskladnene novinky</p>
+              <p className="text-sm text-muted-foreground mt-1">Čerstvo naskladnené novinky</p>
             </div>
             <Button variant="outline" size="sm" className="hidden md:flex font-bold" asChild>
               <Link href="/category/all">
-                Vsetky produkty <ArrowRight className="ml-2 h-4 w-4" />
+                Všetky produkty <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </div>
@@ -281,7 +281,7 @@ export default function Home() {
 
           <div className="mt-8 flex justify-center md:hidden">
             <Button variant="outline" className="w-full font-bold" asChild>
-              <Link href="/category/all">Zobrazit vsetky produkty</Link>
+              <Link href="/category/all">Zobraziť všetky produkty</Link>
             </Button>
           </div>
         </div>
@@ -338,7 +338,7 @@ export default function Home() {
                     href="/category/all"
                     className="text-sm text-slate-400 hover:text-white transition-colors"
                   >
-                    Vsetky produkty
+                    Všetky produkty
                   </Link>
                 </div>
               </div>
@@ -359,9 +359,9 @@ export default function Home() {
       <section className="py-12 bg-background border-t border-border">
         <div className="container">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold tracking-tight text-foreground">Najpredavanejsie</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">Najpredávanejšie</h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Oblubene produkty nasich zakaznikov
+              Obľúbené produkty našich zákazníkov
             </p>
           </div>
 
