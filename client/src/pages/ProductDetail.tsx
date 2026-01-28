@@ -58,6 +58,10 @@ export default function ProductDetail() {
   const { data: userReview } = useUserReview(product?.id, user?.id);
 
   useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
+
+  useEffect(() => {
     async function loadProduct() {
       setIsLoading(true);
       setSelectedImageIndex(0);
