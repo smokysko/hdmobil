@@ -4,12 +4,14 @@ import { Search as SearchIcon, Loader2 } from "lucide-react";
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
 import { searchProducts, Product } from "@/lib/products";
+import { useI18n } from "@/i18n";
 
 export default function Search() {
   const searchParams = useSearch();
   const query = new URLSearchParams(searchParams).get("q") || "";
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const { t } = useI18n();
 
   useEffect(() => {
     const fetchResults = async () => {
@@ -28,18 +30,23 @@ export default function Search() {
     fetchResults();
   }, [query]);
 
+  const getResultsText = (count: number) => {
+    if (count === 0) return t.search.noResults;
+    if (count === 1) return t.search.foundProduct.replace("{count}", "1");
+    if (count < 5) return t.search.foundProductsFew.replace("{count}", String(count));
+    return t.search.foundProducts.replace("{count}", String(count));
+  };
+
   return (
     <Layout>
       <div className="container py-8">
         <div className="mb-8">
           <h1 className="text-2xl font-bold mb-2">
-            Výsledky vyhľadávania pre "{query}"
+            {t.search.searchResults} "{query}"
           </h1>
           {!isLoading && (
             <p className="text-muted-foreground">
-              {products.length === 0
-                ? "Nenašli sa žiadne produkty"
-                : `Nájdených ${products.length} ${products.length === 1 ? "produkt" : products.length < 5 ? "produkty" : "produktov"}`}
+              {getResultsText(products.length)}
             </p>
           )}
         </div>
@@ -59,10 +66,9 @@ export default function Search() {
             <div className="w-16 h-16 rounded-full bg-secondary/50 flex items-center justify-center mb-4">
               <SearchIcon className="h-8 w-8 text-muted-foreground" />
             </div>
-            <h2 className="text-lg font-semibold mb-2">Žiadne výsledky</h2>
+            <h2 className="text-lg font-semibold mb-2">{t.search.noResultsTitle}</h2>
             <p className="text-muted-foreground max-w-md">
-              Pre "{query}" sme nenašli žiadne produkty. Skúste iný výraz alebo
-              prezrite naše kategórie.
+              {t.search.noResultsDesc.replace("{query}", query)}
             </p>
           </div>
         )}

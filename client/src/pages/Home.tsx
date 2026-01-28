@@ -2,9 +2,9 @@ import Layout from '@/components/Layout';
 import ProductCard from '@/components/ProductCard';
 import HeroCarousel, { HeroSlide } from '@/components/HeroCarousel';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { getProducts, Product } from '@/lib/products';
 import { supabase } from '@/lib/supabase';
+import { useI18n } from '@/i18n';
 import { ArrowRight, ShieldCheck, Truck, RotateCcw, Headphones, Zap, Monitor, Sparkles, ChevronRight } from 'lucide-react';
 import { Link } from 'wouter';
 import { useEffect, useRef, useState } from 'react';
@@ -51,57 +51,49 @@ const TRUST_BAR_ICONS: Record<string, React.ComponentType<{ className?: string }
   Headphones,
 };
 
-const DEFAULT_PROMO = {
-  badge_text: 'Tip pre vás',
-  title_sk: 'Produktivita na novej úrovni',
-  description_sk:
-    'Objavte našu ponuku notebookov, monitorov a príslušenstva pre vašu domácu kanceláriu.',
-  image_url: '/images/categories/cat_laptop.png',
-  link_url: '/category/notebooky',
-  link_text: 'Prezrieť kolekciu',
-};
-
-const PROMO_FEATURES = [
-  { icon: Zap, text: 'Rýchle dodanie do 24 hodín' },
-  { icon: Monitor, text: 'Široký výber zariadení' },
-  { icon: ShieldCheck, text: 'Záruka až 3 roky' },
-];
-
-const DEFAULT_TRUST_BAR: TrustBarItem[] = [
-  { icon: 'Truck', title: 'Doprava do 24h', description: 'Pri objednávke do 15:00' },
-  { icon: 'ShieldCheck', title: 'Autorizovaný predajca', description: '100% originálne produkty' },
-  { icon: 'RotateCcw', title: 'Vrátenie do 14 dní', description: 'Bez udania dôvodu' },
-  { icon: 'Headphones', title: 'Odborná podpora', description: 'Po-Pia 8:00 - 17:00' },
-];
-
-const DEFAULT_CATEGORIES = [
-  { name: 'Smartfony', href: '/category/smartfony', image: '/images/categories/cat_smartphone.png' },
-  { name: 'Tablety', href: '/category/tablety', image: '/images/categories/cat_tablet.png' },
-  { name: 'Notebooky', href: '/category/notebooky', image: '/images/categories/cat_laptop.png' },
-  { name: 'Audio', href: '/category/audio', image: '/images/categories/cat_audio.png' },
-  {
-    name: 'Prislusenstvo',
-    href: '/category/prislusenstvo',
-    image: '/images/categories/cat_accessories.png',
-  },
-  {
-    name: 'Nahradne diely',
-    href: '/category/nahradne-diely',
-    image: '/images/categories/cat_parts.png',
-  },
-];
-
 export default function Home() {
   const [featuredProducts, setFeaturedProducts] = useState<Product[]>([]);
   const [saleProducts, setSaleProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
   const [heroHeight, setHeroHeight] = useState<string>('auto');
+  const { t } = useI18n();
 
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
   const [homepageCategories, setHomepageCategories] = useState<HomepageCategory[]>([]);
   const [promoSection, setPromoSection] = useState<HomepageSection | null>(null);
-  const [trustBarItems, setTrustBarItems] = useState<TrustBarItem[]>(DEFAULT_TRUST_BAR);
+  const [trustBarItems, setTrustBarItems] = useState<TrustBarItem[]>([]);
+
+  const DEFAULT_TRUST_BAR: TrustBarItem[] = [
+    { icon: 'Truck', title: t.home.delivery24h, description: t.home.orderBefore },
+    { icon: 'ShieldCheck', title: t.home.authorizedSeller, description: t.home.originalProducts },
+    { icon: 'RotateCcw', title: t.home.return14days, description: t.home.noReason },
+    { icon: 'Headphones', title: t.home.expertSupport, description: t.home.workingHours },
+  ];
+
+  const DEFAULT_PROMO = {
+    badge_text: t.home.tipForYou,
+    title_sk: t.home.productivityTitle,
+    description_sk: t.home.productivityDesc,
+    image_url: '/images/categories/cat_laptop.png',
+    link_url: '/category/notebooky',
+    link_text: t.home.browseCollection,
+  };
+
+  const PROMO_FEATURES = [
+    { icon: Zap, text: t.home.fastDelivery },
+    { icon: Monitor, text: t.home.wideSelection },
+    { icon: ShieldCheck, text: t.home.warrantyUp },
+  ];
+
+  const DEFAULT_CATEGORIES = [
+    { name: t.header.smartphones, href: '/category/smartfony', image: '/images/categories/cat_smartphone.png' },
+    { name: t.header.tablets, href: '/category/tablety', image: '/images/categories/cat_tablet.png' },
+    { name: t.header.laptops, href: '/category/notebooky', image: '/images/categories/cat_laptop.png' },
+    { name: t.header.audio, href: '/category/audio', image: '/images/categories/cat_audio.png' },
+    { name: t.header.accessories, href: '/category/prislusenstvo', image: '/images/categories/cat_accessories.png' },
+    { name: t.header.spareParts, href: '/category/nahradne-diely', image: '/images/categories/cat_parts.png' },
+  ];
 
   useEffect(() => {
     async function loadData() {
@@ -181,6 +173,7 @@ export default function Home() {
   }, []);
 
   const promo = promoSection || DEFAULT_PROMO;
+  const trustItems = trustBarItems.length > 0 ? trustBarItems : DEFAULT_TRUST_BAR;
 
   const categories =
     homepageCategories.length > 0
@@ -199,7 +192,7 @@ export default function Home() {
             <HeroCarousel slides={heroSlides} autoRotateInterval={5000} height="100%" />
           ) : (
             <div className="container py-8 text-center text-muted-foreground">
-              <p>Žiadne hero slidy</p>
+              <p>{t.home.noHeroSlides}</p>
             </div>
           )}
         </section>
@@ -207,7 +200,7 @@ export default function Home() {
         <section className="bg-foreground text-background py-3 border-b border-border/10 shrink-0">
           <div className="container">
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-              {trustBarItems.map((item, idx) => {
+              {trustItems.map((item, idx) => {
                 const Icon = TRUST_BAR_ICONS[item.icon] || Truck;
                 return (
                   <div key={idx} className="flex items-center gap-3 justify-center md:justify-start">
@@ -229,9 +222,9 @@ export default function Home() {
       <section className="py-12 bg-background">
         <div className="container">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="text-2xl font-bold tracking-tight">Populárne kategórie</h2>
+            <h2 className="text-2xl font-bold tracking-tight">{t.home.popularCategories}</h2>
             <Link href="/category/all" className="text-sm font-medium text-primary hover:underline">
-              Zobraziť všetky
+              {t.home.viewAll}
             </Link>
           </div>
 
@@ -262,13 +255,13 @@ export default function Home() {
           <div className="mb-8 flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                Najnovšie v ponuke
+                {t.home.latestProducts}
               </h2>
-              <p className="text-sm text-muted-foreground mt-1">Čerstvo naskladnené novinky</p>
+              <p className="text-sm text-muted-foreground mt-1">{t.home.freshlyStocked}</p>
             </div>
             <Button variant="outline" size="sm" className="hidden md:flex font-bold" asChild>
               <Link href="/category/all">
-                Všetky produkty <ArrowRight className="ml-2 h-4 w-4" />
+                {t.home.allProducts} <ArrowRight className="ml-2 h-4 w-4" />
               </Link>
             </Button>
           </div>
@@ -281,7 +274,7 @@ export default function Home() {
 
           <div className="mt-8 flex justify-center md:hidden">
             <Button variant="outline" className="w-full font-bold" asChild>
-              <Link href="/category/all">Zobraziť všetky produkty</Link>
+              <Link href="/category/all">{t.home.viewAllProducts}</Link>
             </Button>
           </div>
         </div>
@@ -338,7 +331,7 @@ export default function Home() {
                     href="/category/all"
                     className="text-sm text-slate-400 hover:text-white transition-colors"
                   >
-                    Všetky produkty
+                    {t.home.allProducts}
                   </Link>
                 </div>
               </div>
@@ -359,9 +352,9 @@ export default function Home() {
       <section className="py-12 bg-background border-t border-border">
         <div className="container">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold tracking-tight text-foreground">Najpredávanejšie</h2>
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">{t.home.bestSellers}</h2>
             <p className="text-sm text-muted-foreground mt-1">
-              Obľúbené produkty našich zákazníkov
+              {t.home.customerFavorites}
             </p>
           </div>
 

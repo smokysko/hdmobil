@@ -1,20 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'wouter';
 import { useAuth } from '../../contexts/AuthContext';
+import { useI18n } from '@/i18n';
 import { Mail, Lock, Eye, EyeOff, ArrowLeft } from 'lucide-react';
 
 export default function CustomerLogin() {
   const [, navigate] = useLocation();
   const { signIn, user, loading: authLoading } = useAuth();
+  const { t } = useI18n();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Redirect if already logged in
   useEffect(() => {
-    // Only redirect if user is actually logged in (not null/undefined)
     if (!authLoading && user && user.id) {
       navigate('/');
     }
@@ -27,12 +27,12 @@ export default function CustomerLogin() {
 
     try {
       const { error } = await signIn(email, password);
-      
+
       if (error) {
         if (error.message.includes('Invalid login credentials')) {
-          setError('Nesprávny email alebo heslo');
+          setError(t.auth.invalidCredentials);
         } else if (error.message.includes('Email not confirmed')) {
-          setError('Email nie je potvrdený. Skontrolujte svoju emailovú schránku.');
+          setError(t.auth.emailNotConfirmed);
         } else {
           setError(error.message);
         }
@@ -40,7 +40,7 @@ export default function CustomerLogin() {
         navigate('/');
       }
     } catch (err) {
-      setError('Nastala chyba pri prihlasovaní. Skúste to znova.');
+      setError(t.auth.loginError);
     } finally {
       setLoading(false);
     }
@@ -56,31 +56,27 @@ export default function CustomerLogin() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-green-600 transition-colors">
             <ArrowLeft className="w-5 h-5" />
-            <span>Späť do obchodu</span>
+            <span>{t.auth.backToShop}</span>
           </Link>
         </div>
       </header>
 
-      {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4">
         <div className="w-full max-w-md">
-          {/* Logo */}
           <div className="text-center mb-8">
             <Link href="/">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl mb-4">
                 <span className="text-3xl font-bold text-white">HD</span>
               </div>
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Vitajte späť</h1>
-            <p className="text-gray-600 mt-2">Prihláste sa do svojho účtu</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t.auth.welcomeBack}</h1>
+            <p className="text-gray-600 mt-2">{t.auth.loginToAccount}</p>
           </div>
 
-          {/* Login Form */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
@@ -91,7 +87,7 @@ export default function CustomerLogin() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email
+                  {t.auth.email}
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -108,7 +104,7 @@ export default function CustomerLogin() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Heslo
+                  {t.auth.password}
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -117,7 +113,7 @@ export default function CustomerLogin() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                    placeholder="••••••••"
+                    placeholder="********"
                     required
                   />
                   <button
@@ -136,10 +132,10 @@ export default function CustomerLogin() {
                     type="checkbox"
                     className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
                   />
-                  <span className="text-sm text-gray-600">Zapamätať si ma</span>
+                  <span className="text-sm text-gray-600">{t.auth.rememberMe}</span>
                 </label>
                 <Link href="/auth/forgot-password" className="text-sm text-green-600 hover:text-green-700 font-medium">
-                  Zabudnuté heslo?
+                  {t.auth.forgotPassword}
                 </Link>
               </div>
 
@@ -154,37 +150,36 @@ export default function CustomerLogin() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    Prihlasujem...
+                    {t.auth.loggingIn}
                   </span>
                 ) : (
-                  'Prihlásiť sa'
+                  t.auth.login
                 )}
               </button>
             </form>
 
             <div className="mt-6 pt-6 border-t border-gray-200 text-center">
               <p className="text-gray-600">
-                Nemáte účet?{' '}
+                {t.auth.noAccount}{' '}
                 <Link href="/auth/register" className="text-green-600 hover:text-green-700 font-medium">
-                  Zaregistrujte sa
+                  {t.auth.register}
                 </Link>
               </p>
             </div>
           </div>
 
-          {/* Benefits */}
           <div className="mt-8 grid grid-cols-3 gap-4 text-center">
             <div className="p-4">
-              <div className="text-2xl mb-2">🚚</div>
-              <p className="text-sm text-gray-600">Doprava zadarmo od 50€</p>
+              <div className="text-2xl mb-2">***</div>
+              <p className="text-sm text-gray-600">{t.auth.freeShippingFrom}</p>
             </div>
             <div className="p-4">
-              <div className="text-2xl mb-2">🔒</div>
-              <p className="text-sm text-gray-600">Bezpečné platby</p>
+              <div className="text-2xl mb-2">***</div>
+              <p className="text-sm text-gray-600">{t.auth.securePayments}</p>
             </div>
             <div className="p-4">
-              <div className="text-2xl mb-2">↩️</div>
-              <p className="text-sm text-gray-600">14 dní na vrátenie</p>
+              <div className="text-2xl mb-2">***</div>
+              <p className="text-sm text-gray-600">{t.auth.returnIn14Days}</p>
             </div>
           </div>
         </div>

@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCart } from "@/contexts/CartContext";
+import { useI18n } from "@/i18n";
 import {
   getProductBySlug,
   getRecommendedAccessories,
@@ -30,6 +31,7 @@ import NotFound from "./NotFound";
 export default function ProductDetail() {
   const [, params] = useRoute("/product/:id");
   const id = params?.id || "";
+  const { t } = useI18n();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [accessories, setAccessories] = useState<Product[]>([]);
@@ -108,7 +110,7 @@ export default function ProductDetail() {
             <div className="relative aspect-square overflow-hidden rounded-3xl border border-border bg-secondary/30 p-10">
               {product.isNew && (
                 <Badge className="absolute left-6 top-6 z-10 bg-primary text-primary-foreground font-display tracking-wide rounded-full px-4 py-1">
-                  NOVINKA
+                  {t.product.newBadge}
                 </Badge>
               )}
               {product.isSale && (
@@ -116,7 +118,7 @@ export default function ProductDetail() {
                   variant="destructive"
                   className="absolute left-6 top-6 z-10 font-display tracking-wide rounded-full px-4 py-1"
                 >
-                  AKCIA
+                  {t.product.saleBadge}
                 </Badge>
               )}
               <img
@@ -178,7 +180,7 @@ export default function ProductDetail() {
                     {product.rating.toFixed(1)}
                   </span>
                   <span className="text-muted-foreground text-xs">
-                    ({product.reviews} recenzií)
+                    ({product.reviews} {t.product.reviews})
                   </span>
                 </div>
               </div>
@@ -249,7 +251,7 @@ export default function ProductDetail() {
                   disabled={product.stock <= 0}
                 >
                   <ShoppingCart className="mr-2 h-5 w-5" />
-                  {product.stock > 0 ? "PRIDAŤ DO KOŠÍKA" : "VYPREDANÉ"}
+                  {product.stock > 0 ? t.product.addToCart.toUpperCase() : t.product.outOfStock.toUpperCase()}
                 </Button>
                 <Button
                   variant="outline"
@@ -264,27 +266,27 @@ export default function ProductDetail() {
                 <div className="flex items-center gap-3">
                   <Truck className="h-5 w-5 text-primary" />
                   <span className="text-sm font-medium">
-                    Expresná doprava zdarma
+                    {t.product.freeExpressShipping}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Shield className="h-5 w-5 text-primary" />
                   <span className="text-sm font-medium">
-                    2-ročná oficiálna záruka
+                    {t.product.officialWarranty}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary" />
                   <span className="text-sm font-medium">
                     {product.stock > 0
-                      ? `Skladom (${product.stock} ks)`
-                      : "Momentálne nedostupné"}
+                      ? t.product.stockPieces.replace("{count}", String(product.stock))
+                      : t.product.currentlyUnavailable}
                   </span>
                 </div>
                 <div className="flex items-center gap-3">
                   <Check className="h-5 w-5 text-primary" />
                   <span className="text-sm font-medium">
-                    30-dňová garancia vrátenia peňazí
+                    {t.product.moneyBackGuarantee}
                   </span>
                 </div>
               </div>
@@ -298,10 +300,10 @@ export default function ProductDetail() {
           <div className="container">
             <div className="mb-8">
               <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                Odporúčané príslušenstvo
+                {t.product.recommendedAccessories}
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Doplnky, ktoré sa hodia k vášmu produktu
+                {t.product.accessoriesForProduct}
               </p>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
@@ -318,10 +320,10 @@ export default function ProductDetail() {
           <div className="container">
             <div className="mb-8">
               <h2 className="text-2xl font-bold tracking-tight text-foreground">
-                Podobné produkty
+                {t.product.relatedProducts}
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                Ďalšie produkty z kategórie {product.category}
+                {t.product.moreFromCategory} {product.category}
               </p>
             </div>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">

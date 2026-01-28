@@ -4,6 +4,7 @@ import { Search, X, Loader2 } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { searchProducts, Product } from "@/lib/products";
+import { useI18n } from "@/i18n";
 
 interface SearchBarProps {
   variant?: "desktop" | "mobile";
@@ -17,6 +18,7 @@ export default function SearchBar({ variant = "desktop" }: SearchBarProps) {
   const [, navigate] = useLocation();
   const containerRef = useRef<HTMLDivElement>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const { t } = useI18n();
 
   const fetchSuggestions = useCallback(async (searchQuery: string) => {
     if (searchQuery.length < 2) {
@@ -94,7 +96,7 @@ export default function SearchBar({ variant = "desktop" }: SearchBarProps) {
             value={query}
             onChange={(e) => handleInputChange(e.target.value)}
             onFocus={() => query.length >= 2 && suggestions.length > 0 && setIsOpen(true)}
-            placeholder={isDesktop ? "Co hladáte? (napr. iPhone 15, slúchadlá...)" : "Hľadať produkty..."}
+            placeholder={t.search.searchPlaceholder}
             className={`${isDesktop ? "h-11 pl-4 pr-10" : "h-10 pl-4 pr-10"} w-full rounded-l-md border-border bg-secondary/30 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary transition-all`}
           />
           {query && (
@@ -110,7 +112,7 @@ export default function SearchBar({ variant = "desktop" }: SearchBarProps) {
         {isDesktop ? (
           <Button type="submit" className="h-11 rounded-l-none rounded-r-md px-6 font-bold tracking-wide">
             <Search className="h-5 w-5 mr-2" />
-            Hľadať
+            {t.common.search}
           </Button>
         ) : (
           <Button type="submit" size="icon" className="h-10 w-12 rounded-l-none rounded-r-md">
@@ -147,11 +149,11 @@ export default function SearchBar({ variant = "desktop" }: SearchBarProps) {
                       <div className="text-right shrink-0">
                         {product.isSale && product.salePrice ? (
                           <>
-                            <p className="text-sm font-bold text-primary">{product.salePrice.toFixed(2)} €</p>
-                            <p className="text-xs text-muted-foreground line-through">{product.price.toFixed(2)} €</p>
+                            <p className="text-sm font-bold text-primary">{product.salePrice.toFixed(2)} EUR</p>
+                            <p className="text-xs text-muted-foreground line-through">{product.price.toFixed(2)} EUR</p>
                           </>
                         ) : (
-                          <p className="text-sm font-bold">{product.price.toFixed(2)} €</p>
+                          <p className="text-sm font-bold">{product.price.toFixed(2)} EUR</p>
                         )}
                       </div>
                     </button>
@@ -163,12 +165,12 @@ export default function SearchBar({ variant = "desktop" }: SearchBarProps) {
                 onClick={handleSubmit}
                 className="w-full p-3 text-sm font-medium text-primary hover:bg-secondary/30 transition-colors border-t border-border"
               >
-                Zobraziť všetky výsledky pre "{query}"
+                {t.home.viewAll} "{query}"
               </button>
             </>
           ) : (
             <div className="py-6 text-center text-sm text-muted-foreground">
-              Žiadne výsledky pre "{query}"
+              {t.search.noResultsDesc.replace("{query}", query)}
             </div>
           )}
         </div>

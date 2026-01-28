@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useLocation, Link } from 'wouter';
 import { useAuth } from '../../contexts/AuthContext';
+import { useI18n } from '@/i18n';
 import { Mail, Lock, Eye, EyeOff, User, Phone, ArrowLeft, CheckCircle } from 'lucide-react';
 
 export default function CustomerRegister() {
   const [, navigate] = useLocation();
   const { signUp, user, loading: authLoading } = useAuth();
+  const { t } = useI18n();
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -19,7 +21,6 @@ export default function CustomerRegister() {
   const [success, setSuccess] = useState(false);
   const [acceptTerms, setAcceptTerms] = useState(false);
 
-  // Redirect if already logged in
   useEffect(() => {
     if (!authLoading && user) {
       navigate('/');
@@ -32,23 +33,23 @@ export default function CustomerRegister() {
 
   const validateForm = () => {
     if (!formData.fullName.trim()) {
-      setError('Zadajte svoje meno');
+      setError(t.auth.enterName);
       return false;
     }
     if (!formData.email.trim()) {
-      setError('Zadajte email');
+      setError(t.auth.enterEmail);
       return false;
     }
     if (formData.password.length < 6) {
-      setError('Heslo musí mať aspoň 6 znakov');
+      setError(t.auth.passwordTooShort);
       return false;
     }
     if (formData.password !== formData.confirmPassword) {
-      setError('Heslá sa nezhodujú');
+      setError(t.auth.passwordsNoMatch);
       return false;
     }
     if (!acceptTerms) {
-      setError('Musíte súhlasiť s obchodnými podmienkami');
+      setError(t.auth.mustAcceptTerms);
       return false;
     }
     return true;
@@ -74,7 +75,7 @@ export default function CustomerRegister() {
 
       if (error) {
         if (error.message.includes('already registered')) {
-          setError('Tento email je už zaregistrovaný. Skúste sa prihlásiť.');
+          setError(t.auth.emailAlreadyRegistered);
         } else {
           setError(error.message);
         }
@@ -84,7 +85,7 @@ export default function CustomerRegister() {
         navigate('/');
       }
     } catch (err) {
-      setError('Nastala chyba pri registrácii. Skúste to znova.');
+      setError(t.auth.registrationError);
     } finally {
       setLoading(false);
     }
@@ -105,7 +106,7 @@ export default function CustomerRegister() {
           <div className="max-w-7xl mx-auto px-4 py-4">
             <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-green-600 transition-colors">
               <ArrowLeft className="w-5 h-5" />
-              <span>Späť do obchodu</span>
+              <span>{t.auth.backToShop}</span>
             </Link>
           </div>
         </header>
@@ -116,17 +117,16 @@ export default function CustomerRegister() {
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle className="w-8 h-8 text-green-600" />
               </div>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">Registrácia úspešná!</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">{t.auth.registrationSuccess}</h2>
               <p className="text-gray-600 mb-6">
-                Na váš email <strong>{formData.email}</strong> sme poslali potvrdzovací odkaz.
-                Kliknite naň pre aktiváciu účtu.
+                {t.auth.confirmEmailSent.replace('{email}', formData.email)}
               </p>
               <div className="space-y-3">
                 <Link href="/auth/login" className="block w-full py-3 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition-colors">
-                  Prejsť na prihlásenie
+                  {t.auth.goToLogin}
                 </Link>
                 <Link href="/" className="block w-full py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors">
-                  Pokračovať v nákupe
+                  {t.auth.continueShoppingBtn}
                 </Link>
               </div>
             </div>
@@ -138,31 +138,27 @@ export default function CustomerRegister() {
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
       <header className="bg-white border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 py-4">
           <Link href="/" className="inline-flex items-center gap-2 text-gray-600 hover:text-green-600 transition-colors">
             <ArrowLeft className="w-5 h-5" />
-            <span>Späť do obchodu</span>
+            <span>{t.auth.backToShop}</span>
           </Link>
         </div>
       </header>
 
-      {/* Main Content */}
       <div className="flex-1 flex items-center justify-center p-4 py-8">
         <div className="w-full max-w-md">
-          {/* Logo */}
           <div className="text-center mb-8">
             <Link href="/">
               <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl mb-4">
                 <span className="text-3xl font-bold text-white">HD</span>
               </div>
             </Link>
-            <h1 className="text-2xl font-bold text-gray-900">Vytvorte si účet</h1>
-            <p className="text-gray-600 mt-2">Zaregistrujte sa a nakupujte výhodnejšie</p>
+            <h1 className="text-2xl font-bold text-gray-900">{t.auth.createAccount}</h1>
+            <p className="text-gray-600 mt-2">{t.auth.registerAndShop}</p>
           </div>
 
-          {/* Register Form */}
           <div className="bg-white rounded-2xl shadow-lg p-8">
             {error && (
               <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
@@ -173,7 +169,7 @@ export default function CustomerRegister() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Meno a priezvisko *
+                  {t.auth.fullName} *
                 </label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -183,7 +179,7 @@ export default function CustomerRegister() {
                     value={formData.fullName}
                     onChange={handleChange}
                     className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                    placeholder="Ján Novák"
+                    placeholder="Jan Novak"
                     required
                   />
                 </div>
@@ -191,7 +187,7 @@ export default function CustomerRegister() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email *
+                  {t.auth.email} *
                 </label>
                 <div className="relative">
                   <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -209,7 +205,7 @@ export default function CustomerRegister() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Telefón
+                  {t.checkout.phoneOptional}
                 </label>
                 <div className="relative">
                   <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -226,7 +222,7 @@ export default function CustomerRegister() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Heslo *
+                  {t.auth.password} *
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -236,7 +232,7 @@ export default function CustomerRegister() {
                     value={formData.password}
                     onChange={handleChange}
                     className="w-full pl-12 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                    placeholder="Minimálne 6 znakov"
+                    placeholder={t.auth.minPassword}
                     required
                     minLength={6}
                   />
@@ -252,7 +248,7 @@ export default function CustomerRegister() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Potvrdenie hesla *
+                  {t.auth.confirmPassword} *
                 </label>
                 <div className="relative">
                   <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -262,7 +258,7 @@ export default function CustomerRegister() {
                     value={formData.confirmPassword}
                     onChange={handleChange}
                     className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all"
-                    placeholder="Zopakujte heslo"
+                    placeholder={t.auth.repeatPassword}
                     required
                   />
                 </div>
@@ -277,13 +273,13 @@ export default function CustomerRegister() {
                   className="w-4 h-4 mt-1 text-green-600 border-gray-300 rounded focus:ring-green-500"
                 />
                 <label htmlFor="terms" className="text-sm text-gray-600">
-                  Súhlasím s{' '}
+                  {t.auth.agreeToTerms}{' '}
                   <Link href="/obchodne-podmienky" className="text-green-600 hover:underline">
-                    obchodnými podmienkami
+                    {t.auth.termsAndConditions}
                   </Link>{' '}
-                  a{' '}
+                  {t.auth.and}{' '}
                   <Link href="/ochrana-osobnych-udajov" className="text-green-600 hover:underline">
-                    spracovaním osobných údajov
+                    {t.auth.privacyPolicy}
                   </Link>
                 </label>
               </div>
@@ -299,19 +295,19 @@ export default function CustomerRegister() {
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                     </svg>
-                    Registrujem...
+                    {t.auth.registering}
                   </span>
                 ) : (
-                  'Zaregistrovať sa'
+                  t.auth.registerButton
                 )}
               </button>
             </form>
 
             <div className="mt-6 pt-6 border-t border-gray-200 text-center">
               <p className="text-gray-600">
-                Už máte účet?{' '}
+                {t.auth.haveAccount}{' '}
                 <Link href="/auth/login" className="text-green-600 hover:text-green-700 font-medium">
-                  Prihláste sa
+                  {t.auth.loginHere}
                 </Link>
               </p>
             </div>
