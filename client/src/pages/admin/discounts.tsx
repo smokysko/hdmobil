@@ -130,7 +130,7 @@ export default function AdminDiscounts() {
       }
     } catch (err) {
       console.error("Error fetching discounts:", err);
-      toast.error("Nepodarilo sa nacitat kupony");
+      toast.error("Nepodarilo sa načítať kupóny");
     } finally {
       setLoading(false);
     }
@@ -138,7 +138,7 @@ export default function AdminDiscounts() {
 
   async function handleSave() {
     if (!formData.code.trim()) {
-      toast.error("Kod kuponu je povinny");
+      toast.error("Kód kupónu je povinný");
       return;
     }
 
@@ -165,18 +165,18 @@ export default function AdminDiscounts() {
           .eq("id", editingDiscount.id);
 
         if (error) throw error;
-        toast.success("Kupon bol aktualizovany");
+        toast.success("Kupón bol aktualizovaný");
       } else {
         const { error } = await supabase.from("discounts").insert(payload);
 
         if (error) {
           if (error.code === "23505") {
-            toast.error("Kupon s tymto kodom uz existuje");
+            toast.error("Kupón s týmto kódom už existuje");
             return;
           }
           throw error;
         }
-        toast.success("Kupon bol vytvoreny");
+        toast.success("Kupón bol vytvorený");
       }
 
       setShowModal(false);
@@ -185,7 +185,7 @@ export default function AdminDiscounts() {
       fetchDiscounts();
     } catch (err) {
       console.error("Error saving discount:", err);
-      toast.error("Nepodarilo sa ulozit kupon");
+      toast.error("Nepodarilo sa uložiť kupón");
     } finally {
       setSaving(false);
     }
@@ -199,26 +199,26 @@ export default function AdminDiscounts() {
         .eq("id", discount.id);
 
       if (error) throw error;
-      toast.success(discount.is_active ? "Kupon deaktivovany" : "Kupon aktivovany");
+      toast.success(discount.is_active ? "Kupón deaktivovaný" : "Kupón aktivovaný");
       fetchDiscounts();
     } catch (err) {
       console.error("Error toggling discount:", err);
-      toast.error("Nepodarilo sa zmenit stav kuponu");
+      toast.error("Nepodarilo sa zmeniť stav kupónu");
     }
   }
 
   async function deleteDiscount(id: string) {
-    if (!confirm("Naozaj chcete zmazat tento kupon?")) return;
+    if (!confirm("Naozaj chcete zmazať tento kupón?")) return;
 
     try {
       const { error } = await supabase.from("discounts").delete().eq("id", id);
 
       if (error) throw error;
-      toast.success("Kupon bol zmazany");
+      toast.success("Kupón bol zmazaný");
       fetchDiscounts();
     } catch (err) {
       console.error("Error deleting discount:", err);
-      toast.error("Nepodarilo sa zmazat kupon");
+      toast.error("Nepodarilo sa zmazať kupón");
     }
   }
 
@@ -257,7 +257,7 @@ export default function AdminDiscounts() {
 
   function copyCode(code: string) {
     navigator.clipboard.writeText(code);
-    toast.success("Kod skopirovany do schranky");
+    toast.success("Kód skopírovaný do schránky");
   }
 
   const handleLogout = () => {
@@ -271,14 +271,14 @@ export default function AdminDiscounts() {
   });
 
   const navItems = [
-    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehlad" },
+    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehľad" },
     { href: "/admin/products", icon: Package, label: "Produkty" },
-    { href: "/admin/orders", icon: ShoppingCart, label: "Objednavky" },
-    { href: "/admin/customers", icon: Users, label: "Zakaznici" },
-    { href: "/admin/invoices", icon: FileText, label: "Faktury" },
-    { href: "/admin/discounts", icon: Tag, label: "Kupony" },
+    { href: "/admin/orders", icon: ShoppingCart, label: "Objednávky" },
+    { href: "/admin/customers", icon: Users, label: "Zákazníci" },
+    { href: "/admin/invoices", icon: FileText, label: "Faktúry" },
+    { href: "/admin/discounts", icon: Tag, label: "Kupóny" },
     { href: "/admin/marketing", icon: Megaphone, label: "Marketing" },
-    { href: "/admin/cms", icon: Palette, label: "Obsah stranky" },
+    { href: "/admin/cms", icon: Palette, label: "Obsah stránky" },
     { href: "/admin/settings", icon: Settings, label: "Nastavenia" },
   ];
 
@@ -315,7 +315,7 @@ export default function AdminDiscounts() {
               className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobrazit web</span>
+              <span className="hidden sm:inline">Zobraziť web</span>
             </Link>
             <div className="h-6 w-px bg-gray-200"></div>
             <button
@@ -363,7 +363,7 @@ export default function AdminDiscounts() {
               className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
             >
               <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlasit sa</span>
+              <span>Odhlásiť sa</span>
             </button>
           </div>
         </aside>
@@ -372,9 +372,9 @@ export default function AdminDiscounts() {
           <div className="max-w-[1400px] mx-auto space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900">Kupony a zlavy</h2>
+                <h2 className="text-2xl font-semibold text-gray-900">Kupóny a zľavy</h2>
                 <p className="text-gray-500 text-sm mt-1">
-                  Spravujte zlavove kupony pre zakaznikov ({totalCount} celkom)
+                  Spravujte zľavové kupóny pre zákazníkov ({totalCount} celkom)
                 </p>
               </div>
               <button
@@ -382,7 +382,7 @@ export default function AdminDiscounts() {
                 className="flex items-center gap-2 px-4 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
               >
                 <Plus className="w-4 h-4" />
-                Novy kupon
+                Nový kupón
               </button>
             </div>
 
@@ -405,7 +405,7 @@ export default function AdminDiscounts() {
                   </div>
                   <div>
                     <p className="text-2xl font-semibold text-gray-900">{stats.active}</p>
-                    <p className="text-sm text-gray-500">Aktivne</p>
+                    <p className="text-sm text-gray-500">Aktívne</p>
                   </div>
                 </div>
               </div>
@@ -416,7 +416,7 @@ export default function AdminDiscounts() {
                   </div>
                   <div>
                     <p className="text-2xl font-semibold text-gray-900">{stats.expired}</p>
-                    <p className="text-sm text-gray-500">Expirovane</p>
+                    <p className="text-sm text-gray-500">Expirované</p>
                   </div>
                 </div>
               </div>
@@ -427,7 +427,7 @@ export default function AdminDiscounts() {
                   </div>
                   <div>
                     <p className="text-2xl font-semibold text-gray-900">{stats.totalUsed}</p>
-                    <p className="text-sm text-gray-500">Pouziti celkom</p>
+                    <p className="text-sm text-gray-500">Použití celkom</p>
                   </div>
                 </div>
               </div>
@@ -438,7 +438,7 @@ export default function AdminDiscounts() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Hladat podla kodu kuponu..."
+                  placeholder="Hľadať podľa kódu kupónu..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
@@ -457,19 +457,19 @@ export default function AdminDiscounts() {
                     <thead>
                       <tr className="border-b border-gray-100 bg-gray-50/50">
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Kod
+                          Kód
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Zlava
+                          Zľava
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Min. objednavka
+                          Min. objednávka
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Pouzitie
+                          Použitie
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Platnost
+                          Platnosť
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Stav
@@ -541,12 +541,12 @@ export default function AdminDiscounts() {
                               {discount.is_active && !isExpired(discount) ? (
                                 <>
                                   <ToggleRight className="w-3.5 h-3.5" />
-                                  Aktivny
+                                  Aktívny
                                 </>
                               ) : (
                                 <>
                                   <ToggleLeft className="w-3.5 h-3.5" />
-                                  {isExpired(discount) ? "Expirovany" : "Neaktivny"}
+                                  {isExpired(discount) ? "Expirovaný" : "Neaktívny"}
                                 </>
                               )}
                             </button>
@@ -572,7 +572,7 @@ export default function AdminDiscounts() {
                       {filteredDiscounts.length === 0 && (
                         <tr>
                           <td colSpan={7} className="px-5 py-12 text-center text-gray-500">
-                            Ziadne kupony
+                            Žiadne kupóny
                           </td>
                         </tr>
                       )}
@@ -583,9 +583,9 @@ export default function AdminDiscounts() {
 
               <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
                 <p className="text-sm text-gray-500">
-                  Zobrazenych{" "}
+                  Zobrazených{" "}
                   <span className="font-medium text-gray-700">{filteredDiscounts.length}</span> z{" "}
-                  <span className="font-medium text-gray-700">{totalCount}</span> kuponov
+                  <span className="font-medium text-gray-700">{totalCount}</span> kupónov
                 </p>
                 {totalPages > 1 && (
                   <div className="flex items-center gap-2">
@@ -620,7 +620,7 @@ export default function AdminDiscounts() {
           <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-5 border-b border-gray-100">
               <h3 className="text-lg font-semibold text-gray-900">
-                {editingDiscount ? "Upravit kupon" : "Novy kupon"}
+                {editingDiscount ? "Upraviť kupón" : "Nový kupón"}
               </h3>
               <button
                 onClick={() => setShowModal(false)}
@@ -633,7 +633,7 @@ export default function AdminDiscounts() {
             <div className="p-5 space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Kod kuponu *
+                  Kód kupónu *
                 </label>
                 <div className="flex gap-2">
                   <input
@@ -650,14 +650,14 @@ export default function AdminDiscounts() {
                     onClick={generateCode}
                     className="px-3 py-2.5 text-sm text-blue-600 hover:bg-blue-50 border border-gray-200 rounded-lg transition-colors"
                   >
-                    Generovat
+                    Generovať
                   </button>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Typ zlavy</label>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Typ zľavy</label>
                   <select
                     value={formData.discount_type}
                     onChange={(e) =>
@@ -668,8 +668,8 @@ export default function AdminDiscounts() {
                     }
                     className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                   >
-                    <option value="percentage">Percentualna (%)</option>
-                    <option value="fixed">Fixna suma (EUR)</option>
+                    <option value="percentage">Percentuálna (%)</option>
+                    <option value="fixed">Fixná suma (EUR)</option>
                   </select>
                 </div>
                 <div>
@@ -689,7 +689,7 @@ export default function AdminDiscounts() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Minimalna hodnota objednavky (EUR)
+                  Minimálna hodnota objednávky (EUR)
                 </label>
                 <input
                   type="number"
@@ -709,7 +709,7 @@ export default function AdminDiscounts() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Max. pouziti celkom
+                    Max. použití celkom
                   </label>
                   <input
                     type="number"
@@ -720,14 +720,14 @@ export default function AdminDiscounts() {
                         max_uses: e.target.value ? parseInt(e.target.value) : null,
                       })
                     }
-                    placeholder="Neobmedzene"
+                    placeholder="Neobmedzené"
                     min={1}
                     className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                   />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Max. na zakaznika
+                    Max. na zákazníka
                   </label>
                   <input
                     type="number"
@@ -747,7 +747,7 @@ export default function AdminDiscounts() {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Platny od *
+                    Platný od *
                   </label>
                   <input
                     type="date"
@@ -758,7 +758,7 @@ export default function AdminDiscounts() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                    Platny do
+                    Platný do
                   </label>
                   <input
                     type="date"
@@ -780,7 +780,7 @@ export default function AdminDiscounts() {
                   className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 />
                 <label htmlFor="is_active" className="text-sm font-medium text-gray-700">
-                  Kupon je aktivny
+                  Kupón je aktívny
                 </label>
               </div>
             </div>
@@ -790,7 +790,7 @@ export default function AdminDiscounts() {
                 onClick={() => setShowModal(false)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Zrusit
+                Zrušiť
               </button>
               <button
                 onClick={handleSave}
@@ -798,7 +798,7 @@ export default function AdminDiscounts() {
                 className="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
               >
                 {saving && <Loader2 className="w-4 h-4 animate-spin" />}
-                {editingDiscount ? "Ulozit zmeny" : "Vytvorit kupon"}
+                {editingDiscount ? "Uložiť zmeny" : "Vytvoriť kupón"}
               </button>
             </div>
           </div>

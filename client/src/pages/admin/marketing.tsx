@@ -62,16 +62,16 @@ export default function AdminMarketing() {
   const [sending, setSending] = useState(false);
 
   const customerSegments: CustomerSegment[] = [
-    { id: "all", name: "Vsetci zakaznici", count: 0, description: "Vsetci registrovani zakaznici" },
+    { id: "all", name: "Všetci zákazníci", count: 0, description: "Všetci registrovaní zákazníci" },
     {
       id: "newsletter",
-      name: "Newsletter odbratelia",
+      name: "Newsletter odberatelia",
       count: newsletterStats.totalSubscribers,
-      description: "Zakaznici s aktivnym odberom newslettra",
+      description: "Zákazníci s aktívnym odberom newslettra",
     },
-    { id: "inactive", name: "Neaktivni", count: 0, description: "Zakaznici bez objednavky 90+ dni" },
-    { id: "vip", name: "VIP zakaznici", count: 0, description: "Zakaznici s utratou nad 500 EUR" },
-    { id: "new", name: "Novi zakaznici", count: 0, description: "Registrovani za poslednych 30 dni" },
+    { id: "inactive", name: "Neaktívni", count: 0, description: "Zákazníci bez objednávky 90+ dní" },
+    { id: "vip", name: "VIP zákazníci", count: 0, description: "Zákazníci s útratou nad 500 EUR" },
+    { id: "new", name: "Noví zákazníci", count: 0, description: "Registrovaní za posledných 30 dní" },
   ];
 
   useEffect(() => {
@@ -114,18 +114,18 @@ export default function AdminMarketing() {
 
   async function sendCampaign() {
     if (!campaignData.subject.trim() || !campaignData.message.trim()) {
-      toast.error("Vyplnte predmet a spravu");
+      toast.error("Vyplňte predmet a správu");
       return;
     }
 
     setSending(true);
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
-      toast.success("Kampan bola uspesne odoslana");
+      toast.success("Kampaň bola úspešne odoslaná");
       setShowCampaignModal(false);
       setCampaignData({ subject: "", message: "", targetSegment: "all", discountCode: "" });
     } catch (err) {
-      toast.error("Nepodarilo sa odoslat kampan");
+      toast.error("Nepodarilo sa odoslať kampaň");
     } finally {
       setSending(false);
     }
@@ -137,28 +137,28 @@ export default function AdminMarketing() {
   };
 
   const navItems = [
-    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehlad" },
+    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehľad" },
     { href: "/admin/products", icon: Package, label: "Produkty" },
-    { href: "/admin/orders", icon: ShoppingCart, label: "Objednavky" },
-    { href: "/admin/customers", icon: Users, label: "Zakaznici" },
-    { href: "/admin/invoices", icon: FileText, label: "Faktury" },
-    { href: "/admin/discounts", icon: Tag, label: "Kupony" },
+    { href: "/admin/orders", icon: ShoppingCart, label: "Objednávky" },
+    { href: "/admin/customers", icon: Users, label: "Zákazníci" },
+    { href: "/admin/invoices", icon: FileText, label: "Faktúry" },
+    { href: "/admin/discounts", icon: Tag, label: "Kupóny" },
     { href: "/admin/marketing", icon: Megaphone, label: "Marketing" },
-    { href: "/admin/cms", icon: Palette, label: "Obsah stranky" },
+    { href: "/admin/cms", icon: Palette, label: "Obsah stránky" },
     { href: "/admin/settings", icon: Settings, label: "Nastavenia" },
   ];
 
   const quickActions = [
     {
-      title: "Zlavovy kod",
-      description: "Vytvorte novy zlavovy kod pre zakaznikov",
+      title: "Zľavový kód",
+      description: "Vytvorte nový zľavový kód pre zákazníkov",
       icon: Percent,
       color: "blue",
       href: "/admin/discounts",
     },
     {
-      title: "Email kampan",
-      description: "Posielanie hromadnych emailov zakaznikom",
+      title: "Email kampaň",
+      description: "Posielanie hromadných emailov zákazníkom",
       icon: Mail,
       color: "green",
       onClick: () => {
@@ -167,8 +167,8 @@ export default function AdminMarketing() {
       },
     },
     {
-      title: "Push notifikacia",
-      description: "Odoslat notifikaciu do aplikacie",
+      title: "Push notifikácia",
+      description: "Odoslať notifikáciu do aplikácie",
       icon: Bell,
       color: "violet",
       onClick: () => {
@@ -177,8 +177,8 @@ export default function AdminMarketing() {
       },
     },
     {
-      title: "Darceky",
-      description: "Nastavit darcek k objednavke",
+      title: "Darčeky",
+      description: "Nastaviť darček k objednávke",
       icon: Gift,
       color: "amber",
       href: "/admin/settings",
@@ -187,23 +187,23 @@ export default function AdminMarketing() {
 
   const marketingIdeas = [
     {
-      title: "Vitajte zlava 10%",
-      description: "Automaticky kupon pre novych zakaznikov",
+      title: "Vitajte zľava 10%",
+      description: "Automatický kupón pre nových zákazníkov",
       type: "automation",
     },
     {
-      title: "Opusteny kosik",
-      description: "Pripomenut zakaznikom nedokoncenu objednavku",
+      title: "Opustený košík",
+      description: "Pripomenúť zákazníkom nedokončenú objednávku",
       type: "automation",
     },
     {
       title: "Narodeniny",
-      description: "Specialna zlava k narodeninam zakaznika",
+      description: "Špeciálna zľava k narodeninám zákazníka",
       type: "loyalty",
     },
     {
       title: "VIP program",
-      description: "Bonusy pre najvernejsich zakaznikov",
+      description: "Bonusy pre najvernejších zákazníkov",
       type: "loyalty",
     },
   ];
@@ -237,7 +237,7 @@ export default function AdminMarketing() {
               className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobrazit web</span>
+              <span className="hidden sm:inline">Zobraziť web</span>
             </Link>
             <div className="h-6 w-px bg-gray-200"></div>
             <button
@@ -285,7 +285,7 @@ export default function AdminMarketing() {
               className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
             >
               <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlasit sa</span>
+              <span>Odhlásiť sa</span>
             </button>
           </div>
         </aside>
@@ -295,7 +295,7 @@ export default function AdminMarketing() {
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">Marketing</h2>
               <p className="text-gray-500 text-sm mt-1">
-                Spravujte marketingove kampane a komunikaciu so zakaznikmi
+                Spravujte marketingové kampane a komunikáciu so zákazníkmi
               </p>
             </div>
 
@@ -322,7 +322,7 @@ export default function AdminMarketing() {
                     <p className="text-2xl font-semibold text-gray-900">
                       +{newsletterStats.newThisMonth}
                     </p>
-                    <p className="text-sm text-gray-500">Novych tento mesiac</p>
+                    <p className="text-sm text-gray-500">Nových tento mesiac</p>
                   </div>
                 </div>
               </div>
@@ -333,7 +333,7 @@ export default function AdminMarketing() {
                   </div>
                   <div>
                     <p className="text-2xl font-semibold text-gray-900">0</p>
-                    <p className="text-sm text-gray-500">Odoslane kampane</p>
+                    <p className="text-sm text-gray-500">Odoslané kampane</p>
                   </div>
                 </div>
               </div>
@@ -409,8 +409,8 @@ export default function AdminMarketing() {
                       <Target className="w-5 h-5 text-blue-600" strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">Segmenty zakaznikov</h3>
-                      <p className="text-sm text-gray-500">Cielove skupiny pre kampane</p>
+                      <h3 className="font-semibold text-gray-900">Segmenty zákazníkov</h3>
+                      <p className="text-sm text-gray-500">Cieľové skupiny pre kampane</p>
                     </div>
                   </div>
                 </div>
@@ -440,8 +440,8 @@ export default function AdminMarketing() {
                       <Sparkles className="w-5 h-5 text-violet-600" strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">Marketingove napady</h3>
-                      <p className="text-sm text-gray-500">Automatizacie a vernostny program</p>
+                      <h3 className="font-semibold text-gray-900">Marketingové nápady</h3>
+                      <p className="text-sm text-gray-500">Automatizácie a vernostný program</p>
                     </div>
                   </div>
                 </div>
@@ -462,14 +462,14 @@ export default function AdminMarketing() {
                             : "bg-amber-50 text-amber-700"
                         }`}
                       >
-                        {idea.type === "automation" ? "Automatizacia" : "Vernost"}
+                        {idea.type === "automation" ? "Automatizácia" : "Vernosť"}
                       </span>
                     </div>
                   ))}
                 </div>
                 <div className="p-4 bg-gray-50/50 border-t border-gray-100">
                   <p className="text-xs text-gray-500 text-center">
-                    Tieto funkcie budu dostupne v buducich verziach
+                    Tieto funkcie budú dostupné v budúcich verziách
                   </p>
                 </div>
               </div>
@@ -483,8 +483,8 @@ export default function AdminMarketing() {
                       <Send className="w-5 h-5 text-green-600" strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">Posledne kampane</h3>
-                      <p className="text-sm text-gray-500">Historia odoslanych kampani</p>
+                      <h3 className="font-semibold text-gray-900">Posledné kampane</h3>
+                      <p className="text-sm text-gray-500">História odoslaných kampaní</p>
                     </div>
                   </div>
                   <button
@@ -492,7 +492,7 @@ export default function AdminMarketing() {
                     className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                   >
                     <Plus className="w-4 h-4" />
-                    Nova kampan
+                    Nová kampaň
                   </button>
                 </div>
               </div>
@@ -500,9 +500,9 @@ export default function AdminMarketing() {
                 <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                   <Mail className="w-8 h-8 text-gray-400" />
                 </div>
-                <p className="text-gray-500 font-medium">Zatial ziadne kampane</p>
+                <p className="text-gray-500 font-medium">Zatiaľ žiadne kampane</p>
                 <p className="text-sm text-gray-400 mt-1">
-                  Vytvorte svoju prvu marketingovu kampan
+                  Vytvorte svoju prvú marketingovú kampaň
                 </p>
               </div>
             </div>
@@ -522,7 +522,7 @@ export default function AdminMarketing() {
                   <Bell className="w-5 h-5 text-violet-600" />
                 )}
                 <h3 className="text-lg font-semibold text-gray-900">
-                  {campaignType === "email" ? "Email kampan" : "Push notifikacia"}
+                  {campaignType === "email" ? "Email kampaň" : "Push notifikácia"}
                 </h3>
               </div>
               <button
@@ -536,7 +536,7 @@ export default function AdminMarketing() {
             <div className="p-5 space-y-5">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Cielova skupina
+                  Cieľová skupina
                 </label>
                 <select
                   value={campaignData.targetSegment}
@@ -555,7 +555,7 @@ export default function AdminMarketing() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  {campaignType === "email" ? "Predmet emailu" : "Nadpis notifikacie"} *
+                  {campaignType === "email" ? "Predmet emailu" : "Nadpis notifikácie"} *
                 </label>
                 <input
                   type="text"
@@ -563,19 +563,19 @@ export default function AdminMarketing() {
                   onChange={(e) => setCampaignData({ ...campaignData, subject: e.target.value })}
                   placeholder={
                     campaignType === "email"
-                      ? "Specialna ponuka len pre vas!"
-                      : "Nova akcia na e-shope"
+                      ? "Špeciálna ponuka len pre vás!"
+                      : "Nová akcia na e-shope"
                   }
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Sprava *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Správa *</label>
                 <textarea
                   value={campaignData.message}
                   onChange={(e) => setCampaignData({ ...campaignData, message: e.target.value })}
-                  placeholder="Napiste spravu pre zakaznikov..."
+                  placeholder="Napíšte správu pre zákazníkov..."
                   rows={5}
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm resize-none"
                 />
@@ -583,7 +583,7 @@ export default function AdminMarketing() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1.5">
-                  Zlavovy kod (volitelny)
+                  Zľavový kód (voliteľný)
                 </label>
                 <input
                   type="text"
@@ -595,7 +595,7 @@ export default function AdminMarketing() {
                   className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm font-mono"
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  Kod bude automaticky vlozeny do spravy
+                  Kód bude automaticky vložený do správy
                 </p>
               </div>
 
@@ -604,7 +604,7 @@ export default function AdminMarketing() {
                 <div className="text-sm">
                   <p className="font-medium text-amber-800">Pozor</p>
                   <p className="text-amber-700">
-                    Kampan bude odoslana okamzite vsetkym zakaznikom v segmente.
+                    Kampaň bude odoslaná okamžite všetkým zákazníkom v segmente.
                   </p>
                 </div>
               </div>
@@ -615,7 +615,7 @@ export default function AdminMarketing() {
                 onClick={() => setShowCampaignModal(false)}
                 className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
               >
-                Zrusit
+                Zrušiť
               </button>
               <button
                 onClick={sendCampaign}
@@ -627,7 +627,7 @@ export default function AdminMarketing() {
                 ) : (
                   <Send className="w-4 h-4" />
                 )}
-                Odoslat kampan
+                Odoslať kampaň
               </button>
             </div>
           </div>
