@@ -383,6 +383,23 @@ export const sk = {
     relatedProducts: 'Súvisiace produkty',
     accessories: 'Príslušenstvo',
   },
+
+  wishlist: {
+    myFavorites: 'Moje obľúbené',
+    products: 'produktov',
+    noFavorites: 'Žiadne obľúbené produkty',
+    noFavoritesDesc: 'Zatiaľ ste si nepridali žiadne produkty do obľúbených. Prezrite si našu ponuku a pridajte si produkty, ktoré vás zaujmú.',
+    browseProducts: 'PREHLIADAŤ PRODUKTY',
+    toCart: 'Do košíka',
+    soldOut: 'Vypredané',
+    loginToSave: 'Pre uloženie vašich obľúbených produktov sa',
+    loginLink: 'prihláste',
+    or: 'alebo',
+    registerLink: 'zaregistrujte',
+    loginToView: 'Pre zobrazenie vašich obľúbených produktov sa prihláste.',
+    loginBtn: 'Prihlásiť sa',
+    registerBtn: 'Registrovať sa',
+  },
 };
 
 export type Translations = typeof sk;

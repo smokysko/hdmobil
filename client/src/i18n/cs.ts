@@ -385,4 +385,21 @@ export const cs: Translations = {
     relatedProducts: 'Související produkty',
     accessories: 'Příslušenství',
   },
+
+  wishlist: {
+    myFavorites: 'Moje oblíbené',
+    products: 'produktů',
+    noFavorites: 'Žádné oblíbené produkty',
+    noFavoritesDesc: 'Zatím jste si nepřidali žádné produkty do oblíbených. Prohlédněte si naši nabídku a přidejte si produkty, které vás zaujmou.',
+    browseProducts: 'PROHLÍŽET PRODUKTY',
+    toCart: 'Do košíku',
+    soldOut: 'Vyprodáno',
+    loginToSave: 'Pro uložení vašich oblíbených produktů se',
+    loginLink: 'přihlaste',
+    or: 'nebo',
+    registerLink: 'zaregistrujte',
+    loginToView: 'Pro zobrazení vašich oblíbených produktů se přihlaste.',
+    loginBtn: 'Přihlásit se',
+    registerBtn: 'Registrovat se',
+  },
 };

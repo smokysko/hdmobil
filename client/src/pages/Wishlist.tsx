@@ -4,6 +4,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { useWishlist } from "@/contexts/WishlistContext";
+import { useI18n } from "@/i18n";
 import { Heart, ShoppingCart, Trash2 } from "lucide-react";
 import { Link } from "wouter";
 
@@ -11,13 +12,14 @@ export default function Wishlist() {
   const { isAuthenticated } = useAuth();
   const { items, productIds, removeFromWishlist, isLoading } = useWishlist();
   const { addToCart } = useCart();
+  const { t } = useI18n();
 
   if (isLoading) {
     return (
       <Layout>
         <div className="container py-12 md:py-20">
           <h1 className="mb-8 font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            Moje obľúbené
+            {t.wishlist.myFavorites}
           </h1>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
@@ -40,22 +42,22 @@ export default function Wishlist() {
     <Layout>
       <div className="container py-12 md:py-20">
         <h1 className="mb-8 font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-          Moje obľúbené{" "}
+          {t.wishlist.myFavorites}{" "}
           <span className="text-primary">
-            ({isAuthenticated ? items.length : productIds.length} produktov)
+            ({isAuthenticated ? items.length : productIds.length} {t.wishlist.products})
           </span>
         </h1>
 
         {!isAuthenticated && productIds.length > 0 && (
           <div className="mb-8 rounded-2xl border border-amber-200 bg-amber-50 p-4">
             <p className="text-sm text-amber-800">
-              Pre uloženie vašich obľúbených produktov sa{" "}
-              <Link href="/prihlasenie" className="font-semibold underline">
-                prihláste
+              {t.wishlist.loginToSave}{" "}
+              <Link href="/auth/login" className="font-semibold underline">
+                {t.wishlist.loginLink}
               </Link>{" "}
-              alebo{" "}
-              <Link href="/registracia" className="font-semibold underline">
-                zaregistrujte
+              {t.wishlist.or}{" "}
+              <Link href="/auth/register" className="font-semibold underline">
+                {t.wishlist.registerLink}
               </Link>
               .
             </p>
@@ -68,14 +70,13 @@ export default function Wishlist() {
               <Heart className="h-12 w-12 text-muted-foreground opacity-50" />
             </div>
             <h2 className="font-display text-2xl font-bold text-foreground">
-              Žiadne obľúbené produkty
+              {t.wishlist.noFavorites}
             </h2>
             <p className="mt-2 max-w-md text-muted-foreground">
-              Zatiaľ ste si nepridali žiadne produkty do obľúbených. Prezrite si našu ponuku a
-              pridajte si produkty, ktoré vás zaujmú.
+              {t.wishlist.noFavoritesDesc}
             </p>
             <Button size="lg" className="mt-8 font-display tracking-wider" asChild>
-              <Link href="/category/all">PREHLIADAŤ PRODUKTY</Link>
+              <Link href="/category/all">{t.wishlist.browseProducts}</Link>
             </Button>
           </div>
         ) : isAuthenticated ? (
@@ -149,7 +150,7 @@ export default function Wishlist() {
                       }
                     >
                       <ShoppingCart className="h-4 w-4 mr-1" />
-                      {item.product.inStock ? "Do košíka" : "Vypredané"}
+                      {item.product.inStock ? t.wishlist.toCart : t.wishlist.soldOut}
                     </Button>
                   </div>
                 </div>
@@ -159,14 +160,14 @@ export default function Wishlist() {
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              Pre zobrazenie vašich obľúbených produktov sa prihláste.
+              {t.wishlist.loginToView}
             </p>
             <div className="mt-6 flex gap-4 justify-center">
               <Button asChild>
-                <Link href="/prihlasenie">Prihlásiť sa</Link>
+                <Link href="/auth/login">{t.wishlist.loginBtn}</Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="/registracia">Registrovať sa</Link>
+                <Link href="/auth/register">{t.wishlist.registerBtn}</Link>
               </Button>
             </div>
           </div>

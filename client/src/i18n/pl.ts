@@ -385,4 +385,21 @@ export const pl: Translations = {
     relatedProducts: 'Powiązane produkty',
     accessories: 'Akcesoria',
   },
+
+  wishlist: {
+    myFavorites: 'Moje ulubione',
+    products: 'produktów',
+    noFavorites: 'Brak ulubionych produktów',
+    noFavoritesDesc: 'Nie dodałeś jeszcze żadnych produktów do ulubionych. Przeglądaj naszą ofertę i dodaj produkty, które Cię interesują.',
+    browseProducts: 'PRZEGLĄDAJ PRODUKTY',
+    toCart: 'Do koszyka',
+    soldOut: 'Wyprzedane',
+    loginToSave: 'Aby zapisać ulubione produkty,',
+    loginLink: 'zaloguj się',
+    or: 'lub',
+    registerLink: 'zarejestruj się',
+    loginToView: 'Zaloguj się, aby zobaczyć ulubione produkty.',
+    loginBtn: 'Zaloguj się',
+    registerBtn: 'Zarejestruj się',
+  },
 };
