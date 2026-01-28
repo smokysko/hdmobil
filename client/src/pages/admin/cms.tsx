@@ -155,7 +155,7 @@ export default function AdminCMS() {
       if (mediaRes.data) setMediaItems(mediaRes.data);
     } catch (error) {
       console.error('Error loading CMS data:', error);
-      toast.error('Chyba pri nacitavani dat');
+      toast.error('Chyba pri načítavaní dát');
     } finally {
       setIsLoading(false);
     }
@@ -167,23 +167,23 @@ export default function AdminCMS() {
   };
 
   const navItems = [
-    { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Prehlad' },
+    { href: '/admin/dashboard', icon: LayoutDashboard, label: 'Prehľad' },
     { href: '/admin/products', icon: Package, label: 'Produkty' },
-    { href: '/admin/orders', icon: ShoppingCart, label: 'Objednavky' },
-    { href: '/admin/customers', icon: Users, label: 'Zakaznici' },
-    { href: '/admin/invoices', icon: FileText, label: 'Faktury' },
-    { href: '/admin/discounts', icon: Tag, label: 'Kupony' },
+    { href: '/admin/orders', icon: ShoppingCart, label: 'Objednávky' },
+    { href: '/admin/customers', icon: Users, label: 'Zákazníci' },
+    { href: '/admin/invoices', icon: FileText, label: 'Faktúry' },
+    { href: '/admin/discounts', icon: Tag, label: 'Kupóny' },
     { href: '/admin/marketing', icon: Megaphone, label: 'Marketing' },
-    { href: '/admin/cms', icon: Palette, label: 'Obsah stranky' },
+    { href: '/admin/cms', icon: Palette, label: 'Obsah stránky' },
     { href: '/admin/settings', icon: Settings, label: 'Nastavenia' },
   ];
 
   const tabs = [
     { id: 'hero' as TabType, label: 'Hero Carousel', icon: Layers },
-    { id: 'categories' as TabType, label: 'Kategorie', icon: Grid3X3 },
+    { id: 'categories' as TabType, label: 'Kategórie', icon: Grid3X3 },
     { id: 'banners' as TabType, label: 'Bannery', icon: ImageIcon },
     { id: 'sections' as TabType, label: 'Sekcie', icon: Home },
-    { id: 'media' as TabType, label: 'Media', icon: FolderOpen },
+    { id: 'media' as TabType, label: 'Médiá', icon: FolderOpen },
   ];
 
   return (
@@ -205,7 +205,7 @@ export default function AdminCMS() {
               className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobrazit web</span>
+              <span className="hidden sm:inline">Zobraziť web</span>
             </Link>
             <div className="h-6 w-px bg-gray-200"></div>
             <button
@@ -253,7 +253,7 @@ export default function AdminCMS() {
               className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
             >
               <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlasit sa</span>
+              <span>Odhlásiť sa</span>
             </button>
           </div>
         </aside>
@@ -261,9 +261,9 @@ export default function AdminCMS() {
         <main className="flex-1 p-6">
           <div className="max-w-[1400px] mx-auto space-y-6">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900">Obsah stranky</h2>
+              <h2 className="text-2xl font-semibold text-gray-900">Obsah stránky</h2>
               <p className="text-gray-500 text-sm mt-1">
-                Spravujte hero carousel, kategorie, bannery a obrazky
+                Spravujte hero carousel, kategórie, bannery a obrázky
               </p>
             </div>
 
@@ -415,33 +415,33 @@ function HeroSlidesTab({
           .update(dataToSave)
           .eq('id', editingSlide.id);
         if (error) throw error;
-        toast.success('Slide bol aktualizovany');
+        toast.success('Slide bol aktualizovaný');
       } else {
         const { error } = await supabase.from('hero_slides').insert(dataToSave);
         if (error) throw error;
-        toast.success('Slide bol vytvoreny');
+        toast.success('Slide bol vytvorený');
       }
       closeModal();
       onUpdate();
     } catch (error) {
       console.error('Error saving slide:', error);
-      toast.error('Chyba pri ukladani');
+      toast.error('Chyba pri ukladaní');
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDelete = async (id: string, title: string) => {
-    if (!confirm(`Naozaj chcete vymazat slide "${title}"?`)) return;
+    if (!confirm(`Naozaj chcete vymazať slide "${title}"?`)) return;
 
     try {
       const { error } = await supabase.from('hero_slides').delete().eq('id', id);
       if (error) throw error;
-      toast.success('Slide bol vymazany');
+      toast.success('Slide bol vymazaný');
       onUpdate();
     } catch (error) {
       console.error('Error deleting slide:', error);
-      toast.error('Chyba pri mazani');
+      toast.error('Chyba pri mazaní');
     }
   };
 
@@ -465,10 +465,10 @@ function HeroSlidesTab({
       } = supabase.storage.from('images').getPublicUrl(fileName);
 
       setFormData({ ...formData, image_url: publicUrl });
-      toast.success('Obrazok nahraty');
+      toast.success('Obrázok nahratý');
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Chyba pri nahravani');
+      toast.error('Chyba pri nahrávaní');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -486,7 +486,7 @@ function HeroSlidesTab({
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
         >
           <Plus className="w-4 h-4" />
-          Novy slide
+          Nový slide
         </button>
       </div>
 
@@ -531,7 +531,7 @@ function HeroSlidesTab({
                     : 'bg-gray-200 text-gray-600'
                 }`}
               >
-                {slide.is_active ? 'Aktivny' : 'Neaktivny'}
+                {slide.is_active ? 'Aktívny' : 'Neaktívny'}
               </span>
               <button
                 onClick={() => setEditingSlide(slide)}
@@ -551,7 +551,7 @@ function HeroSlidesTab({
 
         {slides.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            Ziadne slidy. Vytvorte prvy slide kliknutim na tlacidlo vyssie.
+            Žiadne slidy. Vytvorte prvý slide kliknutím na tlačidlo vyššie.
           </div>
         )}
       </div>
@@ -561,7 +561,7 @@ function HeroSlidesTab({
           <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-xl font-semibold text-gray-900">
-                {editingSlide ? 'Upravit slide' : 'Novy slide'}
+                {editingSlide ? 'Upraviť slide' : 'Nový slide'}
               </h2>
               <button
                 onClick={closeModal}
@@ -601,7 +601,7 @@ function HeroSlidesTab({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Badge/Stitok
+                    Badge/Štítok
                   </label>
                   <input
                     type="text"
@@ -626,7 +626,7 @@ function HeroSlidesTab({
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Povodna cena
+                      Pôvodná cena
                     </label>
                     <input
                       type="number"
@@ -646,7 +646,7 @@ function HeroSlidesTab({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Obrazok
+                  Obrázok
                 </label>
                 <input
                   ref={fileInputRef}
@@ -688,7 +688,7 @@ function HeroSlidesTab({
                     ) : (
                       <>
                         <Upload className="w-8 h-8 text-gray-400" />
-                        <span className="text-sm text-gray-500">Nahrat obrazok</span>
+                        <span className="text-sm text-gray-500">Nahrať obrázok</span>
                       </>
                     )}
                   </button>
@@ -697,20 +697,20 @@ function HeroSlidesTab({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Features (kazdy riadok = jedna feature)
+                  Features (každý riadok = jedna feature)
                 </label>
                 <textarea
                   rows={4}
                   value={featuresText}
                   onChange={(e) => setFeaturesText(e.target.value)}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm resize-none"
-                  placeholder="Cip A19 Bionic&#10;200MPx kamera&#10;Titanove telo"
+                  placeholder="Čip A19 Bionic&#10;200MPx kamera&#10;Titánové telo"
                 />
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Specifikacie (format: Label: Value)
+                  Špecifikácie (formát: Label: Value)
                 </label>
                 <textarea
                   rows={3}
@@ -724,7 +724,7 @@ function HeroSlidesTab({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Hlavny odkaz URL
+                    Hlavný odkaz URL
                   </label>
                   <input
                     type="text"
@@ -736,14 +736,14 @@ function HeroSlidesTab({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Text hlavneho tlacidla
+                    Text hlavného tlačidla
                   </label>
                   <input
                     type="text"
                     value={formData.link_text || ''}
                     onChange={(e) => setFormData({ ...formData, link_text: e.target.value })}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
-                    placeholder="Kupit teraz"
+                    placeholder="Kúpiť teraz"
                   />
                 </div>
               </div>
@@ -751,7 +751,7 @@ function HeroSlidesTab({
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Sekundarny odkaz URL
+                    Sekundárny odkaz URL
                   </label>
                   <input
                     type="text"
@@ -765,7 +765,7 @@ function HeroSlidesTab({
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Text sekundarneho tlacidla
+                    Text sekundárneho tlačidla
                   </label>
                   <input
                     type="text"
@@ -774,7 +774,7 @@ function HeroSlidesTab({
                       setFormData({ ...formData, secondary_link_text: e.target.value })
                     }
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
-                    placeholder="Vsetky smartfony"
+                    placeholder="Všetky smartfóny"
                   />
                 </div>
               </div>
@@ -786,7 +786,7 @@ function HeroSlidesTab({
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                   className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">Aktivny slide</span>
+                <span className="text-sm text-gray-700">Aktívny slide</span>
               </label>
             </div>
             <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
@@ -794,7 +794,7 @@ function HeroSlidesTab({
                 onClick={closeModal}
                 className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium"
               >
-                Zrusit
+                Zrušiť
               </button>
               <button
                 onClick={handleSave}
@@ -802,7 +802,7 @@ function HeroSlidesTab({
                 className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2"
               >
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                {editingSlide ? 'Ulozit zmeny' : 'Vytvorit slide'}
+                {editingSlide ? 'Uložiť zmeny' : 'Vytvoriť slide'}
               </button>
             </div>
           </div>
@@ -853,7 +853,7 @@ function CategoriesTab({
 
   const handleSave = async () => {
     if (!formData.name_sk || !formData.link_url) {
-      toast.error('Vyplnte nazov a odkaz');
+      toast.error('Vyplňte názov a odkaz');
       return;
     }
 
@@ -865,33 +865,33 @@ function CategoriesTab({
           .update(formData)
           .eq('id', editingCategory.id);
         if (error) throw error;
-        toast.success('Kategoria bola aktualizovana');
+        toast.success('Kategória bola aktualizovaná');
       } else {
         const { error } = await supabase.from('homepage_categories').insert(formData);
         if (error) throw error;
-        toast.success('Kategoria bola vytvorena');
+        toast.success('Kategória bola vytvorená');
       }
       closeModal();
       onUpdate();
     } catch (error) {
       console.error('Error saving category:', error);
-      toast.error('Chyba pri ukladani');
+      toast.error('Chyba pri ukladaní');
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Naozaj chcete vymazat kategoriu "${name}"?`)) return;
+    if (!confirm(`Naozaj chcete vymazať kategóriu "${name}"?`)) return;
 
     try {
       const { error } = await supabase.from('homepage_categories').delete().eq('id', id);
       if (error) throw error;
-      toast.success('Kategoria bola vymazana');
+      toast.success('Kategória bola vymazaná');
       onUpdate();
     } catch (error) {
       console.error('Error deleting category:', error);
-      toast.error('Chyba pri mazani');
+      toast.error('Chyba pri mazaní');
     }
   };
 
@@ -915,10 +915,10 @@ function CategoriesTab({
       } = supabase.storage.from('images').getPublicUrl(fileName);
 
       setFormData({ ...formData, image_url: publicUrl });
-      toast.success('Obrazok nahraty');
+      toast.success('Obrázok nahratý');
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Chyba pri nahravani');
+      toast.error('Chyba pri nahrávaní');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -929,14 +929,14 @@ function CategoriesTab({
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <p className="text-sm text-gray-500">
-          Spravujte kategorie zobrazene na homepage
+          Spravujte kategórie zobrazené na homepage
         </p>
         <button
           onClick={openNewModal}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
         >
           <Plus className="w-4 h-4" />
-          Nova kategoria
+          Nová kategória
         </button>
       </div>
 
@@ -979,7 +979,7 @@ function CategoriesTab({
 
             {!cat.is_active && (
               <span className="absolute top-2 left-2 bg-gray-200 text-gray-600 text-xs px-1.5 py-0.5 rounded">
-                Skryty
+                Skrytý
               </span>
             )}
           </div>
@@ -987,7 +987,7 @@ function CategoriesTab({
 
         {categories.length === 0 && (
           <div className="col-span-full text-center py-12 text-gray-500">
-            Ziadne kategorie. Vytvorte prvu kategoriu.
+            Žiadne kategórie. Vytvorte prvú kategóriu.
           </div>
         )}
       </div>
@@ -997,7 +997,7 @@ function CategoriesTab({
           <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-xl font-semibold text-gray-900">
-                {editingCategory ? 'Upravit kategoriu' : 'Nova kategoria'}
+                {editingCategory ? 'Upraviť kategóriu' : 'Nová kategória'}
               </h2>
               <button
                 onClick={closeModal}
@@ -1008,7 +1008,7 @@ function CategoriesTab({
             </div>
             <div className="p-6 space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Nazov *</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Názov *</label>
                 <input
                   type="text"
                   value={formData.name_sk || ''}
@@ -1030,7 +1030,7 @@ function CategoriesTab({
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Obrazok</label>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Obrázok</label>
                 <input
                   ref={fileInputRef}
                   type="file"
@@ -1071,7 +1071,7 @@ function CategoriesTab({
                     ) : (
                       <>
                         <Upload className="w-6 h-6 text-gray-400" />
-                        <span className="text-sm text-gray-500">Nahrat obrazok</span>
+                        <span className="text-sm text-gray-500">Nahrať obrázok</span>
                       </>
                     )}
                   </button>
@@ -1085,7 +1085,7 @@ function CategoriesTab({
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                   className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">Aktivna kategoria</span>
+                <span className="text-sm text-gray-700">Aktívna kategória</span>
               </label>
             </div>
             <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
@@ -1093,7 +1093,7 @@ function CategoriesTab({
                 onClick={closeModal}
                 className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium"
               >
-                Zrusit
+                Zrušiť
               </button>
               <button
                 onClick={handleSave}
@@ -1101,7 +1101,7 @@ function CategoriesTab({
                 className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2"
               >
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                {editingCategory ? 'Ulozit zmeny' : 'Vytvorit'}
+                {editingCategory ? 'Uložiť zmeny' : 'Vytvoriť'}
               </button>
             </div>
           </div>
@@ -1152,7 +1152,7 @@ function BannersTab({
 
   const handleSave = async () => {
     if (!formData.name) {
-      toast.error('Zadajte nazov bannera');
+      toast.error('Zadajte názov bannera');
       return;
     }
 
@@ -1164,33 +1164,33 @@ function BannersTab({
           .update(formData)
           .eq('id', editingBanner.id);
         if (error) throw error;
-        toast.success('Banner bol aktualizovany');
+        toast.success('Banner bol aktualizovaný');
       } else {
         const { error } = await supabase.from('banners').insert(formData);
         if (error) throw error;
-        toast.success('Banner bol vytvoreny');
+        toast.success('Banner bol vytvorený');
       }
       closeModal();
       onUpdate();
     } catch (error) {
       console.error('Error saving banner:', error);
-      toast.error('Chyba pri ukladani');
+      toast.error('Chyba pri ukladaní');
     } finally {
       setIsSaving(false);
     }
   };
 
   const handleDelete = async (id: string, name: string) => {
-    if (!confirm(`Naozaj chcete vymazat banner "${name}"?`)) return;
+    if (!confirm(`Naozaj chcete vymazať banner "${name}"?`)) return;
 
     try {
       const { error } = await supabase.from('banners').delete().eq('id', id);
       if (error) throw error;
-      toast.success('Banner bol vymazany');
+      toast.success('Banner bol vymazaný');
       onUpdate();
     } catch (error) {
       console.error('Error deleting banner:', error);
-      toast.error('Chyba pri mazani');
+      toast.error('Chyba pri mazaní');
     }
   };
 
@@ -1214,10 +1214,10 @@ function BannersTab({
       } = supabase.storage.from('images').getPublicUrl(fileName);
 
       setFormData({ ...formData, image_url: publicUrl });
-      toast.success('Obrazok nahraty');
+      toast.success('Obrázok nahratý');
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Chyba pri nahravani');
+      toast.error('Chyba pri nahrávaní');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -1226,20 +1226,20 @@ function BannersTab({
 
   const placementOptions = [
     { value: 'homepage_hero', label: 'Homepage - Hero carousel' },
-    { value: 'homepage_middle', label: 'Homepage - Stredna cast' },
-    { value: 'category_top', label: 'Kategorie - Vrchny banner' },
+    { value: 'homepage_middle', label: 'Homepage - Stredná časť' },
+    { value: 'category_top', label: 'Kategórie - Vrchný banner' },
   ];
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
-        <p className="text-sm text-gray-500">Spravujte reklamne bannery na stranke</p>
+        <p className="text-sm text-gray-500">Spravujte reklamné bannery na stránke</p>
         <button
           onClick={openNewModal}
           className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-medium text-sm"
         >
           <Plus className="w-4 h-4" />
-          Novy banner
+          Nový banner
         </button>
       </div>
 
@@ -1278,7 +1278,7 @@ function BannersTab({
                   banner.is_active ? 'bg-blue-50 text-blue-700' : 'bg-gray-200 text-gray-600'
                 }`}
               >
-                {banner.is_active ? 'Aktivny' : 'Neaktivny'}
+                {banner.is_active ? 'Aktívny' : 'Neaktívny'}
               </span>
               <button
                 onClick={() => setEditingBanner(banner)}
@@ -1298,7 +1298,7 @@ function BannersTab({
 
         {banners.length === 0 && (
           <div className="text-center py-12 text-gray-500">
-            Ziadne bannery. Vytvorte prvy banner kliknutim na tlacidlo vyssie.
+            Žiadne bannery. Vytvorte prvý banner kliknutím na tlačidlo vyššie.
           </div>
         )}
       </div>
@@ -1308,7 +1308,7 @@ function BannersTab({
           <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
               <h2 className="text-xl font-semibold text-gray-900">
-                {editingBanner ? 'Upravit banner' : 'Novy banner'}
+                {editingBanner ? 'Upraviť banner' : 'Nový banner'}
               </h2>
               <button
                 onClick={closeModal}
@@ -1320,14 +1320,14 @@ function BannersTab({
             <div className="p-6 space-y-4 overflow-y-auto max-h-[60vh]">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Nazov bannera *
+                  Názov bannera *
                 </label>
                 <input
                   type="text"
                   value={formData.name || ''}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
-                  placeholder="napr. Vianocna akcia 2026"
+                  placeholder="napr. Vianočná akcia 2026"
                 />
               </div>
 
@@ -1405,7 +1405,7 @@ function BannersTab({
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Obrazok bannera
+                  Obrázok bannera
                 </label>
                 <input
                   ref={fileInputRef}
@@ -1447,7 +1447,7 @@ function BannersTab({
                     ) : (
                       <>
                         <Upload className="w-8 h-8 text-gray-400" />
-                        <span className="text-sm text-gray-500">Nahrat obrazok</span>
+                        <span className="text-sm text-gray-500">Nahrať obrázok</span>
                       </>
                     )}
                   </button>
@@ -1461,7 +1461,7 @@ function BannersTab({
                   onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                   className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
-                <span className="text-sm text-gray-700">Aktivny banner</span>
+                <span className="text-sm text-gray-700">Aktívny banner</span>
               </label>
             </div>
             <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
@@ -1469,7 +1469,7 @@ function BannersTab({
                 onClick={closeModal}
                 className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium"
               >
-                Zrusit
+                Zrušiť
               </button>
               <button
                 onClick={handleSave}
@@ -1477,7 +1477,7 @@ function BannersTab({
                 className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2"
               >
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
-                {editingBanner ? 'Ulozit zmeny' : 'Vytvorit banner'}
+                {editingBanner ? 'Uložiť zmeny' : 'Vytvoriť banner'}
               </button>
             </div>
           </div>
@@ -1526,12 +1526,12 @@ function SectionsTab({
         .eq('id', editingSection.id);
 
       if (error) throw error;
-      toast.success('Sekcia bola ulozena');
+      toast.success('Sekcia bola uložená');
       setEditingSection(null);
       onUpdate();
     } catch (error) {
       console.error('Error saving section:', error);
-      toast.error('Chyba pri ukladani');
+      toast.error('Chyba pri ukladaní');
     } finally {
       setIsSaving(false);
     }
@@ -1557,10 +1557,10 @@ function SectionsTab({
       } = supabase.storage.from('images').getPublicUrl(fileName);
 
       setFormData({ ...formData, image_url: publicUrl });
-      toast.success('Obrazok nahraty');
+      toast.success('Obrázok nahratý');
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Chyba pri nahravani');
+      toast.error('Chyba pri nahrávaní');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -1569,7 +1569,7 @@ function SectionsTab({
 
   const getSectionLabel = (key: string) => {
     const labels: Record<string, string> = {
-      hero: 'Hero sekcia (hlavny banner)',
+      hero: 'Hero sekcia (hlavný banner)',
       promo_banner: 'Promo banner',
     };
     return labels[key] || key;
@@ -1581,7 +1581,7 @@ function SectionsTab({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-gray-900">
-              Upravit: {getSectionLabel(editingSection.section_key)}
+              Upraviť: {getSectionLabel(editingSection.section_key)}
             </h3>
           </div>
           <button
@@ -1646,7 +1646,7 @@ function SectionsTab({
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Text tlacidla
+                  Text tlačidla
                 </label>
                 <input
                   type="text"
@@ -1664,12 +1664,12 @@ function SectionsTab({
                 onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
                 className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
               />
-              <span className="text-sm text-gray-700">Aktivna sekcia</span>
+              <span className="text-sm text-gray-700">Aktívna sekcia</span>
             </label>
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Obrazok</label>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Obrázok</label>
             <input
               ref={fileInputRef}
               type="file"
@@ -1710,7 +1710,7 @@ function SectionsTab({
                 ) : (
                   <>
                     <Upload className="w-8 h-8 text-gray-400" />
-                    <span className="text-sm text-gray-500">Nahrat obrazok</span>
+                    <span className="text-sm text-gray-500">Nahrať obrázok</span>
                   </>
                 )}
               </button>
@@ -1731,7 +1731,7 @@ function SectionsTab({
             className="px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium flex items-center gap-2"
           >
             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            Ulozit zmeny
+            Uložiť zmeny
           </button>
         </div>
       </div>
@@ -1740,7 +1740,7 @@ function SectionsTab({
 
   return (
     <div className="space-y-4">
-      <p className="text-sm text-gray-500">Vyberte sekciu na upravu obsahu</p>
+      <p className="text-sm text-gray-500">Vyberte sekciu na úpravu obsahu</p>
 
       <div className="grid gap-4">
         {sections.map((section) => (
@@ -1769,7 +1769,7 @@ function SectionsTab({
                   section.is_active ? 'bg-blue-50 text-blue-700' : 'bg-gray-200 text-gray-600'
                 }`}
               >
-                {section.is_active ? 'Aktivna' : 'Neaktivna'}
+                {section.is_active ? 'Aktívna' : 'Neaktívna'}
               </span>
               <button
                 onClick={() => setEditingSection(section)}
@@ -1782,7 +1782,7 @@ function SectionsTab({
         ))}
 
         {sections.length === 0 && (
-          <div className="text-center py-12 text-gray-500">Ziadne sekcie na upravu</div>
+          <div className="text-center py-12 text-gray-500">Žiadne sekcie na úpravu</div>
         )}
       </div>
     </div>
@@ -1801,11 +1801,11 @@ function MediaTab({
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const folders = [
-    { value: 'all', label: 'Vsetky' },
+    { value: 'all', label: 'Všetky' },
     { value: 'banners', label: 'Bannery' },
     { value: 'cms', label: 'Obsah' },
     { value: 'products', label: 'Produkty' },
-    { value: 'general', label: 'Ostatne' },
+    { value: 'general', label: 'Ostatné' },
   ];
 
   const filteredMedia =
@@ -1840,11 +1840,11 @@ function MediaTab({
           folder: 'general',
         });
       }
-      toast.success('Subory boli nahrate');
+      toast.success('Súbory boli nahraté');
       onUpdate();
     } catch (error) {
       console.error('Upload error:', error);
-      toast.error('Chyba pri nahravani');
+      toast.error('Chyba pri nahrávaní');
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -1852,29 +1852,29 @@ function MediaTab({
   };
 
   const handleDelete = async (item: MediaItem) => {
-    if (!confirm(`Vymazat "${item.filename}"?`)) return;
+    if (!confirm(`Vymazať "${item.filename}"?`)) return;
 
     try {
       await supabase.storage.from('images').remove([item.storage_path]);
       await supabase.from('media_library').delete().eq('id', item.id);
-      toast.success('Subor bol vymazany');
+      toast.success('Súbor bol vymazaný');
       onUpdate();
     } catch (error) {
       console.error('Delete error:', error);
-      toast.error('Chyba pri mazani');
+      toast.error('Chyba pri mazaní');
     }
   };
 
   const copyUrl = (url: string) => {
     navigator.clipboard.writeText(url);
-    toast.success('URL skopirovana do schranky');
+    toast.success('URL skopírovaná do schránky');
   };
 
   return (
     <div className="space-y-4">
       <div className="flex justify-between items-center">
         <div className="flex items-center gap-4">
-          <p className="text-sm text-gray-500">Kniznica vsetkych obrazkov a suborov</p>
+          <p className="text-sm text-gray-500">Knižnica všetkých obrázkov a súborov</p>
           <div className="relative">
             <select
               value={selectedFolder}
@@ -1909,7 +1909,7 @@ function MediaTab({
             ) : (
               <Upload className="w-4 h-4" />
             )}
-            Nahrat subory
+            Nahrať súbory
           </button>
         </div>
       </div>
@@ -1931,14 +1931,14 @@ function MediaTab({
                 <button
                   onClick={() => copyUrl(item.url)}
                   className="p-1.5 bg-white rounded text-gray-700 hover:bg-gray-100"
-                  title="Kopirovat URL"
+                  title="Kopírovať URL"
                 >
                   <Eye className="w-3 h-3" />
                 </button>
                 <button
                   onClick={() => handleDelete(item)}
                   className="p-1.5 bg-white rounded text-red-600 hover:bg-red-50"
-                  title="Vymazat"
+                  title="Vymazať"
                 >
                   <Trash2 className="w-3 h-3" />
                 </button>
@@ -1949,7 +1949,7 @@ function MediaTab({
 
         {filteredMedia.length === 0 && (
           <div className="col-span-full text-center py-12 text-gray-500">
-            Ziadne subory v tejto zlozke
+            Žiadne súbory v tejto zložke
           </div>
         )}
       </div>
