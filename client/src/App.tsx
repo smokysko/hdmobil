@@ -25,6 +25,7 @@ import AdminInvoices from "./pages/admin/invoices";
 import AdminCMS from "./pages/admin/cms";
 import AdminDiscounts from "./pages/admin/discounts";
 import AdminMarketing from "./pages/admin/marketing";
+import AdminReviews from "./pages/admin/reviews";
 import CustomerLogin from "./pages/auth/login";
 import CustomerRegister from "./pages/auth/register";
 import AccountPage from "./pages/account/index";
@@ -66,6 +67,7 @@ function Router() {
       <Route path="/admin/cms" component={AdminCMS} />
       <Route path="/admin/discounts" component={AdminDiscounts} />
       <Route path="/admin/marketing" component={AdminMarketing} />
+      <Route path="/admin/reviews" component={AdminReviews} />
       <Route component={NotFound} />
     </Switch>
   );

@@ -26,6 +26,7 @@ import {
   Palette,
   Tag,
   Megaphone,
+  MessageSquare,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { toast } from "sonner";
@@ -200,6 +201,7 @@ export default function AdminCustomers() {
     { href: "/admin/products", icon: Package, label: "Produkty" },
     { href: "/admin/orders", icon: ShoppingCart, label: "Objednavky" },
     { href: "/admin/customers", icon: Users, label: "Zakaznici" },
+    { href: "/admin/reviews", icon: MessageSquare, label: "Recenzie" },
     { href: "/admin/invoices", icon: FileText, label: "Faktury" },
     { href: "/admin/discounts", icon: Tag, label: "Kupony" },
     { href: "/admin/marketing", icon: Megaphone, label: "Marketing" },
