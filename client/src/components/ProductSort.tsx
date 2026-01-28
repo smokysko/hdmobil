@@ -13,19 +13,19 @@ interface ProductSortProps {
 }
 
 const sortOptions: { value: SortOption; label: string }[] = [
-  { value: "newest", label: "Od najnovsieho" },
-  { value: "oldest", label: "Od najstarsieho" },
-  { value: "price_asc", label: "Od najlacnejsieho" },
-  { value: "price_desc", label: "Od najdrahsieho" },
-  { value: "name_asc", label: "Nazov A-Z" },
-  { value: "name_desc", label: "Nazov Z-A" },
+  { value: "newest", label: "Od najnovšieho" },
+  { value: "oldest", label: "Od najstaršieho" },
+  { value: "price_asc", label: "Od najlacnejšieho" },
+  { value: "price_desc", label: "Od najdrahšieho" },
+  { value: "name_asc", label: "Názov A-Z" },
+  { value: "name_desc", label: "Názov Z-A" },
 ];
 
 export function ProductSort({ value, onChange }: ProductSortProps) {
   return (
     <Select value={value} onValueChange={(v) => onChange(v as SortOption)}>
       <SelectTrigger className="w-[180px]">
-        <SelectValue placeholder="Zoradit" />
+        <SelectValue placeholder="Zoradiť" />
       </SelectTrigger>
       <SelectContent>
         {sortOptions.map((option) => (

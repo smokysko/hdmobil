@@ -19,16 +19,16 @@ import { useEffect, useState, useMemo, useCallback } from "react";
 
 const SPECIAL_CATEGORIES: Record<string, { name: string; description: string }> = {
   akcia: {
-    name: "Vypredaj",
-    description: "Produkty v akcii za znizene ceny",
+    name: "Výpredaj",
+    description: "Produkty v akcii za znížené ceny",
   },
   novinky: {
     name: "Novinky",
-    description: "Najnovsie produkty v nasej ponuke",
+    description: "Najnovšie produkty v našej ponuke",
   },
   all: {
-    name: "Vsetky produkty",
-    description: "Kompletna ponuka produktov",
+    name: "Všetky produkty",
+    description: "Kompletná ponuka produktov",
   },
 };
 
@@ -166,7 +166,7 @@ export default function CategoryPage() {
             <div className="h-1 w-16 bg-primary mx-auto rounded-full mb-4"></div>
             <p className="text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               {categoryDescription ||
-                `Preskumajte nasu premiovu kolekciu ${categoryName.toLowerCase()}.`}
+                `Preskúmajte našu prémiovú kolekciu ${categoryName.toLowerCase()}.`}
             </p>
           </div>
 
@@ -222,14 +222,14 @@ export default function CategoryPage() {
               ) : (
                 <div className="flex flex-col items-center justify-center py-16 text-center">
                   <p className="text-lg text-muted-foreground mb-4">
-                    Ziadne produkty neodpovedaju vybranym filtrom.
+                    Žiadne produkty nezodpovedajú vybraným filtrom.
                   </p>
                   {activeFiltersCount > 0 && (
                     <button
                       onClick={() => handleFiltersChange({})}
                       className="text-primary hover:underline text-sm"
                     >
-                      Vymazat vsetky filtre
+                      Vymazať všetky filtre
                     </button>
                   )}
                 </div>

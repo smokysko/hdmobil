@@ -78,7 +78,7 @@ function FilterContent({
       <Separator />
 
       <div>
-        <h3 className="font-semibold text-sm mb-4">Dostupnost</h3>
+        <h3 className="font-semibold text-sm mb-4">Dostupnosť</h3>
         <div className="space-y-3">
           <label className="flex items-center gap-3 cursor-pointer">
             <Checkbox
@@ -128,7 +128,7 @@ function FilterContent({
             onClick={onClearFilters}
           >
             <X className="w-4 h-4 mr-2" />
-            Vymazat filtre
+            Vymazať filtre
           </Button>
         </>
       )}
