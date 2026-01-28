@@ -40,9 +40,9 @@ interface Review {
   created_at: string;
   updated_at: string;
   product?: {
-    name: string;
+    name_sk: string;
     slug: string;
-    image: string;
+    main_image_url: string;
   };
   customer?: {
     first_name: string;
@@ -95,8 +95,8 @@ export default function AdminReviews() {
         .from("product_reviews")
         .select(`
           *,
-          product:products(name, slug, image),
-          customer:users(first_name, last_name, email)
+          product:products(name_sk, slug, main_image_url),
+          customer:customers(first_name, last_name, email)
         `, { count: "exact" })
         .order("created_at", { ascending: false })
         .range(offset, offset + pageSize - 1);
@@ -206,7 +206,7 @@ export default function AdminReviews() {
     return (
       review.content?.toLowerCase().includes(query) ||
       review.title?.toLowerCase().includes(query) ||
-      review.product?.name?.toLowerCase().includes(query) ||
+      review.product?.name_sk_sk?.toLowerCase().includes(query) ||
       `${review.customer?.first_name} ${review.customer?.last_name}`.toLowerCase().includes(query) ||
       review.customer?.email?.toLowerCase().includes(query)
     );
@@ -457,7 +457,7 @@ export default function AdminReviews() {
                         >
                           <td className="px-5 py-4">
                             <div className="flex items-center gap-3">
-                              {review.product?.image && (
+                              {review.product?.main_image_url && (
                                 <img
                                   src={review.product.image}
                                   alt={review.product.name}
@@ -466,7 +466,7 @@ export default function AdminReviews() {
                               )}
                               <div className="max-w-[200px]">
                                 <p className="text-sm font-medium text-gray-900 truncate">
-                                  {review.product?.name || "Neznamy produkt"}
+                                  {review.product?.name_sk || "Neznamy produkt"}
                                 </p>
                               </div>
                             </div>
@@ -627,7 +627,7 @@ export default function AdminReviews() {
                       Produkt
                     </h4>
                     <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
-                      {selectedReview.product?.image && (
+                      {selectedReview.product?.main_image_url && (
                         <img
                           src={selectedReview.product.image}
                           alt={selectedReview.product.name}
@@ -636,7 +636,7 @@ export default function AdminReviews() {
                       )}
                       <div>
                         <p className="font-medium text-gray-900">
-                          {selectedReview.product?.name}
+                          {selectedReview.product?.name_sk}
                         </p>
                         <Link
                           href={`/product/${selectedReview.product?.slug}`}
