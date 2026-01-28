@@ -97,10 +97,10 @@ Deno.serve(async (req: Request) => {
 
       case "add": {
         const { productId } = body;
-        if (!productId) throw new Error("productId je povinny");
+        if (!productId) throw new Error("productId je povinný");
 
         if (!customerId) {
-          throw new Error("Pre pridanie do oblubenych sa musite prihlasit");
+          throw new Error("Pre pridanie do obľúbených sa musíte prihlásiť");
         }
 
         const { data: product } = await supabase
@@ -111,7 +111,7 @@ Deno.serve(async (req: Request) => {
           .maybeSingle();
 
         if (!product) {
-          throw new Error("Produkt nebol najdeny");
+          throw new Error("Produkt nebol nájdený");
         }
 
         const { data: existing } = await supabase
@@ -123,7 +123,7 @@ Deno.serve(async (req: Request) => {
 
         if (existing) {
           return new Response(
-            JSON.stringify({ success: true, message: "Produkt uz je v oblubenych" }),
+            JSON.stringify({ success: true, message: "Produkt už je v obľúbených" }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
@@ -132,20 +132,20 @@ Deno.serve(async (req: Request) => {
           .from("wishlist")
           .insert({ customer_id: customerId, product_id: productId });
 
-        if (error) throw new Error("Nepodarilo sa pridat do oblubenych");
+        if (error) throw new Error("Nepodarilo sa pridať do obľúbených");
 
         return new Response(
-          JSON.stringify({ success: true, message: "Produkt bol pridany do oblubenych" }),
+          JSON.stringify({ success: true, message: "Produkt bol pridaný do obľúbených" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
       case "remove": {
         const { productId } = body;
-        if (!productId) throw new Error("productId je povinny");
+        if (!productId) throw new Error("productId je povinný");
 
         if (!customerId) {
-          throw new Error("Pre odstranenie z oblubenych sa musite prihlasit");
+          throw new Error("Pre odstránenie z obľúbených sa musíte prihlásiť");
         }
 
         const { error } = await supabase
@@ -154,20 +154,20 @@ Deno.serve(async (req: Request) => {
           .eq("customer_id", customerId)
           .eq("product_id", productId);
 
-        if (error) throw new Error("Nepodarilo sa odstranit z oblubenych");
+        if (error) throw new Error("Nepodarilo sa odstrániť z obľúbených");
 
         return new Response(
-          JSON.stringify({ success: true, message: "Produkt bol odstraneny z oblubenych" }),
+          JSON.stringify({ success: true, message: "Produkt bol odstránený z obľúbených" }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
 
       case "toggle": {
         const { productId } = body;
-        if (!productId) throw new Error("productId je povinny");
+        if (!productId) throw new Error("productId je povinný");
 
         if (!customerId) {
-          throw new Error("Pre spravu oblubenych sa musite prihlasit");
+          throw new Error("Pre správu obľúbených sa musíte prihlásiť");
         }
 
         const { data: existing } = await supabase
@@ -185,7 +185,7 @@ Deno.serve(async (req: Request) => {
             .eq("product_id", productId);
 
           return new Response(
-            JSON.stringify({ success: true, action: "removed", message: "Produkt bol odstraneny z oblubenych" }),
+            JSON.stringify({ success: true, action: "removed", message: "Produkt bol odstránený z obľúbených" }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         } else {
@@ -197,7 +197,7 @@ Deno.serve(async (req: Request) => {
             .maybeSingle();
 
           if (!product) {
-            throw new Error("Produkt nebol najdeny");
+            throw new Error("Produkt nebol nájdený");
           }
 
           await supabase
@@ -205,7 +205,7 @@ Deno.serve(async (req: Request) => {
             .insert({ customer_id: customerId, product_id: productId });
 
           return new Response(
-            JSON.stringify({ success: true, action: "added", message: "Produkt bol pridany do oblubenych" }),
+            JSON.stringify({ success: true, action: "added", message: "Produkt bol pridaný do obľúbených" }),
             { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
         }
@@ -213,7 +213,7 @@ Deno.serve(async (req: Request) => {
 
       case "check": {
         const productId = url.searchParams.get("productId");
-        if (!productId) throw new Error("productId je povinny");
+        if (!productId) throw new Error("productId je povinný");
 
         if (!customerId) {
           return new Response(
@@ -236,10 +236,10 @@ Deno.serve(async (req: Request) => {
       }
 
       default:
-        throw new Error(`Neznama akcia: ${action}`);
+        throw new Error(`Neznáma akcia: ${action}`);
     }
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Neznama chyba";
+    const message = error instanceof Error ? error.message : "Neznáma chyba";
     return new Response(JSON.stringify({ success: false, error: message }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

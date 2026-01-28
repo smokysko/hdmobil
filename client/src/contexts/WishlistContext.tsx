@@ -111,7 +111,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
       if (!isAuthenticated) {
         setLocalProductIds((prev) => [...prev, product.id]);
-        toast.success("Produkt bol pridany do oblubenych");
+        toast.success("Produkt bol pridaný do obľúbených");
         return;
       }
 
@@ -129,13 +129,13 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
         const result = await response.json();
         if (result.success) {
-          toast.success("Produkt bol pridany do oblubenych");
+          toast.success("Produkt bol pridaný do obľúbených");
           fetchWishlist();
         } else {
-          toast.error(result.error || "Nepodarilo sa pridat do oblubenych");
+          toast.error(result.error || "Nepodarilo sa pridať do obľúbených");
         }
       } catch (error) {
-        toast.error("Nepodarilo sa pridat do oblubenych");
+        toast.error("Nepodarilo sa pridať do obľúbených");
       }
     },
     [isAuthenticated, isInWishlist, session?.access_token, fetchWishlist]
@@ -145,7 +145,7 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
     async (productId: string) => {
       if (!isAuthenticated) {
         setLocalProductIds((prev) => prev.filter((id) => id !== productId));
-        toast.info("Produkt bol odstraneny z oblubenych");
+        toast.info("Produkt bol odstránený z obľúbených");
         return;
       }
 
@@ -163,13 +163,13 @@ export function WishlistProvider({ children }: { children: ReactNode }) {
 
         const result = await response.json();
         if (result.success) {
-          toast.info("Produkt bol odstraneny z oblubenych");
+          toast.info("Produkt bol odstránený z obľúbených");
           fetchWishlist();
         } else {
-          toast.error(result.error || "Nepodarilo sa odstranit z oblubenych");
+          toast.error(result.error || "Nepodarilo sa odstrániť z obľúbených");
         }
       } catch (error) {
-        toast.error("Nepodarilo sa odstranit z oblubenych");
+        toast.error("Nepodarilo sa odstrániť z obľúbených");
       }
     },
     [isAuthenticated, session?.access_token, fetchWishlist]

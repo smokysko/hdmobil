@@ -17,7 +17,7 @@ export default function Wishlist() {
       <Layout>
         <div className="container py-12 md:py-20">
           <h1 className="mb-8 font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-            Moje oblubene
+            Moje obľúbené
           </h1>
           <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {[1, 2, 3, 4].map((i) => (
@@ -40,7 +40,7 @@ export default function Wishlist() {
     <Layout>
       <div className="container py-12 md:py-20">
         <h1 className="mb-8 font-display text-3xl font-bold tracking-tight text-foreground md:text-4xl">
-          Moje oblubene{" "}
+          Moje obľúbené{" "}
           <span className="text-primary">
             ({isAuthenticated ? items.length : productIds.length} produktov)
           </span>
@@ -49,9 +49,9 @@ export default function Wishlist() {
         {!isAuthenticated && productIds.length > 0 && (
           <div className="mb-8 rounded-2xl border border-amber-200 bg-amber-50 p-4">
             <p className="text-sm text-amber-800">
-              Pre ulozenie vasich oblubenych produktov sa{" "}
+              Pre uloženie vašich obľúbených produktov sa{" "}
               <Link href="/prihlasenie" className="font-semibold underline">
-                prihlaste
+                prihláste
               </Link>{" "}
               alebo{" "}
               <Link href="/registracia" className="font-semibold underline">
@@ -68,14 +68,14 @@ export default function Wishlist() {
               <Heart className="h-12 w-12 text-muted-foreground opacity-50" />
             </div>
             <h2 className="font-display text-2xl font-bold text-foreground">
-              Ziadne oblubene produkty
+              Žiadne obľúbené produkty
             </h2>
             <p className="mt-2 max-w-md text-muted-foreground">
-              Zatial ste si nepridali ziadne produkty do oblubenych. Prezrite si nasu ponuku a
-              pridajte si produkty, ktore vas zaujmu.
+              Zatiaľ ste si nepridali žiadne produkty do obľúbených. Prezrite si našu ponuku a
+              pridajte si produkty, ktoré vás zaujmú.
             </p>
             <Button size="lg" className="mt-8 font-display tracking-wider" asChild>
-              <Link href="/category/all">PREHLADAT PRODUKTY</Link>
+              <Link href="/category/all">PREHLIADAŤ PRODUKTY</Link>
             </Button>
           </div>
         ) : isAuthenticated ? (
@@ -149,7 +149,7 @@ export default function Wishlist() {
                       }
                     >
                       <ShoppingCart className="h-4 w-4 mr-1" />
-                      {item.product.inStock ? "Do kosika" : "Vypredane"}
+                      {item.product.inStock ? "Do košíka" : "Vypredané"}
                     </Button>
                   </div>
                 </div>
@@ -159,14 +159,14 @@ export default function Wishlist() {
         ) : (
           <div className="text-center py-12">
             <p className="text-muted-foreground">
-              Pre zobrazenie vasich oblubenych produktov sa prihlaste.
+              Pre zobrazenie vašich obľúbených produktov sa prihláste.
             </p>
             <div className="mt-6 flex gap-4 justify-center">
               <Button asChild>
-                <Link href="/prihlasenie">Prihlasit sa</Link>
+                <Link href="/prihlasenie">Prihlásiť sa</Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link href="/registracia">Registrovat sa</Link>
+                <Link href="/registracia">Registrovať sa</Link>
               </Button>
             </div>
           </div>
