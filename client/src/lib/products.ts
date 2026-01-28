@@ -83,21 +83,46 @@ function mapDbProductToProduct(db: DbProduct): Product {
   };
 }
 
-export async function getProducts(options?: {
+export type SortOption = 'newest' | 'oldest' | 'price_asc' | 'price_desc' | 'name_asc' | 'name_desc';
+
+export interface ProductFilters {
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean;
+  isNew?: boolean;
+  isSale?: boolean;
+  isBazaar?: boolean;
+}
+
+export interface GetProductsOptions {
   categorySlug?: string;
   featured?: boolean;
   isNew?: boolean;
   limit?: number;
   search?: string;
-}): Promise<Product[]> {
+  filters?: ProductFilters;
+  sortBy?: SortOption;
+}
+
+export interface GetProductsResult {
+  products: Product[];
+  total: number;
+  priceRange: { min: number; max: number };
+}
+
+export async function getProducts(options?: GetProductsOptions): Promise<Product[]> {
+  const result = await getProductsWithMeta(options);
+  return result.products;
+}
+
+export async function getProductsWithMeta(options?: GetProductsOptions): Promise<GetProductsResult> {
   let query = supabase
     .from('products')
     .select(`
       *,
       category:categories(id, slug, name_sk)
-    `)
-    .eq('is_active', true)
-    .order('created_at', { ascending: false });
+    `, { count: 'exact' })
+    .eq('is_active', true);
 
   if (options?.categorySlug && options.categorySlug !== 'all') {
     const { data: category } = await supabase
@@ -123,18 +148,103 @@ export async function getProducts(options?: {
     query = query.ilike('name_sk', `%${options.search}%`);
   }
 
+  if (options?.filters) {
+    const f = options.filters;
+    if (f.minPrice !== undefined) {
+      query = query.gte('price_with_vat', f.minPrice);
+    }
+    if (f.maxPrice !== undefined) {
+      query = query.lte('price_with_vat', f.maxPrice);
+    }
+    if (f.inStock) {
+      query = query.gt('stock_quantity', 0);
+    }
+    if (f.isNew) {
+      query = query.eq('is_new', true);
+    }
+    if (f.isSale) {
+      query = query.not('original_price', 'is', null);
+    }
+    if (f.isBazaar) {
+      query = query.eq('is_bazaar', true);
+    }
+  }
+
+  const sortBy = options?.sortBy || 'newest';
+  switch (sortBy) {
+    case 'newest':
+      query = query.order('created_at', { ascending: false });
+      break;
+    case 'oldest':
+      query = query.order('created_at', { ascending: true });
+      break;
+    case 'price_asc':
+      query = query.order('price_with_vat', { ascending: true });
+      break;
+    case 'price_desc':
+      query = query.order('price_with_vat', { ascending: false });
+      break;
+    case 'name_asc':
+      query = query.order('name_sk', { ascending: true });
+      break;
+    case 'name_desc':
+      query = query.order('name_sk', { ascending: false });
+      break;
+  }
+
   if (options?.limit) {
     query = query.limit(options.limit);
   }
 
-  const { data, error } = await query;
+  const { data, error, count } = await query;
 
   if (error) {
     console.error('Error fetching products:', error);
-    return [];
+    return { products: [], total: 0, priceRange: { min: 0, max: 0 } };
   }
 
-  return (data || []).map(mapDbProductToProduct);
+  const products = (data || []).map(mapDbProductToProduct);
+  const prices = products.map(p => p.salePrice || p.price);
+  const priceRange = prices.length > 0
+    ? { min: Math.floor(Math.min(...prices)), max: Math.ceil(Math.max(...prices)) }
+    : { min: 0, max: 0 };
+
+  return {
+    products,
+    total: count || products.length,
+    priceRange,
+  };
+}
+
+export async function getCategoryPriceRange(categorySlug?: string): Promise<{ min: number; max: number }> {
+  let query = supabase
+    .from('products')
+    .select('price_with_vat')
+    .eq('is_active', true);
+
+  if (categorySlug && categorySlug !== 'all') {
+    const { data: category } = await supabase
+      .from('categories')
+      .select('id')
+      .eq('slug', categorySlug)
+      .maybeSingle();
+
+    if (category) {
+      query = query.eq('category_id', category.id);
+    }
+  }
+
+  const { data, error } = await query;
+
+  if (error || !data || data.length === 0) {
+    return { min: 0, max: 1000 };
+  }
+
+  const prices = data.map(p => p.price_with_vat);
+  return {
+    min: Math.floor(Math.min(...prices)),
+    max: Math.ceil(Math.max(...prices)),
+  };
 }
 
 export async function getProductBySlug(slug: string): Promise<Product | null> {
