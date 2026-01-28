@@ -1,4 +1,5 @@
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 import { cn } from "@/lib/utils";
 import { Menu, Search, ShoppingBag, Smartphone, X, Phone, Mail, User, Heart, ChevronDown, ChevronRight } from "lucide-react";
 import { useState } from "react";
@@ -24,6 +25,7 @@ import UserProfileDropdown from "./UserProfileDropdown";
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
   const [location] = useLocation();
 
   const navItems = [
@@ -155,10 +157,20 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
             {/* Right Actions */}
             <div className="flex items-center gap-2 shrink-0">
-              <Button variant="ghost" size="icon" className="hidden sm:flex hover:text-primary">
-                <Heart className="h-6 w-6" />
-                <span className="sr-only">Obľúbené</span>
-              </Button>
+              <Link href="/oblubene">
+                <Button variant="ghost" size="icon" className="hidden sm:flex hover:text-primary relative">
+                  <Heart className="h-6 w-6" />
+                  {wishlistCount > 0 && (
+                    <Badge
+                      variant="default"
+                      className="absolute -right-1 -top-1 h-5 w-5 justify-center rounded-full bg-red-500 p-0 text-[10px] font-bold text-white border-2 border-background"
+                    >
+                      {wishlistCount}
+                    </Badge>
+                  )}
+                  <span className="sr-only">Oblubene</span>
+                </Button>
+              </Link>
               
               <Link href="/cart">
                 <Button variant="ghost" className="relative flex items-center gap-2 hover:bg-secondary/50 px-2 sm:px-4 h-11 rounded-md">

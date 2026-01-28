@@ -6,6 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { CartProvider } from "./contexts/CartContext";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { WishlistProvider } from "./contexts/WishlistContext";
 import { I18nProvider } from "./i18n";
 import Cart from "./pages/Cart";
 import Category from "./pages/Category";
@@ -27,6 +28,7 @@ import CustomerRegister from "./pages/auth/register";
 import AccountPage from "./pages/account/index";
 import OrdersPage from "./pages/account/orders";
 import Search from "./pages/Search";
+import Wishlist from "./pages/Wishlist";
 import Preloader from "./components/Preloader";
 import { useState } from "react";
 
@@ -41,6 +43,7 @@ function Router() {
       <Route path="/checkout" component={Checkout} />
       <Route path="/success" component={Success} />
       <Route path="/vyhladavanie" component={Search} />
+      <Route path="/oblubene" component={Wishlist} />
       {/* Customer auth routes */}
       <Route path="/auth/login" component={CustomerLogin} />
       <Route path="/auth/register" component={CustomerRegister} />
@@ -85,6 +88,7 @@ function App() {
         <I18nProvider>
           <AuthProvider>
             <CartProvider>
+            <WishlistProvider>
             <TooltipProvider>
               <Toaster />
               <Preloader 
@@ -95,6 +99,7 @@ function App() {
                 <Router />
               </div>
             </TooltipProvider>
+            </WishlistProvider>
             </CartProvider>
           </AuthProvider>
         </I18nProvider>

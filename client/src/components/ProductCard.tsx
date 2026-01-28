@@ -1,13 +1,16 @@
 import { useCart } from "@/contexts/CartContext";
+import { useWishlist } from "@/contexts/WishlistContext";
 import { Product } from "@/lib/products";
-import { ShoppingCart, Star } from "lucide-react";
+import { Heart, ShoppingCart, Star } from "lucide-react";
 import { Link } from "wouter";
 import { Button } from "./ui/button";
-import { Card, CardContent, CardFooter } from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 import { Badge } from "./ui/badge";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
+  const inWishlist = isInWishlist(product.id);
 
   return (
     <Card className="group relative overflow-hidden border border-border bg-card transition-all duration-300 hover:shadow-md hover:border-primary/50 rounded-lg h-full flex flex-col">
@@ -27,8 +30,22 @@ export default function ProductCard({ product }: { product: Product }) {
           )}
         </div>
 
-        {/* Stock Status - Top Right */}
-        <div className="absolute right-2 top-2 z-10">
+        {/* Wishlist & Stock Status - Top Right */}
+        <div className="absolute right-2 top-2 z-10 flex flex-col items-end gap-2">
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              toggleWishlist(product);
+            }}
+            className={`p-1.5 rounded-full transition-all ${
+              inWishlist
+                ? "bg-red-50 text-red-500 hover:bg-red-100"
+                : "bg-white/80 text-gray-400 hover:text-red-500 hover:bg-red-50"
+            } shadow-sm`}
+          >
+            <Heart className={`h-4 w-4 ${inWishlist ? "fill-current" : ""}`} />
+          </button>
           {product.stock > 0 ? (
             <div className="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-1 rounded-sm border border-green-100">
               <div className="w-1.5 h-1.5 rounded-full bg-green-600 animate-pulse"></div>
