@@ -5,8 +5,12 @@ export interface AdminProduct {
   id: string;
   sku: string | null;
   name_sk: string;
+  name_cs: string | null;
+  name_pl: string | null;
   slug: string;
   description_sk: string | null;
+  description_cs: string | null;
+  description_pl: string | null;
   category_id: string | null;
   price_without_vat: number;
   price_with_vat: number;
@@ -35,8 +39,12 @@ export interface AdminCategory {
 
 export interface CreateProductData {
   name_sk: string;
+  name_cs?: string;
+  name_pl?: string;
   sku?: string;
   description_sk?: string;
+  description_cs?: string;
+  description_pl?: string;
   category_id?: string;
   price_with_vat: number;
   original_price?: number;
@@ -100,9 +108,13 @@ export async function createProduct(productData: CreateProductData): Promise<{ s
     .from('products')
     .insert({
       name_sk: productData.name_sk,
+      name_cs: productData.name_cs || null,
+      name_pl: productData.name_pl || null,
       slug,
       sku: productData.sku || null,
       description_sk: productData.description_sk || null,
+      description_cs: productData.description_cs || null,
+      description_pl: productData.description_pl || null,
       category_id: productData.category_id || null,
       price_with_vat: productData.price_with_vat,
       price_without_vat: priceWithoutVat,
@@ -135,8 +147,12 @@ export async function updateProduct(productData: UpdateProductData): Promise<{ s
     updates.name_sk = productData.name_sk;
     updates.slug = generateSlug(productData.name_sk);
   }
+  if (productData.name_cs !== undefined) updates.name_cs = productData.name_cs;
+  if (productData.name_pl !== undefined) updates.name_pl = productData.name_pl;
   if (productData.sku !== undefined) updates.sku = productData.sku;
   if (productData.description_sk !== undefined) updates.description_sk = productData.description_sk;
+  if (productData.description_cs !== undefined) updates.description_cs = productData.description_cs;
+  if (productData.description_pl !== undefined) updates.description_pl = productData.description_pl;
   if (productData.category_id !== undefined) updates.category_id = productData.category_id;
   if (productData.price_with_vat !== undefined) {
     updates.price_with_vat = productData.price_with_vat;

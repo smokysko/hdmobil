@@ -32,11 +32,23 @@ import {
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
+type Language = 'sk' | 'cs' | 'pl';
+
+const LANGUAGES: { code: Language; label: string; flag: string }[] = [
+  { code: 'sk', label: 'Slovenčina', flag: '🇸🇰' },
+  { code: 'cs', label: 'Čeština', flag: '🇨🇿' },
+  { code: 'pl', label: 'Polski', flag: '🇵🇱' },
+];
+
 interface HeroSlide {
   id: string;
   product_id: string | null;
   title_sk: string;
+  title_cs: string | null;
+  title_pl: string | null;
   subtitle_sk: string | null;
+  subtitle_cs: string | null;
+  subtitle_pl: string | null;
   badge_text: string | null;
   image_url: string | null;
   image_mobile_url: string | null;
@@ -58,6 +70,8 @@ interface HomepageCategory {
   id: string;
   category_id: string | null;
   name_sk: string;
+  name_cs: string | null;
+  name_pl: string | null;
   image_url: string | null;
   link_url: string;
   is_active: boolean;
@@ -333,6 +347,7 @@ function HeroSlidesTab({
   const [formData, setFormData] = useState<Partial<HeroSlide>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [activeLanguage, setActiveLanguage] = useState<Language>('sk');
 
   const [featuresText, setFeaturesText] = useState('');
   const [specsText, setSpecsText] = useState('');
@@ -354,7 +369,11 @@ function HeroSlidesTab({
     setEditingSlide(null);
     setFormData({
       title_sk: '',
+      title_cs: '',
+      title_pl: '',
       subtitle_sk: '',
+      subtitle_cs: '',
+      subtitle_pl: '',
       badge_text: '',
       image_url: '',
       price: null,
@@ -370,6 +389,7 @@ function HeroSlidesTab({
     });
     setFeaturesText('');
     setSpecsText('');
+    setActiveLanguage('sk');
     setShowModal(true);
   };
 
@@ -379,6 +399,7 @@ function HeroSlidesTab({
     setFormData({});
     setFeaturesText('');
     setSpecsText('');
+    setActiveLanguage('sk');
   };
 
   const handleSave = async () => {
@@ -571,30 +592,56 @@ function HeroSlidesTab({
               </button>
             </div>
             <div className="p-6 space-y-4 overflow-y-auto max-h-[60vh]">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Nadpis *
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.title_sk || ''}
-                    onChange={(e) => setFormData({ ...formData, title_sk: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
-                    placeholder="iPhone 17 Pro"
-                  />
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <div className="flex border-b border-gray-200 bg-gray-50">
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => setActiveLanguage(lang.code)}
+                      className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                        activeLanguage === lang.code
+                          ? 'bg-white text-blue-600 border-b-2 border-blue-600 -mb-px'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      }`}
+                    >
+                      <span>{lang.flag}</span>
+                      <span>{lang.label}</span>
+                    </button>
+                  ))}
                 </div>
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Podnadpis
-                  </label>
-                  <input
-                    type="text"
-                    value={formData.subtitle_sk || ''}
-                    onChange={(e) => setFormData({ ...formData, subtitle_sk: e.target.value })}
-                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
-                    placeholder="Titanium"
-                  />
+                <div className="p-4 space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Nadpis {activeLanguage === 'sk' && '*'}
+                        <span className="text-gray-400 font-normal ml-2">
+                          ({LANGUAGES.find(l => l.code === activeLanguage)?.label})
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        value={(formData[`title_${activeLanguage}` as keyof typeof formData] as string) || ''}
+                        onChange={(e) => setFormData({ ...formData, [`title_${activeLanguage}`]: e.target.value })}
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                        placeholder="iPhone 17 Pro"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Podnadpis
+                        <span className="text-gray-400 font-normal ml-2">
+                          ({LANGUAGES.find(l => l.code === activeLanguage)?.label})
+                        </span>
+                      </label>
+                      <input
+                        type="text"
+                        value={(formData[`subtitle_${activeLanguage}` as keyof typeof formData] as string) || ''}
+                        onChange={(e) => setFormData({ ...formData, [`subtitle_${activeLanguage}`]: e.target.value })}
+                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                        placeholder="Titanium"
+                      />
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -825,6 +872,7 @@ function CategoriesTab({
   const [formData, setFormData] = useState<Partial<HomepageCategory>>({});
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [activeLanguage, setActiveLanguage] = useState<Language>('sk');
 
   useEffect(() => {
     if (editingCategory) {
@@ -837,11 +885,14 @@ function CategoriesTab({
     setEditingCategory(null);
     setFormData({
       name_sk: '',
+      name_cs: '',
+      name_pl: '',
       image_url: '',
       link_url: '',
       is_active: true,
       sort_order: categories.length,
     });
+    setActiveLanguage('sk');
     setShowModal(true);
   };
 
@@ -849,6 +900,7 @@ function CategoriesTab({
     setShowModal(false);
     setEditingCategory(null);
     setFormData({});
+    setActiveLanguage('sk');
   };
 
   const handleSave = async () => {
@@ -1007,15 +1059,38 @@ function CategoriesTab({
               </button>
             </div>
             <div className="p-6 space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Názov *</label>
-                <input
-                  type="text"
-                  value={formData.name_sk || ''}
-                  onChange={(e) => setFormData({ ...formData, name_sk: e.target.value })}
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
-                  placeholder="Smartfony"
-                />
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <div className="flex border-b border-gray-200 bg-gray-50">
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => setActiveLanguage(lang.code)}
+                      className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                        activeLanguage === lang.code
+                          ? 'bg-white text-blue-600 border-b-2 border-blue-600 -mb-px'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      }`}
+                    >
+                      <span>{lang.flag}</span>
+                      <span>{lang.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="p-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Názov {activeLanguage === 'sk' && '*'}
+                    <span className="text-gray-400 font-normal ml-2">
+                      ({LANGUAGES.find(l => l.code === activeLanguage)?.label})
+                    </span>
+                  </label>
+                  <input
+                    type="text"
+                    value={(formData[`name_${activeLanguage}` as keyof typeof formData] as string) || ''}
+                    onChange={(e) => setFormData({ ...formData, [`name_${activeLanguage}`]: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm"
+                    placeholder="Smartfony"
+                  />
+                </div>
               </div>
 
               <div>

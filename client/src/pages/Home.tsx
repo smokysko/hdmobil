@@ -4,21 +4,31 @@ import HeroCarousel, { HeroSlide } from '@/components/HeroCarousel';
 import { Button } from '@/components/ui/button';
 import { getProducts, Product } from '@/lib/products';
 import { supabase } from '@/lib/supabase';
-import { useI18n } from '@/i18n';
+import { useI18n, Language } from '@/i18n';
 import { ArrowRight, ShieldCheck, Truck, RotateCcw, Headphones, Zap, Monitor, Sparkles, ChevronRight } from 'lucide-react';
 import { Link } from 'wouter';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 
 interface HomepageSection {
   id: string;
   section_key: string;
   title_sk: string | null;
+  title_cs: string | null;
+  title_pl: string | null;
   subtitle_sk: string | null;
+  subtitle_cs: string | null;
+  subtitle_pl: string | null;
   description_sk: string | null;
-  badge_text: string | null;
+  description_cs: string | null;
+  description_pl: string | null;
+  badge_text_sk: string | null;
+  badge_text_cs: string | null;
+  badge_text_pl: string | null;
+  link_text_sk: string | null;
+  link_text_cs: string | null;
+  link_text_pl: string | null;
   image_url: string | null;
   link_url: string | null;
-  link_text: string | null;
   is_active: boolean;
 }
 
@@ -26,10 +36,23 @@ interface HomepageCategory {
   id: string;
   category_id: string | null;
   name_sk: string;
+  name_cs: string | null;
+  name_pl: string | null;
   image_url: string | null;
   link_url: string;
   is_active: boolean;
   sort_order: number;
+}
+
+function getLocalizedText(
+  item: Record<string, unknown>,
+  field: string,
+  lang: Language,
+  fallback: string = ''
+): string {
+  const langField = `${field}_${lang}`;
+  const skField = `${field}_sk`;
+  return (item[langField] as string) || (item[skField] as string) || fallback;
 }
 
 interface ContentBlock {
@@ -57,43 +80,43 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(true);
   const heroWrapperRef = useRef<HTMLDivElement>(null);
   const [heroHeight, setHeroHeight] = useState<string>('auto');
-  const { t } = useI18n();
+  const { t, language } = useI18n();
 
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
   const [homepageCategories, setHomepageCategories] = useState<HomepageCategory[]>([]);
   const [promoSection, setPromoSection] = useState<HomepageSection | null>(null);
   const [trustBarItems, setTrustBarItems] = useState<TrustBarItem[]>([]);
 
-  const DEFAULT_TRUST_BAR: TrustBarItem[] = [
+  const DEFAULT_TRUST_BAR = useMemo<TrustBarItem[]>(() => [
     { icon: 'Truck', title: t.home.delivery24h, description: t.home.orderBefore },
     { icon: 'ShieldCheck', title: t.home.authorizedSeller, description: t.home.originalProducts },
     { icon: 'RotateCcw', title: t.home.return14days, description: t.home.noReason },
     { icon: 'Headphones', title: t.home.expertSupport, description: t.home.workingHours },
-  ];
+  ], [t]);
 
-  const DEFAULT_PROMO = {
+  const DEFAULT_PROMO = useMemo(() => ({
     badge_text: t.home.tipForYou,
-    title_sk: t.home.productivityTitle,
-    description_sk: t.home.productivityDesc,
+    title: t.home.productivityTitle,
+    description: t.home.productivityDesc,
     image_url: '/images/categories/cat_laptop.png',
     link_url: '/category/notebooky',
     link_text: t.home.browseCollection,
-  };
+  }), [t]);
 
-  const PROMO_FEATURES = [
+  const PROMO_FEATURES = useMemo(() => [
     { icon: Zap, text: t.home.fastDelivery },
     { icon: Monitor, text: t.home.wideSelection },
     { icon: ShieldCheck, text: t.home.warrantyUp },
-  ];
+  ], [t]);
 
-  const DEFAULT_CATEGORIES = [
+  const DEFAULT_CATEGORIES = useMemo(() => [
     { name: t.header.smartphones, href: '/category/smartfony', image: '/images/categories/cat_smartphone.png' },
     { name: t.header.tablets, href: '/category/tablety', image: '/images/categories/cat_tablet.png' },
     { name: t.header.laptops, href: '/category/notebooky', image: '/images/categories/cat_laptop.png' },
     { name: t.header.audio, href: '/category/audio', image: '/images/categories/cat_audio.png' },
     { name: t.header.accessories, href: '/category/prislusenstvo', image: '/images/categories/cat_accessories.png' },
     { name: t.header.spareParts, href: '/category/nahradne-diely', image: '/images/categories/cat_parts.png' },
-  ];
+  ], [t]);
 
   useEffect(() => {
     async function loadData() {
@@ -172,17 +195,28 @@ export default function Home() {
     };
   }, []);
 
-  const promo = promoSection || DEFAULT_PROMO;
   const trustItems = trustBarItems.length > 0 ? trustBarItems : DEFAULT_TRUST_BAR;
 
-  const categories =
-    homepageCategories.length > 0
-      ? homepageCategories.map((cat) => ({
-          name: cat.name_sk,
-          href: cat.link_url,
-          image: cat.image_url || '/images/categories/cat_smartphone.png',
-        }))
-      : DEFAULT_CATEGORIES;
+  const promo = useMemo(() => {
+    if (!promoSection) return DEFAULT_PROMO;
+    return {
+      badge_text: getLocalizedText(promoSection as unknown as Record<string, unknown>, 'badge_text', language, DEFAULT_PROMO.badge_text),
+      title: getLocalizedText(promoSection as unknown as Record<string, unknown>, 'title', language, DEFAULT_PROMO.title),
+      description: getLocalizedText(promoSection as unknown as Record<string, unknown>, 'description', language, DEFAULT_PROMO.description),
+      image_url: promoSection.image_url || DEFAULT_PROMO.image_url,
+      link_url: promoSection.link_url || DEFAULT_PROMO.link_url,
+      link_text: getLocalizedText(promoSection as unknown as Record<string, unknown>, 'link_text', language, DEFAULT_PROMO.link_text),
+    };
+  }, [promoSection, language, DEFAULT_PROMO]);
+
+  const categories = useMemo(() => {
+    if (homepageCategories.length === 0) return DEFAULT_CATEGORIES;
+    return homepageCategories.map((cat) => ({
+      name: getLocalizedText(cat as unknown as Record<string, unknown>, 'name', language, cat.name_sk),
+      href: cat.link_url,
+      image: cat.image_url || '/images/categories/cat_smartphone.png',
+    }));
+  }, [homepageCategories, language, DEFAULT_CATEGORIES]);
 
   return (
     <Layout>
@@ -297,15 +331,15 @@ export default function Home() {
               <div className="space-y-6">
                 <div className="inline-flex items-center gap-2 text-primary text-sm font-medium">
                   <Sparkles className="w-4 h-4" />
-                  <span>{promo.badge_text || DEFAULT_PROMO.badge_text}</span>
+                  <span>{promo.badge_text}</span>
                 </div>
 
                 <div>
                   <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
-                    {promo.title_sk || DEFAULT_PROMO.title_sk}
+                    {promo.title}
                   </h2>
                   <p className="text-slate-400 mt-4 text-base md:text-lg max-w-md leading-relaxed">
-                    {promo.description_sk || DEFAULT_PROMO.description_sk}
+                    {promo.description}
                   </p>
                 </div>
 
@@ -322,8 +356,8 @@ export default function Home() {
 
                 <div className="flex flex-wrap items-center gap-4 pt-2">
                   <Button size="lg" className="font-semibold rounded-lg group" asChild>
-                    <Link href={promo.link_url || DEFAULT_PROMO.link_url}>
-                      {promo.link_text || DEFAULT_PROMO.link_text}
+                    <Link href={promo.link_url}>
+                      {promo.link_text}
                       <ChevronRight className="ml-1 w-4 h-4 transition-transform group-hover:translate-x-1" />
                     </Link>
                   </Button>
@@ -339,8 +373,8 @@ export default function Home() {
               <div className="relative h-72 md:h-96 lg:h-[28rem] flex items-center justify-center">
                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-blue-500/10 rounded-full blur-3xl opacity-40 scale-90"></div>
                 <img
-                  src={promo.image_url || DEFAULT_PROMO.image_url}
-                  alt={promo.title_sk || DEFAULT_PROMO.title_sk || 'Promo'}
+                  src={promo.image_url}
+                  alt={promo.title}
                   className="relative z-10 w-full max-w-xl object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-105"
                 />
               </div>

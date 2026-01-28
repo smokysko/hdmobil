@@ -36,15 +36,27 @@ import {
 } from '@/lib/admin-products';
 import { toast } from 'sonner';
 
+type Language = 'sk' | 'cs' | 'pl';
+
+const LANGUAGES: { code: Language; label: string; flag: string }[] = [
+  { code: 'sk', label: 'Slovenčina', flag: '🇸🇰' },
+  { code: 'cs', label: 'Čeština', flag: '🇨🇿' },
+  { code: 'pl', label: 'Polski', flag: '🇵🇱' },
+];
+
 interface ProductFormData {
   id?: string;
   name_sk: string;
+  name_cs: string;
+  name_pl: string;
   sku: string;
   price_with_vat: string;
   original_price: string;
   stock_quantity: string;
   category_id: string;
   description_sk: string;
+  description_cs: string;
+  description_pl: string;
   main_image_url: string;
   is_active: boolean;
   is_new: boolean;
@@ -53,12 +65,16 @@ interface ProductFormData {
 
 const emptyFormData: ProductFormData = {
   name_sk: '',
+  name_cs: '',
+  name_pl: '',
   sku: '',
   price_with_vat: '',
   original_price: '',
   stock_quantity: '',
   category_id: '',
   description_sk: '',
+  description_cs: '',
+  description_pl: '',
   main_image_url: '',
   is_active: true,
   is_new: false,
@@ -80,6 +96,7 @@ export default function AdminProducts() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<ProductFormData>(emptyFormData);
+  const [activeLanguage, setActiveLanguage] = useState<Language>('sk');
 
   useEffect(() => {
     const isAdmin = localStorage.getItem('hdmobil_admin');
@@ -150,12 +167,16 @@ export default function AdminProducts() {
       const result = await updateProduct({
         id: formData.id,
         name_sk: formData.name_sk,
+        name_cs: formData.name_cs || undefined,
+        name_pl: formData.name_pl || undefined,
         sku: formData.sku || undefined,
         price_with_vat: parseFloat(formData.price_with_vat),
         original_price: formData.original_price ? parseFloat(formData.original_price) : undefined,
         stock_quantity: formData.stock_quantity ? parseInt(formData.stock_quantity) : 0,
         category_id: formData.category_id || undefined,
         description_sk: formData.description_sk || undefined,
+        description_cs: formData.description_cs || undefined,
+        description_pl: formData.description_pl || undefined,
         main_image_url: formData.main_image_url || undefined,
         is_active: formData.is_active,
         is_new: formData.is_new,
@@ -174,12 +195,16 @@ export default function AdminProducts() {
     } else {
       const result = await createProduct({
         name_sk: formData.name_sk,
+        name_cs: formData.name_cs || undefined,
+        name_pl: formData.name_pl || undefined,
         sku: formData.sku || undefined,
         price_with_vat: parseFloat(formData.price_with_vat),
         original_price: formData.original_price ? parseFloat(formData.original_price) : undefined,
         stock_quantity: formData.stock_quantity ? parseInt(formData.stock_quantity) : 0,
         category_id: formData.category_id || undefined,
         description_sk: formData.description_sk || undefined,
+        description_cs: formData.description_cs || undefined,
+        description_pl: formData.description_pl || undefined,
         main_image_url: formData.main_image_url || undefined,
         is_active: formData.is_active,
         is_new: formData.is_new,
@@ -208,17 +233,22 @@ export default function AdminProducts() {
     setFormData({
       id: product.id,
       name_sk: product.name_sk,
+      name_cs: (product as Record<string, unknown>).name_cs as string || '',
+      name_pl: (product as Record<string, unknown>).name_pl as string || '',
       sku: product.sku || '',
       price_with_vat: String(product.price_with_vat),
       original_price: product.original_price ? String(product.original_price) : '',
       stock_quantity: String(product.stock_quantity),
       category_id: product.category_id || '',
       description_sk: product.description_sk || '',
+      description_cs: (product as Record<string, unknown>).description_cs as string || '',
+      description_pl: (product as Record<string, unknown>).description_pl as string || '',
       main_image_url: product.main_image_url || '',
       is_active: product.is_active,
       is_new: product.is_new,
       is_featured: product.is_featured,
     });
+    setActiveLanguage('sk');
     setEditMode(true);
     setShowModal(true);
   };
@@ -227,6 +257,7 @@ export default function AdminProducts() {
     setShowModal(false);
     setEditMode(false);
     setFormData(emptyFormData);
+    setActiveLanguage('sk');
   };
 
   const handleDeleteProduct = async (id: string, name: string) => {
@@ -641,20 +672,6 @@ export default function AdminProducts() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Názov produktu *
-                      </label>
-                      <input
-                        type="text"
-                        placeholder="napr. iPhone 15 Pro"
-                        value={formData.name_sk}
-                        onChange={(e) =>
-                          setFormData({ ...formData, name_sk: e.target.value })
-                        }
-                        className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
                         SKU
                       </label>
                       <input
@@ -667,27 +684,27 @@ export default function AdminProducts() {
                         className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                       />
                     </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Kategória
-                    </label>
-                    <div className="relative">
-                      <select
-                        value={formData.category_id}
-                        onChange={(e) =>
-                          setFormData({ ...formData, category_id: e.target.value })
-                        }
-                        className="w-full appearance-none px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-sm"
-                      >
-                        <option value="">Vyberte kategóriu</option>
-                        {categories.map((cat) => (
-                          <option key={cat.id} value={cat.id}>
-                            {cat.name_sk}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        Kategória
+                      </label>
+                      <div className="relative">
+                        <select
+                          value={formData.category_id}
+                          onChange={(e) =>
+                            setFormData({ ...formData, category_id: e.target.value })
+                          }
+                          className="w-full appearance-none px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 bg-white text-sm"
+                        >
+                          <option value="">Vyberte kategóriu</option>
+                          {categories.map((cat) => (
+                            <option key={cat.id} value={cat.id}>
+                              {cat.name_sk}
+                            </option>
+                          ))}
+                        </select>
+                        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -740,19 +757,59 @@ export default function AdminProducts() {
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Popis
-                </label>
-                <textarea
-                  rows={4}
-                  placeholder="Zadajte popis produktu..."
-                  value={formData.description_sk}
-                  onChange={(e) =>
-                    setFormData({ ...formData, description_sk: e.target.value })
-                  }
-                  className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none text-sm"
-                ></textarea>
+              <div className="border border-gray-200 rounded-lg overflow-hidden">
+                <div className="flex border-b border-gray-200 bg-gray-50">
+                  {LANGUAGES.map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => setActiveLanguage(lang.code)}
+                      className={`flex items-center gap-2 px-4 py-2.5 text-sm font-medium transition-colors ${
+                        activeLanguage === lang.code
+                          ? 'bg-white text-blue-600 border-b-2 border-blue-600 -mb-px'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      }`}
+                    >
+                      <span>{lang.flag}</span>
+                      <span>{lang.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <div className="p-4 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Názov produktu {activeLanguage === 'sk' && '*'}
+                      <span className="text-gray-400 font-normal ml-2">
+                        ({LANGUAGES.find(l => l.code === activeLanguage)?.label})
+                      </span>
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={`napr. iPhone 15 Pro (${activeLanguage.toUpperCase()})`}
+                      value={formData[`name_${activeLanguage}` as keyof ProductFormData] as string}
+                      onChange={(e) =>
+                        setFormData({ ...formData, [`name_${activeLanguage}`]: e.target.value })
+                      }
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Popis
+                      <span className="text-gray-400 font-normal ml-2">
+                        ({LANGUAGES.find(l => l.code === activeLanguage)?.label})
+                      </span>
+                    </label>
+                    <textarea
+                      rows={4}
+                      placeholder={`Zadajte popis produktu (${activeLanguage.toUpperCase()})...`}
+                      value={formData[`description_${activeLanguage}` as keyof ProductFormData] as string}
+                      onChange={(e) =>
+                        setFormData({ ...formData, [`description_${activeLanguage}`]: e.target.value })
+                      }
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none text-sm"
+                    ></textarea>
+                  </div>
+                </div>
               </div>
 
               <div className="flex flex-wrap gap-6 pt-2">
