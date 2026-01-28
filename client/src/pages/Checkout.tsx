@@ -1,3 +1,4 @@
+import { DiscountCodeInput } from "@/components/DiscountCodeInput";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -31,7 +32,7 @@ const checkoutSchema = z.object({
 type CheckoutForm = z.infer<typeof checkoutSchema>;
 
 export default function Checkout() {
-  const { items, cartTotal, clearCart } = useCart();
+  const { items, cartTotal, clearCart, appliedDiscount, discountAmount } = useCart();
   const [, setLocation] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
 
@@ -52,9 +53,7 @@ export default function Checkout() {
   const selectedPayment = watch("paymentMethod");
   const shipping = cartTotal > 100 ? 0 : 4.99;
   const codFee = selectedPayment === "cod" ? 1.5 : 0;
-  const subtotalWithoutVat = cartTotal / 1.2;
-  const vatTotal = cartTotal - subtotalWithoutVat;
-  const total = cartTotal + shipping + codFee;
+  const total = cartTotal + shipping + codFee - discountAmount;
 
   const onSubmit = async (data: CheckoutForm) => {
     setIsProcessing(true);
@@ -90,6 +89,7 @@ export default function Checkout() {
           billingZip: data.zipCode,
           billingCountry: data.country === "Slovensko" ? "SK" : data.country,
           customerNote: data.note,
+          discountCode: appliedDiscount?.code,
         }),
       });
 
@@ -330,6 +330,10 @@ export default function Checkout() {
                 ))}
               </div>
 
+              <div className="mb-6">
+                <DiscountCodeInput />
+              </div>
+
               <Separator className="mb-4 bg-border/50" />
 
               <div className="space-y-2">
@@ -337,6 +341,12 @@ export default function Checkout() {
                   <span className="text-muted-foreground">Medzisucet (s DPH)</span>
                   <span className="font-medium">{cartTotal.toFixed(2)} EUR</span>
                 </div>
+                {discountAmount > 0 && (
+                  <div className="flex justify-between text-sm text-primary">
+                    <span>Zlava ({appliedDiscount?.code})</span>
+                    <span className="font-medium">-{discountAmount.toFixed(2)} EUR</span>
+                  </div>
+                )}
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Doprava</span>
                   <span className="font-medium">{shipping === 0 ? "Zdarma" : `${shipping.toFixed(2)} EUR`}</span>

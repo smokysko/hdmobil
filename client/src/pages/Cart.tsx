@@ -1,3 +1,4 @@
+import { DiscountCodeInput } from "@/components/DiscountCodeInput";
 import Layout from "@/components/Layout";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
@@ -6,10 +7,9 @@ import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import { Link } from "wouter";
 
 export default function Cart() {
-  const { items, removeFromCart, updateQuantity, cartTotal } = useCart();
-  const shipping = cartTotal > 500 ? 0 : 15;
-  const tax = cartTotal * 0.08;
-  const total = cartTotal + shipping + tax;
+  const { items, removeFromCart, updateQuantity, cartTotal, discountAmount, appliedDiscount } = useCart();
+  const shipping = cartTotal > 100 ? 0 : 4.99;
+  const total = cartTotal + shipping - discountAmount;
 
   return (
     <Layout>
@@ -46,7 +46,7 @@ export default function Cart() {
                         <p className="text-sm font-medium text-muted-foreground uppercase tracking-wide">{item.category}</p>
                       </div>
                       <p className="font-display text-lg font-bold text-foreground">
-                        {(item.salePrice || item.price) * item.quantity} €
+                        {((item.salePrice || item.price) * item.quantity).toFixed(2)} EUR
                       </p>
                     </div>
                     
@@ -92,28 +92,34 @@ export default function Cart() {
             <div className="lg:col-span-1">
               <div className="sticky top-24 rounded-3xl border border-border bg-card p-8 shadow-sm">
                 <h2 className="font-display text-xl font-bold text-foreground mb-6">Súhrn objednávky</h2>
-                
+
                 <div className="space-y-4">
+                  <DiscountCodeInput />
+
+                  <Separator className="bg-border/50" />
+
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Medzisúčet</span>
-                    <span className="font-medium">{cartTotal.toFixed(2)} €</span>
+                    <span className="font-medium">{cartTotal.toFixed(2)} EUR</span>
                   </div>
+                  {discountAmount > 0 && (
+                    <div className="flex justify-between text-sm text-primary">
+                      <span>Zľava ({appliedDiscount?.code})</span>
+                      <span className="font-medium">-{discountAmount.toFixed(2)} EUR</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span className="text-muted-foreground">Doprava</span>
                     <span className="font-medium">
-                      {shipping === 0 ? "Zdarma" : `${shipping.toFixed(2)} €`}
+                      {shipping === 0 ? "Zdarma" : `${shipping.toFixed(2)} EUR`}
                     </span>
                   </div>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-muted-foreground">Odhadovaná daň</span>
-                    <span className="font-medium">{tax.toFixed(2)} €</span>
-                  </div>
-                  
+
                   <Separator className="bg-border/50" />
-                  
+
                   <div className="flex justify-between text-xl font-bold">
                     <span>Spolu</span>
-                    <span className="text-foreground">{total.toFixed(2)} €</span>
+                    <span className="text-foreground">{total.toFixed(2)} EUR</span>
                   </div>
                   
                   <Button size="lg" className="w-full font-display tracking-wide mt-6 h-12 rounded-full shadow-lg hover:shadow-xl transition-all" asChild>

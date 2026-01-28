@@ -40,6 +40,91 @@ Deno.serve(async (req: Request) => {
     }
 
     switch (action) {
+      case "validate-discount": {
+        const { code, cartTotal, productIds, categoryIds } = body;
+        if (!code) throw new Error("Zlavovy kod je povinny");
+
+        const { data: discount } = await supabase
+          .from("discounts")
+          .select("*")
+          .eq("code", code.toUpperCase())
+          .eq("is_active", true)
+          .maybeSingle();
+
+        if (!discount) {
+          throw new Error("Neplatny zlavovy kod");
+        }
+
+        const now = new Date();
+        if (discount.valid_from && new Date(discount.valid_from) > now) {
+          throw new Error("Zlavovy kod este nie je platny");
+        }
+        if (discount.valid_until && new Date(discount.valid_until) < now) {
+          throw new Error("Zlavovy kod uz exspiroval");
+        }
+
+        if (discount.max_uses && discount.current_uses >= discount.max_uses) {
+          throw new Error("Zlavovy kod bol uz vycerpany");
+        }
+
+        if (discount.min_order_value && cartTotal < discount.min_order_value) {
+          throw new Error(`Minimalna hodnota objednavky pre tento kod je ${discount.min_order_value} EUR`);
+        }
+
+        if (discount.applies_to_products && discount.applies_to_products.length > 0) {
+          const hasMatchingProduct = productIds?.some((id: string) =>
+            discount.applies_to_products.includes(id)
+          );
+          if (!hasMatchingProduct) {
+            throw new Error("Zlavovy kod nie je platny pre produkty vo vasom kosiku");
+          }
+        }
+
+        if (discount.applies_to_categories && discount.applies_to_categories.length > 0) {
+          const hasMatchingCategory = categoryIds?.some((id: string) =>
+            discount.applies_to_categories.includes(id)
+          );
+          if (!hasMatchingCategory) {
+            throw new Error("Zlavovy kod nie je platny pre kategorie vo vasom kosiku");
+          }
+        }
+
+        if (customerId && discount.max_uses_per_customer) {
+          const { count } = await supabase
+            .from("orders")
+            .select("*", { count: "exact", head: true })
+            .eq("customer_id", customerId)
+            .eq("discount_id", discount.id);
+
+          if (count && count >= discount.max_uses_per_customer) {
+            throw new Error("Tento zlavovy kod ste uz pouzili maximalne mozny pocet krat");
+          }
+        }
+
+        let discountAmount = 0;
+        if (discount.discount_type === "percentage") {
+          discountAmount = (cartTotal * discount.value) / 100;
+        } else {
+          discountAmount = Math.min(discount.value, cartTotal);
+        }
+        discountAmount = Math.round(discountAmount * 100) / 100;
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: {
+              id: discount.id,
+              code: discount.code,
+              discountType: discount.discount_type,
+              value: discount.value,
+              discountAmount,
+              minOrderValue: discount.min_order_value,
+            },
+          }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+
       case "create": {
         const {
           items,
@@ -54,6 +139,7 @@ Deno.serve(async (req: Request) => {
           shippingMethodId,
           paymentMethodId,
           customerNote,
+          discountCode,
         } = body;
 
         if (!items || items.length === 0) {
@@ -86,6 +172,8 @@ Deno.serve(async (req: Request) => {
           vat_mode: string;
           line_total: number;
         }[] = [];
+        const productIds: string[] = [];
+        const categoryIds: string[] = [];
 
         for (const item of items) {
           const { data: product } = await supabase
@@ -97,6 +185,9 @@ Deno.serve(async (req: Request) => {
           if (!product) {
             throw new Error(`Produkt ${item.productId} nebol najdeny`);
           }
+
+          productIds.push(product.id);
+          if (product.category_id) categoryIds.push(product.category_id);
 
           const quantity = item.quantity || 1;
           const priceWithVat = product.price_with_vat;
@@ -121,9 +212,48 @@ Deno.serve(async (req: Request) => {
           });
         }
 
+        const cartTotalWithVat = subtotalWithoutVat + vatTotal;
+        let discountId: string | null = null;
+        let discountCodeUsed: string | null = null;
+        let discountAmount = 0;
+
+        if (discountCode) {
+          const { data: discount } = await supabase
+            .from("discounts")
+            .select("*")
+            .eq("code", discountCode.toUpperCase())
+            .eq("is_active", true)
+            .maybeSingle();
+
+          if (discount) {
+            const now = new Date();
+            const isValid =
+              (!discount.valid_from || new Date(discount.valid_from) <= now) &&
+              (!discount.valid_until || new Date(discount.valid_until) >= now) &&
+              (!discount.max_uses || discount.current_uses < discount.max_uses) &&
+              (!discount.min_order_value || cartTotalWithVat >= discount.min_order_value);
+
+            if (isValid) {
+              if (discount.discount_type === "percentage") {
+                discountAmount = (cartTotalWithVat * discount.value) / 100;
+              } else {
+                discountAmount = Math.min(discount.value, cartTotalWithVat);
+              }
+              discountAmount = Math.round(discountAmount * 100) / 100;
+              discountId = discount.id;
+              discountCodeUsed = discount.code;
+
+              await supabase
+                .from("discounts")
+                .update({ current_uses: (discount.current_uses || 0) + 1 })
+                .eq("id", discount.id);
+            }
+          }
+        }
+
         const shippingCost = shippingMethod?.price || 0;
         const paymentFee = paymentMethod?.fee_fixed || 0;
-        const total = subtotalWithoutVat + vatTotal + shippingCost + paymentFee;
+        const total = subtotalWithoutVat + vatTotal + shippingCost + paymentFee - discountAmount;
 
         const { data: order, error: orderError } = await supabase
           .from("orders")
@@ -134,6 +264,9 @@ Deno.serve(async (req: Request) => {
             vat_total: vatTotal,
             shipping_cost: shippingCost,
             payment_fee: paymentFee,
+            discount_id: discountId,
+            discount_code: discountCodeUsed,
+            discount_amount: discountAmount,
             total,
             shipping_method_id: shippingMethodId || null,
             shipping_method_name: shippingMethod?.name_sk || null,
@@ -183,6 +316,7 @@ Deno.serve(async (req: Request) => {
               orderId: order.id,
               orderNumber: order.order_number,
               total: order.total,
+              discountAmount: order.discount_amount,
             },
           }),
           { headers: { ...corsHeaders, "Content-Type": "application/json" } }
