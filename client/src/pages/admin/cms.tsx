@@ -26,6 +26,8 @@ import {
   GripVertical,
   Layers,
   Grid3X3,
+  Tag,
+  Megaphone,
 } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
@@ -170,6 +172,8 @@ export default function AdminCMS() {
     { href: '/admin/orders', icon: ShoppingCart, label: 'Objednavky' },
     { href: '/admin/customers', icon: Users, label: 'Zakaznici' },
     { href: '/admin/invoices', icon: FileText, label: 'Faktury' },
+    { href: '/admin/discounts', icon: Tag, label: 'Kupony' },
+    { href: '/admin/marketing', icon: Megaphone, label: 'Marketing' },
     { href: '/admin/cms', icon: Palette, label: 'Obsah stranky' },
     { href: '/admin/settings', icon: Settings, label: 'Nastavenia' },
   ];

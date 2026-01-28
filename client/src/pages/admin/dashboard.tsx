@@ -21,6 +21,7 @@ import {
   Loader2,
   RefreshCw,
   Palette,
+  Megaphone,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 
@@ -291,6 +292,8 @@ export default function AdminDashboard() {
     { href: "/admin/orders", icon: ShoppingCart, label: "Objednávky" },
     { href: "/admin/customers", icon: Users, label: "Zákazníci" },
     { href: "/admin/invoices", icon: FileText, label: "Faktúry" },
+    { href: "/admin/discounts", icon: Tag, label: "Kupóny" },
+    { href: "/admin/marketing", icon: Megaphone, label: "Marketing" },
     { href: "/admin/cms", icon: Palette, label: "Obsah stránky" },
     { href: "/admin/settings", icon: Settings, label: "Nastavenia" },
   ];
