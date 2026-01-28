@@ -45,8 +45,7 @@ interface Review {
     main_image_url: string;
   };
   customer?: {
-    first_name: string;
-    last_name: string;
+    full_name: string;
     email: string;
   };
 }
@@ -96,7 +95,7 @@ export default function AdminReviews() {
         .select(`
           *,
           product:products(name_sk, slug, main_image_url),
-          customer:customers(first_name, last_name, email)
+          customer:users(full_name, email)
         `, { count: "exact" })
         .order("created_at", { ascending: false })
         .range(offset, offset + pageSize - 1);
@@ -206,8 +205,8 @@ export default function AdminReviews() {
     return (
       review.content?.toLowerCase().includes(query) ||
       review.title?.toLowerCase().includes(query) ||
-      review.product?.name_sk_sk?.toLowerCase().includes(query) ||
-      `${review.customer?.first_name} ${review.customer?.last_name}`.toLowerCase().includes(query) ||
+      review.product?.name_sk?.toLowerCase().includes(query) ||
+      review.customer?.full_name?.toLowerCase().includes(query) ||
       review.customer?.email?.toLowerCase().includes(query)
     );
   });
@@ -474,7 +473,7 @@ export default function AdminReviews() {
                           <td className="px-5 py-4">
                             <div className="text-sm">
                               <p className="text-gray-900">
-                                {review.customer?.first_name} {review.customer?.last_name}
+                                {review.customer?.full_name || "Neznamy zakaznik"}
                               </p>
                               <p className="text-gray-500 text-xs">
                                 {review.customer?.email}
@@ -654,7 +653,7 @@ export default function AdminReviews() {
                     </h4>
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <p className="font-medium text-gray-900">
-                        {selectedReview.customer?.first_name} {selectedReview.customer?.last_name}
+                        {selectedReview.customer?.full_name || "Neznamy zakaznik"}
                       </p>
                       <p className="text-sm text-gray-500">
                         {selectedReview.customer?.email}
