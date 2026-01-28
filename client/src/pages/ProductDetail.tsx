@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useCart } from "@/contexts/CartContext";
 import {
-  getProductById,
+  getProductBySlug,
   getRecommendedAccessories,
   getRelatedProducts,
   Product,
@@ -43,7 +43,7 @@ export default function ProductDetail() {
     async function loadProduct() {
       setIsLoading(true);
       setSelectedImageIndex(0);
-      const prod = await getProductById(id);
+      const prod = await getProductBySlug(id);
       setProduct(prod);
 
       if (prod) {

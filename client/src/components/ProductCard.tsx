@@ -41,7 +41,7 @@ export default function ProductCard({ product }: { product: Product }) {
           )}
         </div>
 
-        <Link href={`/product/${product.id}`}>
+        <Link href={`/product/${product.slug}`}>
           <img
             src={product.image}
             alt={product.name}
@@ -53,7 +53,7 @@ export default function ProductCard({ product }: { product: Product }) {
       {/* Content */}
       <CardContent className="p-4 flex-1 flex flex-col">
         <div className="mb-2">
-          <Link href={`/product/${product.id}`}>
+          <Link href={`/product/${product.slug}`}>
             <h3 className="font-bold text-base leading-tight text-foreground transition-colors hover:text-primary cursor-pointer line-clamp-2 min-h-[2.5rem]">
               {product.name}
             </h3>
