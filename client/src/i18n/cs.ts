@@ -199,6 +199,7 @@ export const cs: Translations = {
   languages: {
     sk: 'Slovenština',
     cs: 'Čeština',
+    pl: 'Polština',
     en: 'Angličtina',
   },
 

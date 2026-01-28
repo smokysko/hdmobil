@@ -4,11 +4,13 @@ import { useI18n, Language } from '../i18n';
 const flags: Record<Language, string> = {
   sk: '🇸🇰',
   cs: '🇨🇿',
+  pl: '🇵🇱',
 };
 
 const languageNames: Record<Language, string> = {
   sk: 'Slovenčina',
   cs: 'Čeština',
+  pl: 'Polski',
 };
 
 export function LanguageSwitcher() {

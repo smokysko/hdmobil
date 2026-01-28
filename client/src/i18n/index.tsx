@@ -1,8 +1,9 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { sk, Translations } from './sk';
 import { cs } from './cs';
+import { pl } from './pl';
 
-type Language = 'sk' | 'cs';
+type Language = 'sk' | 'cs' | 'pl';
 
 interface I18nContextType {
   language: Language;
@@ -13,6 +14,7 @@ interface I18nContextType {
 const translations: Record<Language, Translations> = {
   sk,
   cs,
+  pl,
 };
 
 const I18nContext = createContext<I18nContextType | undefined>(undefined);
@@ -23,11 +25,11 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved === 'sk' || saved === 'cs') {
+      if (saved === 'sk' || saved === 'cs' || saved === 'pl') {
         return saved;
       }
     }
-    return 'sk'; // Default to Slovak
+    return 'sk';
   });
 
   const setLanguage = (lang: Language) => {

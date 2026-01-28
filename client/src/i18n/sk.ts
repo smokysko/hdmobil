@@ -197,6 +197,7 @@ export const sk = {
   languages: {
     sk: 'Slovenčina',
     cs: 'Čeština',
+    pl: 'Poľština',
     en: 'Angličtina',
   },
 
