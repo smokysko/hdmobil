@@ -21,6 +21,8 @@ export interface DbProduct {
   is_new: boolean;
   is_bazaar: boolean;
   bazaar_condition: string | null;
+  average_rating: number | null;
+  reviews_count: number | null;
   category?: {
     id: string;
     slug: string;
@@ -65,8 +67,8 @@ function mapDbProductToProduct(db: DbProduct): Product {
     id: db.id,
     name: db.name_sk,
     price: db.original_price || db.price_with_vat,
-    rating: 4.5 + Math.random() * 0.5,
-    reviews: Math.floor(Math.random() * 300) + 50,
+    rating: db.average_rating || 0,
+    reviews: db.reviews_count || 0,
     image: mainImage,
     gallery,
     category: db.category?.name_sk || 'Uncategorized',

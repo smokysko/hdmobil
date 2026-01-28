@@ -1,9 +1,17 @@
 import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
+import ReviewForm from "@/components/ReviewForm";
+import ReviewList from "@/components/ReviewList";
+import ReviewStars from "@/components/ReviewStars";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { useCart } from "@/contexts/CartContext";
 import { useI18n } from "@/i18n";
 import {
@@ -12,8 +20,11 @@ import {
   getRelatedProducts,
   Product,
 } from "@/lib/products";
+import { useReviewStats, useUserReview } from "@/hooks/useReviews";
+import { useAuth } from "@/_core/hooks/useAuth";
 import {
   Check,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
   Minus,
@@ -32,6 +43,7 @@ export default function ProductDetail() {
   const [, params] = useRoute("/product/:id");
   const id = params?.id || "";
   const { t } = useI18n();
+  const { user } = useAuth();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [accessories, setAccessories] = useState<Product[]>([]);
@@ -40,6 +52,10 @@ export default function ProductDetail() {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
+  const [reviewFormOpen, setReviewFormOpen] = useState(false);
+
+  const { data: reviewStats } = useReviewStats(product?.id);
+  const { data: userReview } = useUserReview(product?.id, user?.id);
 
   useEffect(() => {
     async function loadProduct() {
@@ -174,15 +190,21 @@ export default function ProductDetail() {
                 <span className="text-sm font-bold uppercase tracking-widest text-primary/80">
                   {product.category}
                 </span>
-                <div className="flex items-center gap-2 text-foreground/70 bg-secondary px-3 py-1 rounded-full">
-                  <Star className="h-4 w-4 fill-current text-yellow-500" />
+                <a
+                  href="#reviews"
+                  className="flex items-center gap-2 text-foreground/70 bg-secondary px-3 py-1 rounded-full hover:bg-secondary/80 transition-colors"
+                >
+                  <ReviewStars
+                    rating={reviewStats?.average || 0}
+                    size="sm"
+                  />
                   <span className="font-bold text-foreground">
-                    {product.rating.toFixed(1)}
+                    {(reviewStats?.average || 0).toFixed(1)}
                   </span>
                   <span className="text-muted-foreground text-xs">
-                    ({product.reviews} {t.product.reviews})
+                    ({reviewStats?.count || 0} {t.product.reviews})
                   </span>
-                </div>
+                </a>
               </div>
 
               <h1 className="font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl leading-tight">
@@ -334,6 +356,65 @@ export default function ProductDetail() {
           </div>
         </section>
       )}
+
+      <section id="reviews" className="py-12 bg-secondary/30 border-t border-border">
+        <div className="container">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+            <h2 className="text-2xl font-bold tracking-tight text-foreground">
+              {t.reviews.title}
+            </h2>
+            {!userReview && (
+              <Collapsible open={reviewFormOpen} onOpenChange={setReviewFormOpen}>
+                <CollapsibleTrigger asChild>
+                  <Button variant="outline" className="gap-2">
+                    {reviewFormOpen ? t.reviews.hideForm : t.reviews.writeReview}
+                    <ChevronDown
+                      className={`h-4 w-4 transition-transform ${
+                        reviewFormOpen ? "rotate-180" : ""
+                      }`}
+                    />
+                  </Button>
+                </CollapsibleTrigger>
+              </Collapsible>
+            )}
+          </div>
+
+          {userReview && !userReview.is_approved && (
+            <div className="mb-6 p-4 rounded-lg border border-yellow-500/30 bg-yellow-500/10">
+              <p className="text-sm text-yellow-700 dark:text-yellow-400">
+                {t.reviews.yourReviewPending}
+              </p>
+            </div>
+          )}
+
+          {!userReview && (
+            <Collapsible open={reviewFormOpen} onOpenChange={setReviewFormOpen}>
+              <CollapsibleContent className="mb-8">
+                <div className="rounded-xl border border-border bg-background p-6">
+                  <ReviewForm
+                    productId={product.id}
+                    onSuccess={() => setReviewFormOpen(false)}
+                  />
+                </div>
+              </CollapsibleContent>
+            </Collapsible>
+          )}
+
+          {userReview && (
+            <div className="mb-8">
+              <h3 className="text-lg font-medium mb-4">{t.reviews.editYourReview}</h3>
+              <div className="rounded-xl border border-border bg-background p-6">
+                <ReviewForm
+                  productId={product.id}
+                  existingReview={userReview}
+                />
+              </div>
+            </div>
+          )}
+
+          <ReviewList productId={product.id} />
+        </div>
+      </section>
     </Layout>
   );
 }
