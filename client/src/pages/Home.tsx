@@ -52,7 +52,8 @@ function getLocalizedText(
 ): string {
   const langField = `${field}_${lang}`;
   const skField = `${field}_sk`;
-  return (item[langField] as string) || (item[skField] as string) || fallback;
+  const baseField = field;
+  return (item[langField] as string) || (item[skField] as string) || (item[baseField] as string) || fallback;
 }
 
 interface ContentBlock {
@@ -195,7 +196,7 @@ export default function Home() {
     };
   }, []);
 
-  const trustItems = trustBarItems.length > 0 ? trustBarItems : DEFAULT_TRUST_BAR;
+  const trustItems = DEFAULT_TRUST_BAR;
 
   const promo = useMemo(() => {
     if (!promoSection) return DEFAULT_PROMO;
