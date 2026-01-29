@@ -128,7 +128,7 @@ export default function AdminReviews() {
       }
     } catch (err) {
       console.error("Error fetching reviews:", err);
-      toast.error("Nepodarilo sa nacitat recenzie");
+      toast.error("Nepodarilo sa načítať recenzie");
     } finally {
       setLoading(false);
     }
@@ -143,14 +143,14 @@ export default function AdminReviews() {
 
       if (error) throw error;
 
-      toast.success("Recenzia bola schvalena");
+      toast.success("Recenzia bola schválená");
       fetchReviews();
       if (selectedReview?.id === reviewId) {
         setSelectedReview({ ...selectedReview, is_approved: true });
       }
     } catch (err) {
       console.error("Error approving review:", err);
-      toast.error("Nepodarilo sa schvalit recenziu");
+      toast.error("Nepodarilo sa schváliť recenziu");
     }
   }
 
@@ -163,19 +163,19 @@ export default function AdminReviews() {
 
       if (error) throw error;
 
-      toast.success("Recenzia bola zamiettnuta");
+      toast.success("Recenzia bola zamietnutá");
       fetchReviews();
       if (selectedReview?.id === reviewId) {
         setSelectedReview({ ...selectedReview, is_approved: false });
       }
     } catch (err) {
       console.error("Error rejecting review:", err);
-      toast.error("Nepodarilo sa zamietnut recenziu");
+      toast.error("Nepodarilo sa zamietnuť recenziu");
     }
   }
 
   async function deleteReview(reviewId: string) {
-    if (!confirm("Naozaj chcete vymazat tuto recenziu?")) return;
+    if (!confirm("Naozaj chcete vymazať túto recenziu?")) return;
 
     try {
       const { error } = await supabase
@@ -185,12 +185,12 @@ export default function AdminReviews() {
 
       if (error) throw error;
 
-      toast.success("Recenzia bola vymazana");
+      toast.success("Recenzia bola vymazaná");
       setSelectedReview(null);
       fetchReviews();
     } catch (err) {
       console.error("Error deleting review:", err);
-      toast.error("Nepodarilo sa vymazat recenziu");
+      toast.error("Nepodarilo sa vymazať recenziu");
     }
   }
 
@@ -212,15 +212,15 @@ export default function AdminReviews() {
   });
 
   const navItems = [
-    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehlad" },
+    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehľad" },
     { href: "/admin/products", icon: Package, label: "Produkty" },
-    { href: "/admin/orders", icon: ShoppingCart, label: "Objednavky" },
-    { href: "/admin/customers", icon: Users, label: "Zakaznici" },
+    { href: "/admin/orders", icon: ShoppingCart, label: "Objednávky" },
+    { href: "/admin/customers", icon: Users, label: "Zákazníci" },
     { href: "/admin/reviews", icon: MessageSquare, label: "Recenzie" },
-    { href: "/admin/invoices", icon: FileText, label: "Faktury" },
-    { href: "/admin/discounts", icon: Tag, label: "Kupony" },
+    { href: "/admin/invoices", icon: FileText, label: "Faktúry" },
+    { href: "/admin/discounts", icon: Tag, label: "Kupóny" },
     { href: "/admin/marketing", icon: Megaphone, label: "Marketing" },
-    { href: "/admin/cms", icon: Palette, label: "Obsah stranky" },
+    { href: "/admin/cms", icon: Palette, label: "Obsah stránky" },
     { href: "/admin/settings", icon: Settings, label: "Nastavenia" },
   ];
 
@@ -266,7 +266,7 @@ export default function AdminReviews() {
               className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobrazit web</span>
+              <span className="hidden sm:inline">Zobraziť web</span>
             </Link>
             <div className="h-6 w-px bg-gray-200"></div>
             <button
@@ -314,7 +314,7 @@ export default function AdminReviews() {
               className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
             >
               <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlasit sa</span>
+              <span>Odhlásiť sa</span>
             </button>
           </div>
         </aside>
@@ -353,7 +353,7 @@ export default function AdminReviews() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {stats.pending}
                     </p>
-                    <p className="text-sm text-gray-500">Cakajucich</p>
+                    <p className="text-sm text-gray-500">Čakajúcich</p>
                   </div>
                 </div>
               </div>
@@ -366,7 +366,7 @@ export default function AdminReviews() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {stats.approved}
                     </p>
-                    <p className="text-sm text-gray-500">Schvalenych</p>
+                    <p className="text-sm text-gray-500">Schválených</p>
                   </div>
                 </div>
               </div>
@@ -379,7 +379,7 @@ export default function AdminReviews() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {stats.averageRating.toFixed(1)}
                     </p>
-                    <p className="text-sm text-gray-500">Priemerne hodnotenie</p>
+                    <p className="text-sm text-gray-500">Priemerné hodnotenie</p>
                   </div>
                 </div>
               </div>
@@ -391,7 +391,7 @@ export default function AdminReviews() {
                   <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                   <input
                     type="text"
-                    placeholder="Hladat podla textu, produktu alebo zakaznika..."
+                    placeholder="Hľadať podľa textu, produktu alebo zákazníka..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
@@ -407,9 +407,9 @@ export default function AdminReviews() {
                     }}
                     className="px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                   >
-                    <option value="all">Vsetky stavy</option>
-                    <option value="pending">Cakajuce na schvalenie</option>
-                    <option value="approved">Schvalene</option>
+                    <option value="all">Všetky stavy</option>
+                    <option value="pending">Čakajúce na schválenie</option>
+                    <option value="approved">Schválené</option>
                   </select>
                 </div>
               </div>
@@ -429,7 +429,7 @@ export default function AdminReviews() {
                           Produkt
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Zakaznik
+                          Zákazník
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Hodnotenie
@@ -441,7 +441,7 @@ export default function AdminReviews() {
                           Stav
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Datum
+                          Dátum
                         </th>
                         <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Akcie
@@ -465,7 +465,7 @@ export default function AdminReviews() {
                               )}
                               <div className="max-w-[200px]">
                                 <p className="text-sm font-medium text-gray-900 truncate">
-                                  {review.product?.name_sk || "Neznamy produkt"}
+                                  {review.product?.name_sk || "Neznámy produkt"}
                                 </p>
                               </div>
                             </div>
@@ -473,7 +473,7 @@ export default function AdminReviews() {
                           <td className="px-5 py-4">
                             <div className="text-sm">
                               <p className="text-gray-900">
-                                {review.customer?.full_name || "Neznamy zakaznik"}
+                                {review.customer?.full_name || "Neznámy zákazník"}
                               </p>
                               <p className="text-gray-500 text-xs">
                                 {review.customer?.email}
@@ -506,12 +506,12 @@ export default function AdminReviews() {
                               {review.is_approved ? (
                                 <>
                                   <Check className="w-3 h-3" />
-                                  Schvalena
+                                  Schválená
                                 </>
                               ) : (
                                 <>
                                   <MessageSquare className="w-3 h-3" />
-                                  Caka
+                                  Čaká
                                 </>
                               )}
                             </span>
@@ -524,7 +524,7 @@ export default function AdminReviews() {
                               <button
                                 onClick={() => setSelectedReview(review)}
                                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                                title="Zobrazit detail"
+                                title="Zobraziť detail"
                               >
                                 <Eye className="w-4 h-4" />
                               </button>
@@ -532,7 +532,7 @@ export default function AdminReviews() {
                                 <button
                                   onClick={() => approveReview(review.id)}
                                   className="p-2 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-lg transition-colors"
-                                  title="Schvalit"
+                                  title="Schváliť"
                                 >
                                   <Check className="w-4 h-4" />
                                 </button>
@@ -541,7 +541,7 @@ export default function AdminReviews() {
                                 <button
                                   onClick={() => rejectReview(review.id)}
                                   className="p-2 text-amber-500 hover:text-amber-700 hover:bg-amber-50 rounded-lg transition-colors"
-                                  title="Zrusit schvalenie"
+                                  title="Zrušiť schválenie"
                                 >
                                   <X className="w-4 h-4" />
                                 </button>
@@ -549,7 +549,7 @@ export default function AdminReviews() {
                               <button
                                 onClick={() => deleteReview(review.id)}
                                 className="p-2 text-red-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                title="Vymazat"
+                                title="Vymazať"
                               >
                                 <Trash2 className="w-4 h-4" />
                               </button>
@@ -563,7 +563,7 @@ export default function AdminReviews() {
                             colSpan={7}
                             className="px-5 py-12 text-center text-gray-500"
                           >
-                            Ziadne recenzie
+                            Žiadne recenzie
                           </td>
                         </tr>
                       )}
@@ -574,13 +574,13 @@ export default function AdminReviews() {
 
               <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
                 <p className="text-sm text-gray-500">
-                  Zobrazenych{" "}
+                  Zobrazených{" "}
                   <span className="font-medium text-gray-700">
                     {filteredReviews.length}
                   </span>{" "}
                   z{" "}
                   <span className="font-medium text-gray-700">{totalCount}</span>{" "}
-                  recenzii
+                  recenzií
                 </p>
                 {totalPages > 1 && (
                   <div className="flex items-center gap-2">
@@ -641,7 +641,7 @@ export default function AdminReviews() {
                           href={`/product/${selectedReview.product?.slug}`}
                           className="text-sm text-blue-600 hover:text-blue-700"
                         >
-                          Zobrazit produkt
+                          Zobraziť produkt
                         </Link>
                       </div>
                     </div>
@@ -649,11 +649,11 @@ export default function AdminReviews() {
 
                   <div>
                     <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                      Zakaznik
+                      Zákazník
                     </h4>
                     <div className="p-4 bg-gray-50 rounded-lg">
                       <p className="font-medium text-gray-900">
-                        {selectedReview.customer?.full_name || "Neznamy zakaznik"}
+                        {selectedReview.customer?.full_name || "Neznámy zákazník"}
                       </p>
                       <p className="text-sm text-gray-500">
                         {selectedReview.customer?.email}
@@ -662,7 +662,7 @@ export default function AdminReviews() {
                         {selectedReview.is_verified_purchase && (
                           <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-emerald-50 text-emerald-700 text-xs font-medium rounded">
                             <Check className="w-3 h-3" />
-                            Overeny nakup
+                            Overený nákup
                           </span>
                         )}
                       </div>
@@ -690,9 +690,9 @@ export default function AdminReviews() {
                       {selectedReview.content}
                     </p>
                     <p className="text-xs text-gray-500">
-                      Vytvorena: {new Date(selectedReview.created_at).toLocaleString("sk-SK")}
+                      Vytvorená: {new Date(selectedReview.created_at).toLocaleString("sk-SK")}
                       {selectedReview.updated_at !== selectedReview.created_at && (
-                        <> | Upravena: {new Date(selectedReview.updated_at).toLocaleString("sk-SK")}</>
+                        <> | Upravená: {new Date(selectedReview.updated_at).toLocaleString("sk-SK")}</>
                       )}
                     </p>
                   </div>
@@ -710,12 +710,12 @@ export default function AdminReviews() {
                       {selectedReview.is_approved ? (
                         <>
                           <Check className="w-4 h-4" />
-                          Schvalena
+                          Schválená
                         </>
                       ) : (
                         <>
                           <MessageSquare className="w-4 h-4" />
-                          Caka na schvalenie
+                          Čaká na schválenie
                         </>
                       )}
                     </span>
@@ -727,7 +727,7 @@ export default function AdminReviews() {
                         className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors"
                       >
                         <Check className="w-4 h-4" />
-                        Schvalit recenziu
+                        Schváliť recenziu
                       </button>
                     ) : (
                       <button
@@ -735,7 +735,7 @@ export default function AdminReviews() {
                         className="inline-flex items-center gap-2 px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition-colors"
                       >
                         <X className="w-4 h-4" />
-                        Zrusit schvalenie
+                        Zrušiť schválenie
                       </button>
                     )}
                     <button
@@ -743,7 +743,7 @@ export default function AdminReviews() {
                       className="inline-flex items-center gap-2 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
                     >
                       <Trash2 className="w-4 h-4" />
-                      Vymazat
+                      Vymazať
                     </button>
                   </div>
                 </div>
