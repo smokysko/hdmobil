@@ -26,7 +26,6 @@ import AdminCMS from "./pages/admin/cms";
 import AdminDiscounts from "./pages/admin/discounts";
 import AdminMarketing from "./pages/admin/marketing";
 import AdminReviews from "./pages/admin/reviews";
-import AdminNewsletter from "./pages/admin/newsletter";
 import CustomerLogin from "./pages/auth/login";
 import CustomerRegister from "./pages/auth/register";
 import AccountPage from "./pages/account/index";
@@ -34,11 +33,6 @@ import OrdersPage from "./pages/account/orders";
 import Search from "./pages/Search";
 import Wishlist from "./pages/Wishlist";
 import Preloader from "./components/Preloader";
-import CookieConsent from "./components/CookieConsent";
-import PrivacyPage from "./pages/legal/PrivacyPage";
-import CookiesPage from "./pages/legal/CookiesPage";
-import TermsPage from "./pages/legal/TermsPage";
-import UnsubscribePage from "./pages/legal/UnsubscribePage";
 import { useState } from "react";
 
 function Router() {
@@ -74,12 +68,6 @@ function Router() {
       <Route path="/admin/discounts" component={AdminDiscounts} />
       <Route path="/admin/marketing" component={AdminMarketing} />
       <Route path="/admin/reviews" component={AdminReviews} />
-      <Route path="/admin/newsletter" component={AdminNewsletter} />
-      {/* Legal pages */}
-      <Route path="/ochrana-sukromia" component={PrivacyPage} />
-      <Route path="/cookies" component={CookiesPage} />
-      <Route path="/obchodne-podmienky" component={TermsPage} />
-      <Route path="/odhlasit-newsletter" component={UnsubscribePage} />
       <Route component={NotFound} />
     </Switch>
   );
@@ -115,7 +103,6 @@ function App() {
               />
               <div className={`transition-opacity duration-500 ${isPreloaded ? 'opacity-100' : 'opacity-0'}`}>
                 <Router />
-                <CookieConsent />
               </div>
             </TooltipProvider>
             </WishlistProvider>
