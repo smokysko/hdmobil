@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useI18n } from '@/i18n'
 import { supabase } from '@/lib/supabase'
-import Layout from '@/components/Layout'
+import DashboardLayout from '@/components/DashboardLayout'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Users, CheckCircle, TrendingUp, Download, Search, Filter } from 'lucide-react'
@@ -18,7 +18,7 @@ type Subscriber = {
 
 type FilterType = 'all' | 'active' | 'used_coupon'
 
-export default function AdminNewsletterPage() {
+export default function AdminNewsletter() {
   const { t } = useI18n()
   const [subscribers, setSubscribers] = useState<Subscriber[]>([])
   const [loading, setLoading] = useState(true)
@@ -95,15 +95,15 @@ export default function AdminNewsletterPage() {
     : '0'
 
   return (
-    <Layout>
-      <div className="container py-8">
+    <DashboardLayout>
+      <div className="p-6">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-foreground">
-            {t.admin.newsletter.title}
+            {t.adminNewsletter.title}
           </h1>
           <Button onClick={exportCsv} className="gap-2">
             <Download className="w-4 h-4" />
-            {t.admin.newsletter.exportCsv}
+            {t.adminNewsletter.exportCsv}
           </Button>
         </div>
 
@@ -115,7 +115,7 @@ export default function AdminNewsletterPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">
-                  {t.admin.newsletter.totalSubscribers}
+                  {t.adminNewsletter.totalSubscribers}
                 </p>
                 <p className="text-2xl font-bold text-foreground">{stats.total}</p>
               </div>
@@ -129,7 +129,7 @@ export default function AdminNewsletterPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">
-                  {t.admin.newsletter.activeSubscribers}
+                  {t.adminNewsletter.activeSubscribers}
                 </p>
                 <p className="text-2xl font-bold text-foreground">{stats.active}</p>
               </div>
@@ -143,7 +143,7 @@ export default function AdminNewsletterPage() {
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">
-                  {t.admin.newsletter.couponsUsed}
+                  {t.adminNewsletter.couponsUsed}
                 </p>
                 <p className="text-2xl font-bold text-foreground">{stats.usedCoupons}</p>
               </div>
@@ -152,12 +152,12 @@ export default function AdminNewsletterPage() {
 
           <div className="bg-white border border-border rounded-lg p-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-violet-100 rounded-full flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-violet-600" />
+              <div className="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center">
+                <TrendingUp className="w-5 h-5 text-blue-600" />
               </div>
               <div>
                 <p className="text-sm text-muted-foreground">
-                  {t.admin.newsletter.conversionRate}
+                  {t.adminNewsletter.conversionRate}
                 </p>
                 <p className="text-2xl font-bold text-foreground">{conversionRate}%</p>
               </div>
@@ -183,9 +183,9 @@ export default function AdminNewsletterPage() {
                 onChange={(e) => setFilter(e.target.value as FilterType)}
                 className="h-10 px-3 rounded-md border border-input bg-background text-sm"
               >
-                <option value="all">{t.admin.newsletter.filterAll}</option>
-                <option value="active">{t.admin.newsletter.filterActive}</option>
-                <option value="used_coupon">{t.admin.newsletter.filterUsedCoupon}</option>
+                <option value="all">{t.adminNewsletter.filterAll}</option>
+                <option value="active">{t.adminNewsletter.filterActive}</option>
+                <option value="used_coupon">{t.adminNewsletter.filterUsedCoupon}</option>
               </select>
             </div>
           </div>
@@ -196,7 +196,7 @@ export default function AdminNewsletterPage() {
             </div>
           ) : filteredSubscribers.length === 0 ? (
             <div className="p-8 text-center text-muted-foreground">
-              {t.admin.newsletter.noSubscribers}
+              {t.adminNewsletter.noSubscribers}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -204,19 +204,19 @@ export default function AdminNewsletterPage() {
                 <thead>
                   <tr className="border-b border-border bg-muted/50">
                     <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                      {t.admin.newsletter.email}
+                      {t.adminNewsletter.email}
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                      {t.admin.newsletter.subscribedAt}
+                      {t.adminNewsletter.subscribedAt}
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                      {t.admin.newsletter.discountCode}
+                      {t.adminNewsletter.discountCode}
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                      {t.admin.newsletter.discountUsed}
+                      {t.adminNewsletter.discountUsed}
                     </th>
                     <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
-                      {t.admin.newsletter.status}
+                      {t.adminNewsletter.status}
                     </th>
                   </tr>
                 </thead>
@@ -246,11 +246,11 @@ export default function AdminNewsletterPage() {
                       <td className="px-4 py-3">
                         {sub.is_active ? (
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-700">
-                            {t.admin.newsletter.active}
+                            {t.adminNewsletter.active}
                           </span>
                         ) : (
                           <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-muted text-muted-foreground">
-                            {t.admin.newsletter.inactive}
+                            {t.adminNewsletter.inactive}
                           </span>
                         )}
                       </td>
@@ -262,6 +262,6 @@ export default function AdminNewsletterPage() {
           )}
         </div>
       </div>
-    </Layout>
+    </DashboardLayout>
   )
 }

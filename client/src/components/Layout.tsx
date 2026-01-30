@@ -20,6 +20,7 @@ import {
 import CollapsibleMenu from "./CollapsibleMenu";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import UserProfileDropdown from "./UserProfileDropdown";
+import NewsletterForm from "./NewsletterForm";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -300,11 +301,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             <div>
               <h3 className="font-bold text-lg mb-6 text-background">{t.footer.customerService}</h3>
               <ul className="space-y-3 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-primary cursor-pointer transition-colors">{t.footer.myAccount}</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">{t.footer.orderStatus}</a></li>
+                <li><Link href="/moj-ucet"><span className="hover:text-primary cursor-pointer transition-colors">{t.footer.myAccount}</span></Link></li>
+                <li><Link href="/moje-objednavky"><span className="hover:text-primary transition-colors cursor-pointer">{t.footer.orderStatus}</span></Link></li>
                 <li><a href="#" className="hover:text-primary transition-colors">{t.footer.returns}</a></li>
                 <li><a href="#" className="hover:text-primary transition-colors">{t.footer.shipping}</a></li>
-                <li><a href="#" className="hover:text-primary transition-colors">{t.footer.terms}</a></li>
+                <li><Link href="/obchodne-podmienky"><span className="hover:text-primary transition-colors cursor-pointer">{t.footer.terms}</span></Link></li>
               </ul>
             </div>
 
@@ -330,11 +331,17 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             </div>
           </div>
 
+          <div className="mb-12">
+            <div className="max-w-md">
+              <NewsletterForm />
+            </div>
+          </div>
+
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
             <p>&copy; 2026 HDmobil. {t.footer.allRightsReserved}.</p>
             <div className="flex gap-4">
-              <span>{t.footer.privacy}</span>
-              <span>{t.footer.cookies}</span>
+              <Link href="/ochrana-sukromia"><span className="hover:text-primary cursor-pointer transition-colors">{t.footer.privacy}</span></Link>
+              <Link href="/cookies"><span className="hover:text-primary cursor-pointer transition-colors">{t.footer.cookies}</span></Link>
             </div>
           </div>
         </div>
