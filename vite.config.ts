@@ -14,4 +14,16 @@ export default defineConfig({
   build: {
     outDir: '../dist',
   },
+  optimizeDeps: {
+    include: [
+      '@tanstack/react-query',
+      'sonner',
+      '@hookform/resolvers/zod',
+      '@radix-ui/react-tooltip',
+      '@radix-ui/react-separator',
+      '@radix-ui/react-select',
+      '@radix-ui/react-radio-group',
+      'next-themes',
+    ],
+  },
 })
