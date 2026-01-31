@@ -44,85 +44,125 @@ Deno.serve(async (req: Request) => {
         const { code, cartTotal, productIds, categoryIds } = body;
         if (!code) throw new Error("Zlavovy kod je povinny");
 
+        const normalizedCode = code.toUpperCase().trim();
+
         const { data: discount } = await supabase
           .from("discounts")
           .select("*")
-          .eq("code", code.toUpperCase())
+          .eq("code", normalizedCode)
           .eq("is_active", true)
           .maybeSingle();
 
-        if (!discount) {
-          throw new Error("Neplatny zlavovy kod");
-        }
+        if (discount) {
+          const now = new Date();
+          if (discount.valid_from && new Date(discount.valid_from) > now) {
+            throw new Error("Zlavovy kod este nie je platny");
+          }
+          if (discount.valid_until && new Date(discount.valid_until) < now) {
+            throw new Error("Zlavovy kod uz exspiroval");
+          }
 
-        const now = new Date();
-        if (discount.valid_from && new Date(discount.valid_from) > now) {
-          throw new Error("Zlavovy kod este nie je platny");
-        }
-        if (discount.valid_until && new Date(discount.valid_until) < now) {
-          throw new Error("Zlavovy kod uz exspiroval");
-        }
+          if (discount.max_uses && discount.current_uses >= discount.max_uses) {
+            throw new Error("Zlavovy kod bol uz vycerpany");
+          }
 
-        if (discount.max_uses && discount.current_uses >= discount.max_uses) {
-          throw new Error("Zlavovy kod bol uz vycerpany");
-        }
+          if (discount.min_order_value && cartTotal < discount.min_order_value) {
+            throw new Error(`Minimalna hodnota objednavky pre tento kod je ${discount.min_order_value} EUR`);
+          }
 
-        if (discount.min_order_value && cartTotal < discount.min_order_value) {
-          throw new Error(`Minimalna hodnota objednavky pre tento kod je ${discount.min_order_value} EUR`);
-        }
+          if (discount.applies_to_products && discount.applies_to_products.length > 0) {
+            const hasMatchingProduct = productIds?.some((id: string) =>
+              discount.applies_to_products.includes(id)
+            );
+            if (!hasMatchingProduct) {
+              throw new Error("Zlavovy kod nie je platny pre produkty vo vasom kosiku");
+            }
+          }
 
-        if (discount.applies_to_products && discount.applies_to_products.length > 0) {
-          const hasMatchingProduct = productIds?.some((id: string) =>
-            discount.applies_to_products.includes(id)
+          if (discount.applies_to_categories && discount.applies_to_categories.length > 0) {
+            const hasMatchingCategory = categoryIds?.some((id: string) =>
+              discount.applies_to_categories.includes(id)
+            );
+            if (!hasMatchingCategory) {
+              throw new Error("Zlavovy kod nie je platny pre kategorie vo vasom kosiku");
+            }
+          }
+
+          if (customerId && discount.max_uses_per_customer) {
+            const { count } = await supabase
+              .from("orders")
+              .select("*", { count: "exact", head: true })
+              .eq("customer_id", customerId)
+              .eq("discount_id", discount.id);
+
+            if (count && count >= discount.max_uses_per_customer) {
+              throw new Error("Tento zlavovy kod ste uz pouzili maximalne mozny pocet krat");
+            }
+          }
+
+          let discountAmount = 0;
+          if (discount.discount_type === "percentage") {
+            discountAmount = (cartTotal * discount.value) / 100;
+          } else {
+            discountAmount = Math.min(discount.value, cartTotal);
+          }
+          discountAmount = Math.round(discountAmount * 100) / 100;
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              data: {
+                id: discount.id,
+                code: discount.code,
+                discountType: discount.discount_type,
+                value: discount.value,
+                discountAmount,
+                minOrderValue: discount.min_order_value,
+                source: "discounts",
+              },
+            }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
-          if (!hasMatchingProduct) {
-            throw new Error("Zlavovy kod nie je platny pre produkty vo vasom kosiku");
-          }
         }
 
-        if (discount.applies_to_categories && discount.applies_to_categories.length > 0) {
-          const hasMatchingCategory = categoryIds?.some((id: string) =>
-            discount.applies_to_categories.includes(id)
+        const { data: newsletterSubscriber } = await supabase
+          .from("newsletter_subscribers")
+          .select("*")
+          .eq("discount_code", normalizedCode)
+          .eq("is_active", true)
+          .maybeSingle();
+
+        if (newsletterSubscriber) {
+          if (newsletterSubscriber.discount_used) {
+            throw new Error("Tento zlavovy kod bol uz pouzity");
+          }
+
+          const now = new Date();
+          if (newsletterSubscriber.discount_expires_at && new Date(newsletterSubscriber.discount_expires_at) < now) {
+            throw new Error("Zlavovy kod uz exspiroval");
+          }
+
+          const discountValue = 5;
+          const discountAmount = Math.round((cartTotal * discountValue) / 100 * 100) / 100;
+
+          return new Response(
+            JSON.stringify({
+              success: true,
+              data: {
+                id: newsletterSubscriber.id,
+                code: newsletterSubscriber.discount_code,
+                discountType: "percentage",
+                value: discountValue,
+                discountAmount,
+                minOrderValue: null,
+                source: "newsletter",
+              },
+            }),
+            { headers: { ...corsHeaders, "Content-Type": "application/json" } }
           );
-          if (!hasMatchingCategory) {
-            throw new Error("Zlavovy kod nie je platny pre kategorie vo vasom kosiku");
-          }
         }
 
-        if (customerId && discount.max_uses_per_customer) {
-          const { count } = await supabase
-            .from("orders")
-            .select("*", { count: "exact", head: true })
-            .eq("customer_id", customerId)
-            .eq("discount_id", discount.id);
-
-          if (count && count >= discount.max_uses_per_customer) {
-            throw new Error("Tento zlavovy kod ste uz pouzili maximalne mozny pocet krat");
-          }
-        }
-
-        let discountAmount = 0;
-        if (discount.discount_type === "percentage") {
-          discountAmount = (cartTotal * discount.value) / 100;
-        } else {
-          discountAmount = Math.min(discount.value, cartTotal);
-        }
-        discountAmount = Math.round(discountAmount * 100) / 100;
-
-        return new Response(
-          JSON.stringify({
-            success: true,
-            data: {
-              id: discount.id,
-              code: discount.code,
-              discountType: discount.discount_type,
-              value: discount.value,
-              discountAmount,
-              minOrderValue: discount.min_order_value,
-            },
-          }),
-          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        throw new Error("Neplatny zlavovy kod");
       }
 
       case "create": {
@@ -217,11 +257,15 @@ Deno.serve(async (req: Request) => {
         let discountCodeUsed: string | null = null;
         let discountAmount = 0;
 
+        let newsletterSubscriberId: string | null = null;
+
         if (discountCode) {
+          const normalizedDiscountCode = discountCode.toUpperCase().trim();
+
           const { data: discount } = await supabase
             .from("discounts")
             .select("*")
-            .eq("code", discountCode.toUpperCase())
+            .eq("code", normalizedDiscountCode)
             .eq("is_active", true)
             .maybeSingle();
 
@@ -247,6 +291,27 @@ Deno.serve(async (req: Request) => {
                 .from("discounts")
                 .update({ current_uses: (discount.current_uses || 0) + 1 })
                 .eq("id", discount.id);
+            }
+          } else {
+            const { data: newsletterSubscriber } = await supabase
+              .from("newsletter_subscribers")
+              .select("*")
+              .eq("discount_code", normalizedDiscountCode)
+              .eq("is_active", true)
+              .eq("discount_used", false)
+              .maybeSingle();
+
+            if (newsletterSubscriber) {
+              const now = new Date();
+              const isValid = !newsletterSubscriber.discount_expires_at ||
+                new Date(newsletterSubscriber.discount_expires_at) >= now;
+
+              if (isValid) {
+                const discountValue = 5;
+                discountAmount = Math.round((cartTotalWithVat * discountValue) / 100 * 100) / 100;
+                discountCodeUsed = newsletterSubscriber.discount_code;
+                newsletterSubscriberId = newsletterSubscriber.id;
+              }
             }
           }
         }
@@ -306,6 +371,16 @@ Deno.serve(async (req: Request) => {
         if (itemsError) {
           await supabase.from("orders").delete().eq("id", order.id);
           throw new Error("Nepodarilo sa ulozit polozky objednavky");
+        }
+
+        if (newsletterSubscriberId) {
+          await supabase
+            .from("newsletter_subscribers")
+            .update({
+              discount_used: true,
+              discount_used_at: new Date().toISOString(),
+            })
+            .eq("id", newsletterSubscriberId);
         }
 
         return new Response(

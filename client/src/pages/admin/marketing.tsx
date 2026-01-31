@@ -20,7 +20,6 @@ import {
   Plus,
   X,
   Loader2,
-  CheckCircle,
   Clock,
   Users2,
   Percent,
@@ -29,13 +28,31 @@ import {
   Target,
   BarChart3,
   MessageSquare,
+  Download,
+  Check,
+  XCircle,
+  Ticket,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import { toast } from "sonner";
 
 interface NewsletterStats {
   totalSubscribers: number;
+  activeSubscribers: number;
   newThisMonth: number;
+  usedDiscounts: number;
+}
+
+interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  language: string;
+  discount_code: string | null;
+  discount_used: boolean;
+  discount_expires_at: string | null;
+  is_active: boolean;
+  subscribed_at: string;
+  created_at: string;
 }
 
 interface CustomerSegment {
@@ -50,8 +67,12 @@ export default function AdminMarketing() {
   const [loading, setLoading] = useState(true);
   const [newsletterStats, setNewsletterStats] = useState<NewsletterStats>({
     totalSubscribers: 0,
+    activeSubscribers: 0,
     newThisMonth: 0,
+    usedDiscounts: 0,
   });
+  const [subscribers, setSubscribers] = useState<NewsletterSubscriber[]>([]);
+  const [showSubscribers, setShowSubscribers] = useState(false);
   const [showCampaignModal, setShowCampaignModal] = useState(false);
   const [campaignType, setCampaignType] = useState<"email" | "notification">("email");
   const [campaignData, setCampaignData] = useState({
@@ -89,21 +110,31 @@ export default function AdminMarketing() {
   async function fetchStats() {
     setLoading(true);
     try {
-      const { data: customers } = await supabase
-        .from("customers")
-        .select("newsletter_subscribed, created_at");
+      const { data: newsletterData } = await supabase
+        .from("newsletter_subscribers")
+        .select("*")
+        .order("created_at", { ascending: false });
 
-      if (customers) {
+      if (newsletterData) {
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
+        setSubscribers(newsletterData);
         setNewsletterStats({
-          totalSubscribers: customers.filter((c) => c.newsletter_subscribed).length,
-          newThisMonth: customers.filter(
-            (c) => c.newsletter_subscribed && new Date(c.created_at) >= startOfMonth
+          totalSubscribers: newsletterData.length,
+          activeSubscribers: newsletterData.filter((s) => s.is_active).length,
+          newThisMonth: newsletterData.filter(
+            (s) => new Date(s.created_at) >= startOfMonth
           ).length,
+          usedDiscounts: newsletterData.filter((s) => s.discount_used).length,
         });
+      }
 
+      const { data: customers } = await supabase
+        .from("customers")
+        .select("id", { count: "exact" });
+
+      if (customers) {
         customerSegments[0].count = customers.length;
       }
     } catch (err) {
@@ -111,6 +142,33 @@ export default function AdminMarketing() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function exportToCSV() {
+    if (subscribers.length === 0) {
+      toast.error("Ziadni odberatelia na export");
+      return;
+    }
+
+    const headers = ["Email", "Jazyk", "Zlavovy kod", "Kod pouzity", "Aktivny", "Datum prihlasenia"];
+    const rows = subscribers.map((s) => [
+      s.email,
+      s.language,
+      s.discount_code || "",
+      s.discount_used ? "Ano" : "Nie",
+      s.is_active ? "Ano" : "Nie",
+      new Date(s.subscribed_at || s.created_at).toLocaleDateString("sk-SK"),
+    ]);
+
+    const csvContent = [headers, ...rows].map((row) => row.join(";")).join("\n");
+    const blob = new Blob(["\ufeff" + csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `newsletter_odberatelia_${new Date().toISOString().split("T")[0]}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("Export uspesny");
   }
 
   async function sendCampaign() {
@@ -311,45 +369,172 @@ export default function AdminMarketing() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {newsletterStats.totalSubscribers}
                     </p>
-                    <p className="text-sm text-gray-500">Newsletter odbratelia</p>
+                    <p className="text-sm text-gray-500">Celkom odberatelov</p>
                   </div>
                 </div>
               </div>
               <div className="bg-white rounded-xl border border-gray-200/80 p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                    <TrendingUp className="w-5 h-5 text-blue-600" strokeWidth={1.5} />
+                    <Check className="w-5 h-5 text-blue-600" strokeWidth={1.5} />
                   </div>
                   <div>
                     <p className="text-2xl font-semibold text-gray-900">
-                      +{newsletterStats.newThisMonth}
+                      {newsletterStats.activeSubscribers}
                     </p>
-                    <p className="text-sm text-gray-500">Nových tento mesiac</p>
+                    <p className="text-sm text-gray-500">Aktivnych</p>
                   </div>
                 </div>
               </div>
               <div className="bg-white rounded-xl border border-gray-200/80 p-4">
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-violet-50 flex items-center justify-center">
-                    <Send className="w-5 h-5 text-violet-600" strokeWidth={1.5} />
+                  <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-emerald-600" strokeWidth={1.5} />
                   </div>
                   <div>
-                    <p className="text-2xl font-semibold text-gray-900">0</p>
-                    <p className="text-sm text-gray-500">Odoslané kampane</p>
+                    <p className="text-2xl font-semibold text-gray-900">
+                      +{newsletterStats.newThisMonth}
+                    </p>
+                    <p className="text-sm text-gray-500">Novych tento mesiac</p>
                   </div>
                 </div>
               </div>
               <div className="bg-white rounded-xl border border-gray-200/80 p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
-                    <BarChart3 className="w-5 h-5 text-amber-600" strokeWidth={1.5} />
+                    <Ticket className="w-5 h-5 text-amber-600" strokeWidth={1.5} />
                   </div>
                   <div>
-                    <p className="text-2xl font-semibold text-gray-900">0%</p>
-                    <p className="text-sm text-gray-500">Priem. otvorenie</p>
+                    <p className="text-2xl font-semibold text-gray-900">
+                      {newsletterStats.usedDiscounts}
+                    </p>
+                    <p className="text-sm text-gray-500">Pouzitych kodov</p>
                   </div>
                 </div>
               </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200/80 overflow-hidden">
+              <div className="p-5 border-b border-gray-100">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-green-600" strokeWidth={1.5} />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Newsletter odberatelia</h3>
+                      <p className="text-sm text-gray-500">Zoznam vsetkych prihlasenych emailov</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={exportToCSV}
+                      className="flex items-center gap-2 px-3 py-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors text-sm"
+                    >
+                      <Download className="w-4 h-4" />
+                      Export CSV
+                    </button>
+                    <button
+                      onClick={() => setShowSubscribers(!showSubscribers)}
+                      className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
+                    >
+                      {showSubscribers ? "Skryt zoznam" : "Zobrazit zoznam"}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+              {showSubscribers && (
+                <div className="overflow-x-auto">
+                  {subscribers.length === 0 ? (
+                    <div className="p-12 text-center">
+                      <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                        <Mail className="w-8 h-8 text-gray-400" />
+                      </div>
+                      <p className="text-gray-500 font-medium">Zatial ziadni odberatelia</p>
+                    </div>
+                  ) : (
+                    <table className="w-full">
+                      <thead className="bg-gray-50 border-b border-gray-100">
+                        <tr>
+                          <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Email
+                          </th>
+                          <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Jazyk
+                          </th>
+                          <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Zlavovy kod
+                          </th>
+                          <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Stav kodu
+                          </th>
+                          <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Status
+                          </th>
+                          <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                            Datum
+                          </th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {subscribers.map((subscriber) => (
+                          <tr key={subscriber.id} className="hover:bg-gray-50/50">
+                            <td className="px-5 py-4 text-sm text-gray-900">{subscriber.email}</td>
+                            <td className="px-5 py-4 text-sm text-gray-600 uppercase">
+                              {subscriber.language}
+                            </td>
+                            <td className="px-5 py-4">
+                              {subscriber.discount_code ? (
+                                <code className="text-xs bg-gray-100 px-2 py-1 rounded font-mono">
+                                  {subscriber.discount_code}
+                                </code>
+                              ) : (
+                                <span className="text-gray-400">-</span>
+                              )}
+                            </td>
+                            <td className="px-5 py-4">
+                              {subscriber.discount_used ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                                  <Check className="w-3 h-3" />
+                                  Pouzity
+                                </span>
+                              ) : subscriber.discount_expires_at &&
+                                new Date(subscriber.discount_expires_at) < new Date() ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
+                                  <Clock className="w-3 h-3" />
+                                  Expirovany
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                                  <Clock className="w-3 h-3" />
+                                  Aktivny
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-5 py-4">
+                              {subscriber.is_active ? (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                                  <Check className="w-3 h-3" />
+                                  Aktivny
+                                </span>
+                              ) : (
+                                <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700">
+                                  <XCircle className="w-3 h-3" />
+                                  Odhlaseny
+                                </span>
+                              )}
+                            </td>
+                            <td className="px-5 py-4 text-sm text-gray-600">
+                              {new Date(subscriber.subscribed_at || subscriber.created_at).toLocaleDateString("sk-SK")}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="grid grid-cols-4 gap-4">

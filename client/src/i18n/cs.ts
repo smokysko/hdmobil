@@ -458,4 +458,16 @@ export const cs: Translations = {
     alreadySubscribed: 'Tento email je již přihlášen k odběru.',
     subscribeError: 'Nastala chyba. Zkuste to prosím znovu.',
   },
+
+  unsubscribe: {
+    processing: 'Zpracovávám...',
+    pleaseWait: 'Počkejte prosím, odhlašujeme vás z odběru.',
+    successTitle: 'Úspěšně odhlášen',
+    successMessage: 'Byli jste úspěšně odhlášeni z odběru newsletteru.',
+    errorTitle: 'Nastala chyba',
+    errorMessage: 'Nepodařilo se vás odhlásit z odběru. Zkuste to prosím později.',
+    invalidTitle: 'Neplatný odkaz',
+    invalidMessage: 'Tento odkaz na odhlášení je neplatný nebo již byl použit.',
+    backToShop: 'Zpět do obchodu',
+  },
 };

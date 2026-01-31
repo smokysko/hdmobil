@@ -456,6 +456,18 @@ export const sk = {
     alreadySubscribed: 'Tento email je už prihlásený na odber.',
     subscribeError: 'Nastala chyba. Skúste to prosím znova.',
   },
+
+  unsubscribe: {
+    processing: 'Spracovávam...',
+    pleaseWait: 'Počkajte prosím, odhlasujeme vás z odberu.',
+    successTitle: 'Úspešne odhlásený',
+    successMessage: 'Boli ste úspešne odhlásený z odberu newslettera.',
+    errorTitle: 'Nastala chyba',
+    errorMessage: 'Nepodarilo sa vás odhlásiť z odberu. Skúste to prosím neskôr.',
+    invalidTitle: 'Neplatný odkaz',
+    invalidMessage: 'Tento odkaz na odhlásenie je neplatný alebo už bol použitý.',
+    backToShop: 'Späť do obchodu',
+  },
 };
 
 export type Translations = typeof sk;

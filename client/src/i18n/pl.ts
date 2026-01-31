@@ -458,4 +458,16 @@ export const pl: Translations = {
     alreadySubscribed: 'Ten email jest już zapisany do newslettera.',
     subscribeError: 'Wystąpił błąd. Spróbuj ponownie.',
   },
+
+  unsubscribe: {
+    processing: 'Przetwarzam...',
+    pleaseWait: 'Proszę czekać, wypisujemy Cię z newslettera.',
+    successTitle: 'Pomyślnie wypisany',
+    successMessage: 'Zostałeś pomyślnie wypisany z newslettera.',
+    errorTitle: 'Wystąpił błąd',
+    errorMessage: 'Nie udało się Cię wypisać z newslettera. Spróbuj ponownie później.',
+    invalidTitle: 'Nieprawidłowy link',
+    invalidMessage: 'Ten link do wypisania jest nieprawidłowy lub został już użyty.',
+    backToShop: 'Wróć do sklepu',
+  },
 };

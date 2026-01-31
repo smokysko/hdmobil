@@ -32,6 +32,7 @@ import AccountPage from "./pages/account/index";
 import OrdersPage from "./pages/account/orders";
 import Search from "./pages/Search";
 import Wishlist from "./pages/Wishlist";
+import Unsubscribe from "./pages/Unsubscribe";
 import Preloader from "./components/Preloader";
 import { useState } from "react";
 
@@ -47,6 +48,8 @@ function Router() {
       <Route path="/success" component={Success} />
       <Route path="/vyhladavanie" component={Search} />
       <Route path="/oblubene" component={Wishlist} />
+      <Route path="/unsubscribe" component={Unsubscribe} />
+      <Route path="/odhlasit-newsletter" component={Unsubscribe} />
       {/* Customer auth routes */}
       <Route path="/auth/login" component={CustomerLogin} />
       <Route path="/auth/register" component={CustomerRegister} />
