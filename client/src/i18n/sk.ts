@@ -430,6 +430,32 @@ export const sk = {
     editYourReview: 'Upraviť vašu recenziu',
     yourReviewPending: 'Vaša recenzia čaká na schválenie.',
   },
+
+  newsletter: {
+    popupTitle: 'Získajte 5% zľavu',
+    popupSubtitle: 'Prihláste sa na odber noviniek a získajte zľavový kód na prvý nákup.',
+    emailPlaceholder: 'Váš email',
+    emailRequired: 'Zadajte prosím email',
+    invalidEmail: 'Neplatná emailová adresa',
+    gdprRequired: 'Pre pokračovanie musíte súhlasiť so spracovaním osobných údajov',
+    gdprText: 'Súhlasím so spracovaním osobných údajov podľa',
+    gdprShort: 'Súhlasím s',
+    privacyPolicy: 'zásad ochrany osobných údajov',
+    subscribing: 'Prihlasujem...',
+    getDiscount: 'ZÍSKAŤ 5% ZĽAVU',
+    noSpam: 'Žiadny spam. Odhlásiť sa môžete kedykoľvek.',
+    successTitle: 'Ďakujeme za prihlásenie!',
+    successMessage: 'Váš zľavový kód je pripravený. Použite ho pri pokladni.',
+    yourCode: 'Váš zľavový kód',
+    copyCode: 'Kopírovať kód',
+    validFor24h: 'Platný 24 hodín',
+    startShopping: 'ZAČAŤ NAKUPOVAŤ',
+    thankYou: 'Ďakujeme za prihlásenie!',
+    footerText: 'Prihláste sa a získajte 5% zľavu na prvý nákup.',
+    discountInfo: '5% zľava na prvú objednávku pre nových odberateľov.',
+    alreadySubscribed: 'Tento email je už prihlásený na odber.',
+    subscribeError: 'Nastala chyba. Skúste to prosím znova.',
+  },
 };
 
 export type Translations = typeof sk;

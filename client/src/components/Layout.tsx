@@ -20,6 +20,8 @@ import {
 import CollapsibleMenu from "./CollapsibleMenu";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 import UserProfileDropdown from "./UserProfileDropdown";
+import NewsletterPopup from "./NewsletterPopup";
+import NewsletterFooter from "./NewsletterFooter";
 
 export default function Layout({ children }: { children: React.ReactNode }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -266,7 +268,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
 
       <footer className="bg-foreground text-background pt-16 pb-8">
         <div className="container">
-          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-4 mb-12">
+          <div className="grid gap-12 md:grid-cols-2 lg:grid-cols-5 mb-12">
             <div className="space-y-6">
               <div className="flex items-center gap-2">
                 <span className="font-display text-2xl font-bold tracking-tight text-background">
@@ -328,6 +330,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 </li>
               </ul>
             </div>
+
+            <div className="md:col-span-2 lg:col-span-1">
+              <NewsletterFooter />
+            </div>
           </div>
 
           <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-muted-foreground">
@@ -339,6 +345,8 @@ export default function Layout({ children }: { children: React.ReactNode }) {
           </div>
         </div>
       </footer>
+
+      <NewsletterPopup />
     </div>
   );
 }
