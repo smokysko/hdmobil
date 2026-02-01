@@ -6,6 +6,7 @@ import { Input } from "./ui/input";
 import { Checkbox } from "./ui/checkbox";
 import { subscribeToNewsletter } from "@/services/newsletter";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
 
 const POPUP_STORAGE_KEY = "hdmobil_newsletter_popup_shown";
 const POPUP_DELAY_MS = 10000;
@@ -51,12 +52,29 @@ export default function NewsletterPopup({
     const wasShown = localStorage.getItem(POPUP_STORAGE_KEY);
     if (wasShown) return;
 
-    const timer = setTimeout(() => {
-      setIsOpen(true);
-      localStorage.setItem(POPUP_STORAGE_KEY, Date.now().toString());
-    }, POPUP_DELAY_MS);
+    let timer: ReturnType<typeof setTimeout>;
 
-    return () => clearTimeout(timer);
+    async function checkAndShow() {
+      const { data } = await supabase
+        .from("settings")
+        .select("value")
+        .eq("key", "newsletter_popup_enabled")
+        .maybeSingle();
+
+      const isEnabled = data?.value !== false;
+      if (!isEnabled) return;
+
+      timer = setTimeout(() => {
+        setIsOpen(true);
+        localStorage.setItem(POPUP_STORAGE_KEY, Date.now().toString());
+      }, POPUP_DELAY_MS);
+    }
+
+    checkAndShow();
+
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
   }, [forceOpen]);
 
   useEffect(() => {
