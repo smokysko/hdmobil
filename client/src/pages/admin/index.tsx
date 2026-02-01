@@ -75,7 +75,7 @@ export default function AdminDashboard() {
 
       <div className="flex">
         {/* Sidebar */}
-        <aside className="w-64 bg-white border-r border-gray-200 min-h-[calc(100vh-64px)] hidden md:block">
+        <aside className="w-64 bg-white border-r border-gray-200 h-[calc(100vh-64px)] hidden md:block sticky top-16 overflow-y-auto">
           <nav className="p-4 space-y-1">
             {navItems.map((item) => (
               <Link

@@ -368,7 +368,7 @@ export default function AdminMarketing() {
       </header>
 
       <div className="flex">
-        <aside className="w-64 bg-white border-r border-gray-200/80 min-h-[calc(100vh-57px)] hidden lg:block">
+        <aside className="w-64 bg-white border-r border-gray-200/80 h-[calc(100vh-57px)] hidden lg:block sticky top-[57px] overflow-y-auto">
           <nav className="p-4 space-y-1">
             {navItems.map((item) => {
               const Icon = item.icon;
