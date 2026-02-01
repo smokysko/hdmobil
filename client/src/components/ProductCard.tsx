@@ -88,7 +88,7 @@ export default function ProductCard({ product }: { product: Product }) {
               />
             ))}
           </div>
-          <span className="text-xs text-muted-foreground">({Math.floor(Math.random() * 50) + 5})</span>
+          <span className="text-xs text-muted-foreground">({product.reviews})</span>
         </div>
 
         <div className="mt-auto pt-2 border-t border-border/50 flex items-center justify-between">
