@@ -13,10 +13,7 @@ import {
   Tag,
   Megaphone,
   MessageSquare,
-  Mail,
 } from 'lucide-react';
-import { supabase } from '@/lib/supabase';
-import { Switch } from '@/components/ui/switch';
 
 export default function AdminSettings() {
   const [location, navigate] = useLocation();
@@ -43,43 +40,11 @@ export default function AdminSettings() {
     language: 'sk',
   });
 
-  const [newsletterPopupEnabled, setNewsletterPopupEnabled] = useState(true);
   const [saved, setSaved] = useState(false);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    async function loadSettings() {
-      const { data } = await supabase
-        .from('settings')
-        .select('key, value')
-        .in('key', ['newsletter_popup_enabled']);
-
-      if (data) {
-        data.forEach((setting) => {
-          if (setting.key === 'newsletter_popup_enabled') {
-            setNewsletterPopupEnabled(setting.value === true);
-          }
-        });
-      }
-      setLoading(false);
-    }
-    loadSettings();
-  }, []);
 
   const handleSave = async () => {
-    await supabase
-      .from('settings')
-      .upsert({ key: 'newsletter_popup_enabled', value: newsletterPopupEnabled, updated_at: new Date().toISOString() });
-
     setSaved(true);
     setTimeout(() => setSaved(false), 3000);
-  };
-
-  const handleNewsletterToggle = async (enabled: boolean) => {
-    setNewsletterPopupEnabled(enabled);
-    await supabase
-      .from('settings')
-      .upsert({ key: 'newsletter_popup_enabled', value: enabled, updated_at: new Date().toISOString() });
   };
 
   const handleLogout = () => {
@@ -264,28 +229,6 @@ export default function AdminSettings() {
                     value={settings.icDph}
                     onChange={(e) => setSettings({ ...settings, icDph: e.target.value })}
                     className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white rounded-xl border border-gray-200/80 p-6 mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Marketing</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                      <Mail className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-gray-900">Newsletter popup</p>
-                      <p className="text-sm text-gray-500">Zobrazovat popup pre odber newslettera novym navstevnikom</p>
-                    </div>
-                  </div>
-                  <Switch
-                    checked={newsletterPopupEnabled}
-                    onCheckedChange={handleNewsletterToggle}
-                    disabled={loading}
                   />
                 </div>
               </div>

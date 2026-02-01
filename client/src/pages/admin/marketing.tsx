@@ -26,13 +26,14 @@ import {
   Gift,
   Sparkles,
   Target,
-  BarChart3,
   MessageSquare,
   Download,
   Check,
   XCircle,
   Ticket,
+  SettingsIcon,
 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import { supabase } from "../../lib/supabase";
 import { toast } from "sonner";
 
@@ -82,6 +83,10 @@ export default function AdminMarketing() {
     discountCode: "",
   });
   const [sending, setSending] = useState(false);
+  const [newsletterPopupEnabled, setNewsletterPopupEnabled] = useState(true);
+  const [newsletterDiscount, setNewsletterDiscount] = useState(10);
+  const [newsletterExpirationDays, setNewsletterExpirationDays] = useState(7);
+  const [settingsLoading, setSettingsLoading] = useState(true);
 
   const customerSegments: CustomerSegment[] = [
     { id: "all", name: "Všetci zákazníci", count: 0, description: "Všetci registrovaní zákazníci" },
@@ -105,7 +110,56 @@ export default function AdminMarketing() {
 
   useEffect(() => {
     fetchStats();
+    loadNewsletterSettings();
   }, []);
+
+  async function loadNewsletterSettings() {
+    setSettingsLoading(true);
+    try {
+      const { data } = await supabase
+        .from("settings")
+        .select("key, value")
+        .in("key", ["newsletter_popup_enabled", "newsletter_discount", "newsletter_expiration_days"]);
+
+      if (data) {
+        data.forEach((setting) => {
+          if (setting.key === "newsletter_popup_enabled") {
+            setNewsletterPopupEnabled(setting.value === true);
+          } else if (setting.key === "newsletter_discount") {
+            setNewsletterDiscount(Number(setting.value) || 10);
+          } else if (setting.key === "newsletter_expiration_days") {
+            setNewsletterExpirationDays(Number(setting.value) || 7);
+          }
+        });
+      }
+    } catch (err) {
+      console.error("Error loading newsletter settings:", err);
+    } finally {
+      setSettingsLoading(false);
+    }
+  }
+
+  async function handleNewsletterToggle(enabled: boolean) {
+    setNewsletterPopupEnabled(enabled);
+    await supabase
+      .from("settings")
+      .upsert({ key: "newsletter_popup_enabled", value: enabled, updated_at: new Date().toISOString() });
+    toast.success(enabled ? "Newsletter popup zapnuty" : "Newsletter popup vypnuty");
+  }
+
+  async function handleDiscountChange(value: number) {
+    setNewsletterDiscount(value);
+    await supabase
+      .from("settings")
+      .upsert({ key: "newsletter_discount", value: value, updated_at: new Date().toISOString() });
+  }
+
+  async function handleExpirationChange(value: number) {
+    setNewsletterExpirationDays(value);
+    await supabase
+      .from("settings")
+      .upsert({ key: "newsletter_expiration_days", value: value, updated_at: new Date().toISOString() });
+  }
 
   async function fetchStats() {
     setLoading(true);
@@ -409,6 +463,65 @@ export default function AdminMarketing() {
                       {newsletterStats.usedDiscounts}
                     </p>
                     <p className="text-sm text-gray-500">Pouzitych kodov</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-xl border border-gray-200/80 overflow-hidden">
+              <div className="p-5 border-b border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                    <SettingsIcon className="w-5 h-5 text-blue-600" strokeWidth={1.5} />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900">Nastavenia newslettera</h3>
+                    <p className="text-sm text-gray-500">Konfiguracia popup okna a zlavovych kodov</p>
+                  </div>
+                </div>
+              </div>
+              <div className="p-5 space-y-5">
+                <div className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                      <Mail className="w-5 h-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="font-medium text-gray-900">Newsletter popup</p>
+                      <p className="text-sm text-gray-500">Zobrazovat popup pre odber newslettera novym navstevnikom</p>
+                    </div>
+                  </div>
+                  <Switch
+                    checked={newsletterPopupEnabled}
+                    onCheckedChange={handleNewsletterToggle}
+                    disabled={settingsLoading}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Vyska zlavy (%)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="50"
+                      value={newsletterDiscount}
+                      onChange={(e) => handleDiscountChange(Number(e.target.value))}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Zlava pre novych odberatelov</p>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Platnost kodu (dni)</label>
+                    <input
+                      type="number"
+                      min="1"
+                      max="365"
+                      value={newsletterExpirationDays}
+                      onChange={(e) => handleExpirationChange(Number(e.target.value))}
+                      className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">Pocet dni do vyprsania zlavy</p>
                   </div>
                 </div>
               </div>
