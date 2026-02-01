@@ -144,7 +144,7 @@ export default function AdminMarketing() {
     await supabase
       .from("settings")
       .upsert({ key: "newsletter_popup_enabled", value: enabled, updated_at: new Date().toISOString() });
-    toast.success(enabled ? "Newsletter popup zapnuty" : "Newsletter popup vypnuty");
+    toast.success(enabled ? "Newsletter popup zapnutý" : "Newsletter popup vypnutý");
   }
 
   async function handleDiscountChange(value: number) {
@@ -200,17 +200,17 @@ export default function AdminMarketing() {
 
   function exportToCSV() {
     if (subscribers.length === 0) {
-      toast.error("Ziadni odberatelia na export");
+      toast.error("Žiadni odberatelia na export");
       return;
     }
 
-    const headers = ["Email", "Jazyk", "Zlavovy kod", "Kod pouzity", "Aktivny", "Datum prihlasenia"];
+    const headers = ["Email", "Jazyk", "Zľavový kód", "Kód použitý", "Aktívny", "Dátum prihlásenia"];
     const rows = subscribers.map((s) => [
       s.email,
       s.language,
       s.discount_code || "",
-      s.discount_used ? "Ano" : "Nie",
-      s.is_active ? "Ano" : "Nie",
+      s.discount_used ? "Áno" : "Nie",
+      s.is_active ? "Áno" : "Nie",
       new Date(s.subscribed_at || s.created_at).toLocaleDateString("sk-SK"),
     ]);
 
@@ -222,7 +222,7 @@ export default function AdminMarketing() {
     link.download = `newsletter_odberatelia_${new Date().toISOString().split("T")[0]}.csv`;
     link.click();
     URL.revokeObjectURL(url);
-    toast.success("Export uspesny");
+    toast.success("Export úspešný");
   }
 
   async function sendCampaign() {
@@ -423,7 +423,7 @@ export default function AdminMarketing() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {newsletterStats.totalSubscribers}
                     </p>
-                    <p className="text-sm text-gray-500">Celkom odberatelov</p>
+                    <p className="text-sm text-gray-500">Celkom odberateľov</p>
                   </div>
                 </div>
               </div>
@@ -436,7 +436,7 @@ export default function AdminMarketing() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {newsletterStats.activeSubscribers}
                     </p>
-                    <p className="text-sm text-gray-500">Aktivnych</p>
+                    <p className="text-sm text-gray-500">Aktívnych</p>
                   </div>
                 </div>
               </div>
@@ -449,7 +449,7 @@ export default function AdminMarketing() {
                     <p className="text-2xl font-semibold text-gray-900">
                       +{newsletterStats.newThisMonth}
                     </p>
-                    <p className="text-sm text-gray-500">Novych tento mesiac</p>
+                    <p className="text-sm text-gray-500">Nových tento mesiac</p>
                   </div>
                 </div>
               </div>
@@ -462,7 +462,7 @@ export default function AdminMarketing() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {newsletterStats.usedDiscounts}
                     </p>
-                    <p className="text-sm text-gray-500">Pouzitych kodov</p>
+                    <p className="text-sm text-gray-500">Použitých kódov</p>
                   </div>
                 </div>
               </div>
@@ -476,7 +476,7 @@ export default function AdminMarketing() {
                   </div>
                   <div>
                     <h3 className="font-semibold text-gray-900">Nastavenia newslettera</h3>
-                    <p className="text-sm text-gray-500">Konfiguracia popup okna a zlavovych kodov</p>
+                    <p className="text-sm text-gray-500">Konfigurácia popup okna a zľavových kódov</p>
                   </div>
                 </div>
               </div>
@@ -488,7 +488,7 @@ export default function AdminMarketing() {
                     </div>
                     <div>
                       <p className="font-medium text-gray-900">Newsletter popup</p>
-                      <p className="text-sm text-gray-500">Zobrazovat popup pre odber newslettera novym navstevnikom</p>
+                      <p className="text-sm text-gray-500">Zobrazovať popup pre odber newslettera novým návštevníkom</p>
                     </div>
                   </div>
                   <Switch
@@ -500,7 +500,7 @@ export default function AdminMarketing() {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Vyska zlavy (%)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Výška zľavy (%)</label>
                     <input
                       type="number"
                       min="1"
@@ -509,10 +509,10 @@ export default function AdminMarketing() {
                       onChange={(e) => handleDiscountChange(Number(e.target.value))}
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Zlava pre novych odberatelov</p>
+                    <p className="text-xs text-gray-500 mt-1">Zľava pre nových odberateľov</p>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Platnost kodu (dni)</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Platnosť kódu (dni)</label>
                     <input
                       type="number"
                       min="1"
@@ -521,7 +521,7 @@ export default function AdminMarketing() {
                       onChange={(e) => handleExpirationChange(Number(e.target.value))}
                       className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                     />
-                    <p className="text-xs text-gray-500 mt-1">Pocet dni do vyprsania zlavy</p>
+                    <p className="text-xs text-gray-500 mt-1">Počet dní do vypršania zľavy</p>
                   </div>
                 </div>
               </div>
@@ -536,7 +536,7 @@ export default function AdminMarketing() {
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-900">Newsletter odberatelia</h3>
-                      <p className="text-sm text-gray-500">Zoznam vsetkych prihlasenych emailov</p>
+                      <p className="text-sm text-gray-500">Zoznam všetkých prihlásených emailov</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -551,7 +551,7 @@ export default function AdminMarketing() {
                       onClick={() => setShowSubscribers(!showSubscribers)}
                       className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm font-medium"
                     >
-                      {showSubscribers ? "Skryt zoznam" : "Zobrazit zoznam"}
+                      {showSubscribers ? "Skryť zoznam" : "Zobraziť zoznam"}
                     </button>
                   </div>
                 </div>
@@ -564,7 +564,7 @@ export default function AdminMarketing() {
                       <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                         <Mail className="w-8 h-8 text-gray-400" />
                       </div>
-                      <p className="text-gray-500 font-medium">Zatial ziadni odberatelia</p>
+                      <p className="text-gray-500 font-medium">Zatiaľ žiadni odberatelia</p>
                     </div>
                   ) : (
                     <table className="w-full">
@@ -577,10 +577,10 @@ export default function AdminMarketing() {
                             Jazyk
                           </th>
                           <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            Zlavovy kod
+                            Zľavový kód
                           </th>
                           <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                            Stav kodu
+                            Stav kódu
                           </th>
                           <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">
                             Status
@@ -610,18 +610,18 @@ export default function AdminMarketing() {
                               {subscriber.discount_used ? (
                                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
                                   <Check className="w-3 h-3" />
-                                  Pouzity
+                                  Použitý
                                 </span>
                               ) : subscriber.discount_expires_at &&
                                 new Date(subscriber.discount_expires_at) < new Date() ? (
                                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-600">
                                   <Clock className="w-3 h-3" />
-                                  Expirovany
+                                  Expirovaný
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
                                   <Clock className="w-3 h-3" />
-                                  Aktivny
+                                  Aktívny
                                 </span>
                               )}
                             </td>
@@ -629,12 +629,12 @@ export default function AdminMarketing() {
                               {subscriber.is_active ? (
                                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
                                   <Check className="w-3 h-3" />
-                                  Aktivny
+                                  Aktívny
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700">
                                   <XCircle className="w-3 h-3" />
-                                  Odhlaseny
+                                  Odhlásený
                                 </span>
                               )}
                             </td>
