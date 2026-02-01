@@ -42,6 +42,12 @@ export default function NewsletterPopup({
       return;
     }
 
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get("newsletter") === "1") {
+      setIsOpen(true);
+      return;
+    }
+
     const wasShown = localStorage.getItem(POPUP_STORAGE_KEY);
     if (wasShown) return;
 
