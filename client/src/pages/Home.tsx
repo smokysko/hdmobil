@@ -8,6 +8,7 @@ import { useI18n, Language } from '@/i18n';
 import { ArrowRight, ShieldCheck, Truck, RotateCcw, Headphones, Zap, Monitor, Sparkles, ChevronRight } from 'lucide-react';
 import { Link } from 'wouter';
 import { useEffect, useRef, useState, useMemo } from 'react';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 interface HomepageSection {
   id: string;
@@ -82,6 +83,8 @@ export default function Home() {
   const heroWrapperRef = useRef<HTMLDivElement>(null);
   const [heroHeight, setHeroHeight] = useState<string>('auto');
   const { t, language } = useI18n();
+
+  useDocumentTitle('');
 
   const [heroSlides, setHeroSlides] = useState<HeroSlide[]>([]);
   const [homepageCategories, setHomepageCategories] = useState<HomepageCategory[]>([]);
@@ -272,6 +275,7 @@ export default function Home() {
                     <img
                       src={cat.image}
                       alt={cat.name}
+                      loading="lazy"
                       className="w-full h-full object-contain group-hover:scale-110 transition-transform duration-300"
                     />
                   </div>
@@ -376,6 +380,7 @@ export default function Home() {
                 <img
                   src={promo.image_url}
                   alt={promo.title}
+                  loading="lazy"
                   className="relative z-10 w-full max-w-xl object-contain drop-shadow-2xl transition-transform duration-700 hover:scale-105"
                 />
               </div>

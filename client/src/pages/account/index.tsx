@@ -2,54 +2,29 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useI18n } from '@/i18n';
 import Layout from '@/components/Layout';
 import { useLocation } from 'wouter';
-import { useEffect, useState } from 'react';
-import { Package, User, Heart, Settings, CreditCard, MapPin, Bell } from 'lucide-react';
+import { useEffect } from 'react';
+import { Package, User, Heart, Settings, CreditCard, MapPin } from 'lucide-react';
 import { Link } from 'wouter';
-
-interface Order {
-  id: string;
-  order_number: string;
-  status: string;
-  total: number;
-  created_at: string;
-  items_count: number;
-}
+import { useCustomerOrders } from '@/hooks/useOrders';
+import { useDocumentTitle } from '@/hooks/useDocumentTitle';
 
 export default function AccountPage() {
   const { user, isAuthenticated, loading: isLoading } = useAuth();
   const { t } = useI18n();
   const [, setLocation] = useLocation();
-  const [orders, setOrders] = useState<Order[]>([]);
+  useDocumentTitle('Môj účet');
+  const { data: ordersData, isLoading: ordersLoading } = useCustomerOrders({
+    customerId: user?.id,
+    page: 1,
+    limit: 5,
+  });
+  const orders = ordersData?.orders ?? [];
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
       setLocation('/prihlasenie');
     }
   }, [isLoading, isAuthenticated, setLocation]);
-
-  // Mock orders for demo
-  useEffect(() => {
-    if (isAuthenticated) {
-      setOrders([
-        {
-          id: '1',
-          order_number: 'OBJ-2025-001',
-          status: 'delivered',
-          total: 1299,
-          created_at: '2025-01-10',
-          items_count: 2,
-        },
-        {
-          id: '2',
-          order_number: 'OBJ-2025-002',
-          status: 'shipped',
-          total: 599,
-          created_at: '2025-01-12',
-          items_count: 1,
-        },
-      ]);
-    }
-  }, [isAuthenticated]);
 
   if (isLoading) {
     return (
@@ -139,26 +114,15 @@ export default function AccountPage() {
             </div>
 
             {/* Quick Stats */}
-            <div className="grid sm:grid-cols-3 gap-4">
+            <div className="grid sm:grid-cols-2 gap-4">
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
                     <Package className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{orders.length}</p>
+                    <p className="text-2xl font-bold">{ordersData?.total ?? 0}</p>
                     <p className="text-sm text-muted-foreground">Objednávky</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
-                    <Heart className="h-6 w-6 text-red-600" />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">5</p>
-                    <p className="text-sm text-muted-foreground">Obľúbené</p>
                   </div>
                 </div>
               </div>
@@ -168,7 +132,7 @@ export default function AccountPage() {
                     <CreditCard className="h-6 w-6 text-green-600" />
                   </div>
                   <div>
-                    <p className="text-2xl font-bold">{orders.reduce((sum, o) => sum + o.total, 0)} €</p>
+                    <p className="text-2xl font-bold">{orders.reduce((sum, o) => sum + o.total, 0).toFixed(2)} €</p>
                     <p className="text-sm text-muted-foreground">Celkové nákupy</p>
                   </div>
                 </div>
@@ -201,12 +165,12 @@ export default function AccountPage() {
                         <div>
                           <p className="font-medium">{order.order_number}</p>
                           <p className="text-sm text-muted-foreground">
-                            {order.items_count} {order.items_count === 1 ? 'položka' : 'položky'} • {order.created_at}
+                            {new Date(order.created_at).toLocaleDateString('sk-SK')}
                           </p>
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="font-bold">{order.total} €</p>
+                        <p className="font-bold">{order.total.toFixed(2)} €</p>
                         <span className={`inline-block px-2 py-1 rounded-full text-xs font-medium ${statusLabels[order.status]?.color || 'bg-gray-100 text-gray-800'}`}>
                           {statusLabels[order.status]?.label || order.status}
                         </span>

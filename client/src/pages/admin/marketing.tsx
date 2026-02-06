@@ -1,18 +1,6 @@
 import { useState, useEffect } from "react";
-import { Link, useLocation } from "wouter";
+import { Link } from "wouter";
 import {
-  LayoutDashboard,
-  Package,
-  ShoppingCart,
-  Users,
-  Settings,
-  LogOut,
-  ExternalLink,
-  RefreshCw,
-  FileText,
-  Palette,
-  Tag,
-  Megaphone,
   Mail,
   Bell,
   TrendingUp,
@@ -26,7 +14,6 @@ import {
   Gift,
   Sparkles,
   Target,
-  MessageSquare,
   Download,
   Check,
   XCircle,
@@ -35,6 +22,7 @@ import {
 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "../../lib/supabase";
+import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
 
 interface NewsletterStats {
@@ -64,7 +52,6 @@ interface CustomerSegment {
 }
 
 export default function AdminMarketing() {
-  const [location, navigate] = useLocation();
   const [loading, setLoading] = useState(true);
   const [newsletterStats, setNewsletterStats] = useState<NewsletterStats>({
     totalSubscribers: 0,
@@ -100,13 +87,6 @@ export default function AdminMarketing() {
     { id: "vip", name: "VIP zákazníci", count: 0, description: "Zákazníci s útratou nad 500 EUR" },
     { id: "new", name: "Noví zákazníci", count: 0, description: "Registrovaní za posledných 30 dní" },
   ];
-
-  useEffect(() => {
-    const isAdmin = localStorage.getItem("hdmobil_admin");
-    if (!isAdmin) {
-      navigate("/admin/login");
-    }
-  }, [navigate]);
 
   useEffect(() => {
     fetchStats();
@@ -244,24 +224,6 @@ export default function AdminMarketing() {
     }
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("hdmobil_admin");
-    navigate("/admin/login");
-  };
-
-  const navItems = [
-    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehľad" },
-    { href: "/admin/products", icon: Package, label: "Produkty" },
-    { href: "/admin/orders", icon: ShoppingCart, label: "Objednávky" },
-    { href: "/admin/customers", icon: Users, label: "Zákazníci" },
-    { href: "/admin/reviews", icon: MessageSquare, label: "Recenzie" },
-    { href: "/admin/invoices", icon: FileText, label: "Faktúry" },
-    { href: "/admin/discounts", icon: Tag, label: "Kupóny" },
-    { href: "/admin/marketing", icon: Megaphone, label: "Marketing" },
-    { href: "/admin/cms", icon: Palette, label: "Obsah stránky" },
-    { href: "/admin/settings", icon: Settings, label: "Nastavenia" },
-  ];
-
   const quickActions = [
     {
       title: "Zľavový kód",
@@ -323,89 +285,9 @@ export default function AdminMarketing() {
   ];
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <header className="bg-white border-b border-gray-200/80 sticky top-0 z-40 backdrop-blur-sm bg-white/95">
-        <div className="max-w-[1600px] mx-auto px-6 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <Link href="/admin/dashboard" className="flex items-center gap-3">
-              <img
-                src="/images/hdmobil_logo_blue.jpg"
-                alt="HDmobil Logo"
-                className="h-10 w-auto object-contain"
-              />
-              <div>
-                <h1 className="text-lg font-semibold text-gray-900">HDmobil</h1>
-                <p className="text-xs text-gray-500">Admin Panel</p>
-              </div>
-            </Link>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={fetchStats}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <RefreshCw className={`w-5 h-5 ${loading ? "animate-spin" : ""}`} />
-            </button>
-            <Link
-              href="/"
-              className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobraziť web</span>
-            </Link>
-            <div className="h-6 w-px bg-gray-200"></div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
-                A
-              </div>
-              <span className="text-sm font-medium hidden sm:inline">Admin</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex">
-        <aside className="w-64 bg-white border-r border-gray-200/80 h-[calc(100vh-57px)] hidden lg:block sticky top-[57px] overflow-y-auto">
-          <nav className="p-4 space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
-                    isActive
-                      ? "bg-blue-50 text-blue-700 font-medium"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
-                >
-                  <Icon
-                    className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-400"}`}
-                    strokeWidth={1.5}
-                  />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="p-4 border-t border-gray-100 mt-auto">
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
-            >
-              <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlásiť sa</span>
-            </button>
-          </div>
-        </aside>
-
-        <main className="flex-1 p-6">
-          <div className="max-w-[1400px] mx-auto space-y-6">
+    <AdminLayout>
+      <>
+        <div className="max-w-[1400px] mx-auto space-y-6">
             <div>
               <h2 className="text-2xl font-semibold text-gray-900">Marketing</h2>
               <p className="text-gray-500 text-sm mt-1">
@@ -806,11 +688,9 @@ export default function AdminMarketing() {
                 </p>
               </div>
             </div>
-          </div>
-        </main>
-      </div>
+        </div>
 
-      {showCampaignModal && (
+        {showCampaignModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/50" onClick={() => setShowCampaignModal(false)} />
           <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
@@ -932,7 +812,8 @@ export default function AdminMarketing() {
             </div>
           </div>
         </div>
-      )}
-    </div>
+        )}
+      </>
+    </AdminLayout>
   );
 }

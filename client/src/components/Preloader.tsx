@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 // import Logo from "./Logo";
 import { cn } from "@/lib/utils";
+import { useI18n } from '@/i18n';
 
 interface PreloaderProps {
   images: string[];
@@ -8,6 +9,7 @@ interface PreloaderProps {
 }
 
 export default function Preloader({ images, onComplete }: PreloaderProps) {
+  const { t } = useI18n();
   const [isLoading, setIsLoading] = useState(true);
   const [progress, setProgress] = useState(0);
 
@@ -69,7 +71,7 @@ export default function Preloader({ images, onComplete }: PreloaderProps) {
           />
         </div>
         <div className="mt-2 text-xs font-bold text-muted-foreground tracking-widest">
-          NAČÍTAVAM {progress}%
+          {t.preloader.loading} {progress}%
         </div>
       </div>
     </div>

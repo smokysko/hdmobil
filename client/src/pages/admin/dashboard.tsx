@@ -1,27 +1,17 @@
-import { useEffect, useRef, useState } from "react";
-import { Link, useLocation } from "wouter";
+import { useEffect, useState } from "react";
+import { Link } from "wouter";
 import {
-  LayoutDashboard,
   Package,
   ShoppingCart,
   Users,
-  Tag,
-  Settings,
-  LogOut,
   TrendingUp,
   TrendingDown,
   Euro,
   Clock,
   ChevronRight,
-  ExternalLink,
   BarChart3,
   PieChartIcon,
-  FileText,
   Loader2,
-  RefreshCw,
-  Palette,
-  Megaphone,
-  MessageSquare,
   AlertTriangle,
   Star,
   Mail,
@@ -30,8 +20,11 @@ import {
   Award,
   PackageX,
   CalendarClock,
+  MessageSquare,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
+import AdminLayout from "../../components/AdminLayout";
+
 
 interface TopProduct {
   id: string;
@@ -127,20 +120,8 @@ const categoryColors = [
 ];
 
 export default function AdminDashboard() {
-  const [location, navigate] = useLocation();
-  const hasCheckedAuth = useRef(false);
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    if (hasCheckedAuth.current) return;
-    hasCheckedAuth.current = true;
-
-    const isAdmin = localStorage.getItem("hdmobil_admin");
-    if (!isAdmin) {
-      navigate("/admin/login");
-    }
-  }, []);
 
   useEffect(() => {
     fetchDashboardStats();
@@ -490,11 +471,6 @@ export default function AdminDashboard() {
     }
   }
 
-  const handleLogout = () => {
-    localStorage.removeItem("hdmobil_admin");
-    navigate("/admin/login");
-  };
-
   const getStatusBadge = (status: string) => {
     const statusMap: Record<
       string,
@@ -548,19 +524,6 @@ export default function AdminDashboard() {
     );
   };
 
-  const navItems = [
-    { href: "/admin/dashboard", icon: LayoutDashboard, label: "Prehľad" },
-    { href: "/admin/products", icon: Package, label: "Produkty" },
-    { href: "/admin/orders", icon: ShoppingCart, label: "Objednávky" },
-    { href: "/admin/customers", icon: Users, label: "Zákazníci" },
-    { href: "/admin/reviews", icon: MessageSquare, label: "Recenzie" },
-    { href: "/admin/invoices", icon: FileText, label: "Faktúry" },
-    { href: "/admin/discounts", icon: Tag, label: "Kupóny" },
-    { href: "/admin/marketing", icon: Megaphone, label: "Marketing" },
-    { href: "/admin/cms", icon: Palette, label: "Obsah stránky" },
-    { href: "/admin/settings", icon: Settings, label: "Nastavenia" },
-  ];
-
   const maxRevenue = stats
     ? Math.max(...stats.revenueByMonth.map((d) => d.revenue), 1)
     : 1;
@@ -595,89 +558,8 @@ export default function AdminDashboard() {
       stats.discountStats.expiringSoon > 0);
 
   return (
-    <div className="min-h-screen bg-gray-50/50">
-      <header className="bg-white border-b border-gray-200/80 sticky top-0 z-40 backdrop-blur-sm bg-white/95">
-        <div className="max-w-[1600px] mx-auto px-6 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <img
-              src="/images/hdmobil_logo_blue.jpg"
-              alt="HDmobil Logo"
-              className="h-10 w-auto object-contain"
-            />
-            <div>
-              <h1 className="text-lg font-semibold text-gray-900">HDmobil</h1>
-              <p className="text-xs text-gray-500">Admin Panel</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <button
-              onClick={fetchDashboardStats}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <RefreshCw
-                className={`w-5 h-5 ${loading ? "animate-spin" : ""}`}
-              />
-            </button>
-            <Link
-              href="/"
-              className="flex items-center gap-1.5 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <ExternalLink className="w-4 h-4" />
-              <span className="hidden sm:inline">Zobraziť web</span>
-            </Link>
-            <div className="h-6 w-px bg-gray-200"></div>
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
-            >
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white text-sm font-medium">
-                A
-              </div>
-              <span className="text-sm font-medium hidden sm:inline">Admin</span>
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="flex">
-        <aside className="w-64 bg-white border-r border-gray-200/80 h-[calc(100vh-57px)] hidden lg:block sticky top-[57px] overflow-y-auto">
-          <nav className="p-4 space-y-1">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              const isActive = location === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all ${
-                    isActive
-                      ? "bg-blue-50 text-blue-700 font-medium"
-                      : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
-                  }`}
-                >
-                  <Icon
-                    className={`w-5 h-5 ${isActive ? "text-blue-600" : "text-gray-400"}`}
-                    strokeWidth={1.5}
-                  />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="p-4 border-t border-gray-100 mt-auto">
-            <button
-              onClick={handleLogout}
-              className="flex items-center gap-3 px-4 py-2.5 rounded-lg text-gray-600 hover:bg-red-50 hover:text-red-600 transition-colors w-full"
-            >
-              <LogOut className="w-5 h-5" strokeWidth={1.5} />
-              <span>Odhlásiť sa</span>
-            </button>
-          </div>
-        </aside>
-
-        <main className="flex-1 p-6">
-          <div className="max-w-[1400px] mx-auto space-y-6">
+    <AdminLayout>
+      <div className="max-w-[1400px] mx-auto space-y-6">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-semibold text-gray-900">Prehľad</h2>
@@ -1481,9 +1363,7 @@ export default function AdminDashboard() {
                 Nepodarilo sa načítať dáta
               </div>
             )}
-          </div>
-        </main>
       </div>
-    </div>
+    </AdminLayout>
   );
 }

@@ -5,6 +5,7 @@ import Layout from "@/components/Layout";
 import ProductCard from "@/components/ProductCard";
 import { searchProducts, Product } from "@/lib/products";
 import { useI18n } from "@/i18n";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 export default function Search() {
   const searchParams = useSearch();
@@ -12,8 +13,11 @@ export default function Search() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { t } = useI18n();
+  useDocumentTitle('Vyhľadávanie');
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchResults = async () => {
       if (!query) {
         setProducts([]);
@@ -23,11 +27,17 @@ export default function Search() {
 
       setIsLoading(true);
       const results = await searchProducts(query);
-      setProducts(results);
-      setIsLoading(false);
+      if (!cancelled) {
+        setProducts(results);
+        setIsLoading(false);
+      }
     };
 
     fetchResults();
+
+    return () => {
+      cancelled = true;
+    };
   }, [query]);
 
   const getResultsText = (count: number) => {

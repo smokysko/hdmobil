@@ -134,7 +134,7 @@ export default function CustomerLogin() {
                   />
                   <span className="text-sm text-gray-600">{t.auth.rememberMe}</span>
                 </label>
-                <Link href="/auth/forgot-password" className="text-sm text-green-600 hover:text-green-700 font-medium">
+                <Link href="/reset-password" className="text-sm text-green-600 hover:text-green-700 font-medium">
                   {t.auth.forgotPassword}
                 </Link>
               </div>

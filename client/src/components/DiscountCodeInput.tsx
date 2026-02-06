@@ -3,8 +3,10 @@ import { Input } from "@/components/ui/input";
 import { useCart } from "@/contexts/CartContext";
 import { Loader2, Tag, X } from "lucide-react";
 import { useState } from "react";
+import { useI18n } from '@/i18n';
 
 export function DiscountCodeInput() {
+  const { t } = useI18n();
   const { appliedDiscount, applyDiscount, removeDiscount, isApplyingDiscount } = useCart();
   const [code, setCode] = useState("");
 
@@ -46,7 +48,7 @@ export function DiscountCodeInput() {
   return (
     <div className="flex gap-2">
       <Input
-        placeholder="Zlavovy kod"
+        placeholder={t.discountCode.placeholder}
         value={code}
         onChange={(e) => setCode(e.target.value.toUpperCase())}
         onKeyDown={handleKeyDown}
@@ -54,7 +56,7 @@ export function DiscountCodeInput() {
         className="flex-1"
       />
       <Button onClick={handleApply} disabled={isApplyingDiscount || !code.trim()} variant="outline">
-        {isApplyingDiscount ? <Loader2 className="h-4 w-4 animate-spin" /> : "Uplatnit"}
+        {isApplyingDiscount ? <Loader2 className="h-4 w-4 animate-spin" /> : t.discountCode.apply}
       </Button>
     </div>
   );

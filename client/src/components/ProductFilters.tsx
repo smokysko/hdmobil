@@ -6,6 +6,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { Separator } from "@/components/ui/separator";
 import { SlidersHorizontal, X } from "lucide-react";
 import type { ProductFilters as Filters } from "@/lib/products";
+import { useI18n } from '@/i18n';
 
 interface ProductFiltersProps {
   filters: Filters;
@@ -29,6 +30,7 @@ function FilterContent({
   setLocalPriceRange: (range: [number, number]) => void;
   onClearFilters: () => void;
 }) {
+  const { t } = useI18n();
   const handlePriceChange = (values: number[]) => {
     setLocalPriceRange([values[0], values[1]]);
   };
@@ -59,7 +61,7 @@ function FilterContent({
   return (
     <div className="space-y-6">
       <div>
-        <h3 className="font-semibold text-sm mb-4">Cena</h3>
+        <h3 className="font-semibold text-sm mb-4">{t.product.price}</h3>
         <Slider
           value={localPriceRange}
           min={priceRange.min}
@@ -78,14 +80,14 @@ function FilterContent({
       <Separator />
 
       <div>
-        <h3 className="font-semibold text-sm mb-4">Dostupnosť</h3>
+        <h3 className="font-semibold text-sm mb-4">{t.product.availability}</h3>
         <div className="space-y-3">
           <label className="flex items-center gap-3 cursor-pointer">
             <Checkbox
               checked={filters.inStock || false}
               onCheckedChange={(checked) => handleCheckboxChange("inStock", checked === true)}
             />
-            <span className="text-sm">Na sklade</span>
+            <span className="text-sm">{t.product.inStockFilter}</span>
           </label>
         </div>
       </div>
@@ -93,28 +95,28 @@ function FilterContent({
       <Separator />
 
       <div>
-        <h3 className="font-semibold text-sm mb-4">Typ produktu</h3>
+        <h3 className="font-semibold text-sm mb-4">{t.product.productType}</h3>
         <div className="space-y-3">
           <label className="flex items-center gap-3 cursor-pointer">
             <Checkbox
               checked={filters.isNew || false}
               onCheckedChange={(checked) => handleCheckboxChange("isNew", checked === true)}
             />
-            <span className="text-sm">Novinky</span>
+            <span className="text-sm">{t.product.newProducts}</span>
           </label>
           <label className="flex items-center gap-3 cursor-pointer">
             <Checkbox
               checked={filters.isSale || false}
               onCheckedChange={(checked) => handleCheckboxChange("isSale", checked === true)}
             />
-            <span className="text-sm">V akcii</span>
+            <span className="text-sm">{t.product.onSale}</span>
           </label>
           <label className="flex items-center gap-3 cursor-pointer">
             <Checkbox
               checked={filters.isBazaar || false}
               onCheckedChange={(checked) => handleCheckboxChange("isBazaar", checked === true)}
             />
-            <span className="text-sm">Bazar</span>
+            <span className="text-sm">{t.product.bazaar}</span>
           </label>
         </div>
       </div>
@@ -128,7 +130,7 @@ function FilterContent({
             onClick={onClearFilters}
           >
             <X className="w-4 h-4 mr-2" />
-            Vymazať filtre
+            {t.product.clearFilters}
           </Button>
         </>
       )}
@@ -142,6 +144,7 @@ export function ProductFilters({
   priceRange,
   activeFiltersCount,
 }: ProductFiltersProps) {
+  const { t } = useI18n();
   const [localPriceRange, setLocalPriceRange] = useState<[number, number]>([
     filters.minPrice ?? priceRange.min,
     filters.maxPrice ?? priceRange.max,
@@ -164,7 +167,7 @@ export function ProductFilters({
     <>
       <div className="hidden lg:block w-64 shrink-0">
         <div className="sticky top-24 bg-card border border-border rounded-lg p-5">
-          <h2 className="font-semibold text-lg mb-5">Filtre</h2>
+          <h2 className="font-semibold text-lg mb-5">{t.product.filters}</h2>
           <FilterContent
             filters={filters}
             onFiltersChange={onFiltersChange}
@@ -181,7 +184,7 @@ export function ProductFilters({
           <SheetTrigger asChild>
             <Button variant="outline" className="gap-2">
               <SlidersHorizontal className="w-4 h-4" />
-              Filtre
+              {t.product.filters}
               {activeFiltersCount > 0 && (
                 <span className="bg-primary text-primary-foreground text-xs rounded-full w-5 h-5 flex items-center justify-center">
                   {activeFiltersCount}
@@ -191,7 +194,7 @@ export function ProductFilters({
           </SheetTrigger>
           <SheetContent side="left" className="w-[300px] sm:w-[350px]">
             <SheetHeader>
-              <SheetTitle>Filtre</SheetTitle>
+              <SheetTitle>{t.product.filters}</SheetTitle>
             </SheetHeader>
             <div className="mt-6">
               <FilterContent

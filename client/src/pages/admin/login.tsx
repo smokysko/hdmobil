@@ -4,13 +4,14 @@ import { useAuth } from '../../contexts/AuthContext';
 
 export default function AdminLogin() {
   const [, navigate] = useLocation();
-  const { signIn, user, isAdmin, loading: authLoading } = useAuth();
+  const { signIn, signOut, user, isAdmin, loading: authLoading } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [waitingForAdmin, setWaitingForAdmin] = useState(false);
   const hasRedirected = useRef(false);
 
   useEffect(() => {
@@ -19,6 +20,15 @@ export default function AdminLogin() {
       navigate('/admin/dashboard');
     }
   }, [user, isAdmin, authLoading]);
+
+  useEffect(() => {
+    if (waitingForAdmin && !authLoading && user && !isAdmin) {
+      setError('Nemáte oprávnenie na prístup do administrácie');
+      setWaitingForAdmin(false);
+      setLoading(false);
+      signOut();
+    }
+  }, [waitingForAdmin, authLoading, user, isAdmin]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,8 +48,7 @@ export default function AdminLogin() {
         }
         setLoading(false);
       } else {
-        localStorage.setItem('hdmobil_admin', 'true');
-        window.location.href = '/admin/dashboard';
+        setWaitingForAdmin(true);
       }
     } catch (err) {
       setError('Nastala chyba pri prihlasovaní. Skúste to znova.');

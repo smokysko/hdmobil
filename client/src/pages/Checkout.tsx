@@ -15,6 +15,7 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import { z } from "zod";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 const checkoutSchema = z.object({
   email: z.string().email("Neplatna emailova adresa"),
@@ -35,6 +36,7 @@ export default function Checkout() {
   const { items, cartTotal, clearCart, appliedDiscount, discountAmount } = useCart();
   const [, setLocation] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
+  useDocumentTitle('Pokladňa');
 
   const {
     register,

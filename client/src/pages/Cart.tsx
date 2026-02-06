@@ -6,10 +6,12 @@ import { useCart } from "@/contexts/CartContext";
 import { useI18n } from "@/i18n";
 import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import { Link } from "wouter";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 export default function Cart() {
   const { items, removeFromCart, updateQuantity, cartTotal, discountAmount, appliedDiscount } = useCart();
   const { t } = useI18n();
+  useDocumentTitle('Košík');
   const shipping = cartTotal > 100 ? 0 : 4.99;
   const total = cartTotal + shipping - discountAmount;
 

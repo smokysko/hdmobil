@@ -181,6 +181,7 @@ export default function ProductDetail() {
                   <img
                     src={img}
                     alt={`${product.name} view ${i + 1}`}
+                    loading="lazy"
                     className="h-full w-full object-contain"
                   />
                 </button>

@@ -7,12 +7,14 @@ import { useWishlist } from "@/contexts/WishlistContext";
 import { useI18n } from "@/i18n";
 import { Heart, ShoppingCart, Trash2 } from "lucide-react";
 import { Link } from "wouter";
+import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
 export default function Wishlist() {
   const { isAuthenticated } = useAuth();
   const { items, productIds, removeFromWishlist, isLoading } = useWishlist();
   const { addToCart } = useCart();
   const { t } = useI18n();
+  useDocumentTitle('Obľúbené');
 
   if (isLoading) {
     return (
@@ -136,14 +138,19 @@ export default function Wishlist() {
                           id: item.product.id,
                           name: item.product.name,
                           price: item.product.price,
-                          salePrice: item.product.salePrice,
+                          salePrice: item.product.salePrice ?? undefined,
                           image: item.product.image,
                           slug: item.product.slug,
                           category: item.product.category,
                           categoryId: "",
+                          categorySlug: "",
                           description: "",
                           stock: item.product.inStock ? 1 : 0,
                           rating: 0,
+                          reviews: 0,
+                          gallery: [],
+                          specs: {},
+                          sku: "",
                           isNew: false,
                           isSale: !!item.product.originalPrice,
                         })

@@ -180,7 +180,7 @@ async function checkVerifiedPurchase(
   if (!data) return false;
 
   return data.some((item) => {
-    const order = item.order as { customer_id: string; status: string } | null;
+    const order = item.order as unknown as { customer_id: string; status: string } | null;
     return (
       order &&
       order.customer_id === userId &&
