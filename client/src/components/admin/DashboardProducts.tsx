@@ -20,16 +20,16 @@ export function DashboardProducts({ stats }: Props) {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">
-                Top predavane produkty
+                Top predávané produkty
               </h3>
-              <p className="text-sm text-gray-500">Podla trzby</p>
+              <p className="text-sm text-gray-500">Podľa tržby</p>
             </div>
           </div>
           <Link
             href="/admin/products"
             className="text-blue-600 hover:text-blue-700 text-sm font-medium"
           >
-            Zobrazit vsetky
+            Zobraziť všetky
           </Link>
         </div>
         <div className="space-y-3">
@@ -58,7 +58,7 @@ export function DashboardProducts({ stats }: Props) {
                     {product.name}
                   </p>
                   <p className="text-xs text-gray-500">
-                    {product.quantity_sold} ks predanych
+                    {product.quantity_sold} ks predaných
                   </p>
                 </div>
                 <div className="text-right">
@@ -70,7 +70,7 @@ export function DashboardProducts({ stats }: Props) {
             ))
           ) : (
             <p className="text-sm text-gray-500 text-center py-4">
-              Ziadne data o predajoch
+              Žiadne dáta o predajoch
             </p>
           )}
         </div>
@@ -86,7 +86,7 @@ export function DashboardProducts({ stats }: Props) {
               />
             </div>
             <div>
-              <h3 className="font-semibold text-gray-900">Nizky sklad</h3>
+              <h3 className="font-semibold text-gray-900">Nízky sklad</h3>
               <p className="text-sm text-gray-500">Produkty na doplnenie</p>
             </div>
           </div>
@@ -94,7 +94,7 @@ export function DashboardProducts({ stats }: Props) {
             href="/admin/products?stock=low"
             className="text-blue-600 hover:text-blue-700 text-sm font-medium"
           >
-            Zobrazit vsetky
+            Zobraziť všetky
           </Link>
         </div>
         <div className="space-y-3">
@@ -131,7 +131,7 @@ export function DashboardProducts({ stats }: Props) {
                 <Package className="w-6 h-6 text-green-500" />
               </div>
               <p className="text-sm text-gray-500">
-                Vsetky produkty su na sklade
+                Všetky produkty sú na sklade
               </p>
             </div>
           )}

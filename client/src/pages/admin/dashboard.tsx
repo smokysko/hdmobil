@@ -35,13 +35,13 @@ export default function AdminDashboard() {
       <div className="max-w-[1400px] mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-semibold text-gray-900">Prehlad</h2>
+            <h2 className="text-2xl font-semibold text-gray-900">Prehľad</h2>
             <p className="text-gray-500 text-sm mt-1">
-              Vitajte spat! Tu je prehlad vasho obchodu.
+              Vitajte späť! Tu je prehľad vášho obchodu.
             </p>
           </div>
           <div className="text-sm text-gray-500">
-            Posledna aktualizacia:{" "}
+            Posledná aktualizácia:{" "}
             <span className="font-medium text-gray-700">prave teraz</span>
           </div>
         </div>
@@ -61,7 +61,7 @@ export default function AdminDashboard() {
           </>
         ) : (
           <div className="text-center py-20 text-gray-500">
-            Nepodarilo sa nacitat data
+            Nepodarilo sa načítať dáta
           </div>
         )}
       </div>

@@ -13,13 +13,13 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const STATUS_LABELS: Record<string, string> = {
-  pending: "Cakajuce",
-  confirmed: "Potvrdene",
-  processing: "Spracovane",
-  shipped: "Odoslane",
-  delivered: "Dorucene",
-  cancelled: "Zrusene",
-  returned: "Vratene",
+  pending: "Čakajúce",
+  confirmed: "Potvrdené",
+  processing: "Spracované",
+  shipped: "Odoslané",
+  delivered: "Doručené",
+  cancelled: "Zrušené",
+  returned: "Vrátené",
 };
 
 const STATUS_BADGE_MAP: Record<
@@ -29,37 +29,37 @@ const STATUS_BADGE_MAP: Record<
   pending: {
     bg: "bg-amber-50",
     text: "text-amber-700",
-    label: "Cakajuca",
+    label: "Čakajúca",
     dot: "bg-amber-500",
   },
   confirmed: {
     bg: "bg-blue-50",
     text: "text-blue-700",
-    label: "Potvrdena",
+    label: "Potvrdená",
     dot: "bg-blue-500",
   },
   processing: {
     bg: "bg-blue-50",
     text: "text-blue-700",
-    label: "Spracovava sa",
+    label: "Spracováva sa",
     dot: "bg-blue-500",
   },
   shipped: {
     bg: "bg-teal-50",
     text: "text-teal-700",
-    label: "Odoslana",
+    label: "Odoslaná",
     dot: "bg-teal-500",
   },
   delivered: {
     bg: "bg-green-50",
     text: "text-green-700",
-    label: "Dorucena",
+    label: "Doručená",
     dot: "bg-green-500",
   },
   cancelled: {
     bg: "bg-red-50",
     text: "text-red-700",
-    label: "Zrusena",
+    label: "Zrušená",
     dot: "bg-red-500",
   },
 };
@@ -84,7 +84,7 @@ export function DashboardOrders({ stats }: Props) {
   return (
     <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
       <div className="bg-white rounded-xl border border-gray-200/80 p-5">
-        <h3 className="font-semibold text-gray-900 mb-4">Stav objednavok</h3>
+        <h3 className="font-semibold text-gray-900 mb-4">Stav objednávok</h3>
         <div className="space-y-3">
           {stats.ordersByStatus.map((status, idx) => (
             <div
@@ -110,7 +110,7 @@ export function DashboardOrders({ stats }: Props) {
           ))}
           {stats.ordersByStatus.length === 0 && (
             <p className="text-sm text-gray-500 text-center py-4">
-              Ziadne objednavky
+              Žiadne objednávky
             </p>
           )}
         </div>
@@ -120,13 +120,13 @@ export function DashboardOrders({ stats }: Props) {
         <div className="p-5 border-b border-gray-100">
           <div className="flex justify-between items-center">
             <h3 className="font-semibold text-gray-900">
-              Posledne objednavky
+              Posledné objednávky
             </h3>
             <Link
               href="/admin/orders"
               className="flex items-center gap-1 text-blue-600 hover:text-blue-700 text-sm font-medium"
             >
-              Zobrazit vsetky
+              Zobraziť všetky
               <ChevronRight className="w-4 h-4" />
             </Link>
           </div>
@@ -136,13 +136,13 @@ export function DashboardOrders({ stats }: Props) {
             <thead>
               <tr className="border-b border-gray-100">
                 <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Objednavka
+                  Objednávka
                 </th>
                 <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Zakaznik
+                  Zákazník
                 </th>
                 <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Polozky
+                  Položky
                 </th>
                 <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                   Suma
@@ -151,7 +151,7 @@ export function DashboardOrders({ stats }: Props) {
                   Stav
                 </th>
                 <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                  Datum
+                  Dátum
                 </th>
               </tr>
             </thead>
@@ -197,7 +197,7 @@ export function DashboardOrders({ stats }: Props) {
                     colSpan={6}
                     className="px-5 py-8 text-center text-gray-500"
                   >
-                    Ziadne objednavky
+                    Žiadne objednávky
                   </td>
                 </tr>
               )}

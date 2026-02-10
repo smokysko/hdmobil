@@ -3,10 +3,10 @@ import type { DashboardStats } from "@/types/dashboard";
 
 const COUNTRY_NAMES: Record<string, string> = {
   SK: "Slovensko",
-  CZ: "Cesko",
-  PL: "Polsko",
-  HU: "Madarsko",
-  AT: "Rakusko",
+  CZ: "Česko",
+  PL: "Poľsko",
+  HU: "Maďarsko",
+  AT: "Rakúsko",
 };
 
 interface Props {
@@ -55,7 +55,7 @@ export function DashboardMethodStats({ stats }: Props) {
             />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">Platobne metody</h3>
+            <h3 className="font-semibold text-gray-900">Platobné metódy</h3>
             <p className="text-sm text-gray-500">Rozdelenie platieb</p>
           </div>
         </div>
@@ -78,7 +78,7 @@ export function DashboardMethodStats({ stats }: Props) {
             <Truck className="w-5 h-5 text-teal-600" strokeWidth={1.5} />
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">Dopravne metody</h3>
+            <h3 className="font-semibold text-gray-900">Dopravné metódy</h3>
             <p className="text-sm text-gray-500">Rozdelenie dopravy</p>
           </div>
         </div>
@@ -102,9 +102,9 @@ export function DashboardMethodStats({ stats }: Props) {
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">
-              Objednavky podla krajiny
+              Objednávky podľa krajiny
             </h3>
-            <p className="text-sm text-gray-500">Geograficke rozlozenie</p>
+            <p className="text-sm text-gray-500">Geografické rozloženie</p>
           </div>
         </div>
         <div className="space-y-3">

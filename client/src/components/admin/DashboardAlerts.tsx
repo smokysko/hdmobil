@@ -27,7 +27,7 @@ export function DashboardAlerts({ stats }: Props) {
         <AlertTriangle className="w-5 h-5 text-amber-600 mt-0.5" />
         <div className="flex-1">
           <h3 className="font-medium text-amber-800">
-            Upozornenia vyzadujuce pozornost
+            Upozornenia vyžadujúce pozornosť
           </h3>
           <div className="mt-2 flex flex-wrap gap-4 text-sm text-amber-700">
             {stats.pendingOrdersOld > 0 && (
@@ -36,7 +36,7 @@ export function DashboardAlerts({ stats }: Props) {
                 className="flex items-center gap-1 hover:underline"
               >
                 <Clock className="w-4 h-4" />
-                {stats.pendingOrdersOld} objednavok caka viac ako 24h
+                {stats.pendingOrdersOld} objednávok čaká viac ako 24h
               </Link>
             )}
             {stats.outOfStockCount > 0 && (
@@ -54,7 +54,7 @@ export function DashboardAlerts({ stats }: Props) {
                 className="flex items-center gap-1 hover:underline"
               >
                 <MessageSquare className="w-4 h-4" />
-                {stats.reviewStats.pending} recenzii na schvalenie
+                {stats.reviewStats.pending} recenzií na schválenie
               </Link>
             )}
             {stats.discountStats.expiringSoon > 0 && (
@@ -63,7 +63,7 @@ export function DashboardAlerts({ stats }: Props) {
                 className="flex items-center gap-1 hover:underline"
               >
                 <CalendarClock className="w-4 h-4" />
-                {stats.discountStats.expiringSoon} kuponov expiruje do 7 dni
+                {stats.discountStats.expiringSoon} kupónov expiruje do 7 dní
               </Link>
             )}
           </div>

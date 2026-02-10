@@ -98,7 +98,7 @@ export function DashboardStatCards({ stats }: Props) {
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatCard
-          label="Celkove objednavky"
+          label="Celkové objednávky"
           value={String(stats.totalOrders)}
           icon={
             <ShoppingCart
@@ -107,19 +107,19 @@ export function DashboardStatCards({ stats }: Props) {
             />
           }
           iconBg="bg-blue-50"
-          trend={{ value: weeklyChange, label: "tento tyzden" }}
+          trend={{ value: weeklyChange, label: "tento týždeň" }}
         />
         <StatCard
-          label="Trzby celkom"
+          label="Tržby celkom"
           value={formatCurrency(stats.totalRevenue)}
           icon={
             <Euro className="w-6 h-6 text-green-600" strokeWidth={1.5} />
           }
           iconBg="bg-green-50"
-          trend={{ value: dailyRevenueChange, label: "dnes vs vcera" }}
+          trend={{ value: dailyRevenueChange, label: "dnes vs včera" }}
         />
         <StatCard
-          label="Priemerna objednavka"
+          label="Priemerná objednávka"
           value={stats.averageOrderValue.toLocaleString("sk-SK", {
             minimumFractionDigits: 2,
             maximumFractionDigits: 2,
@@ -131,9 +131,9 @@ export function DashboardStatCards({ stats }: Props) {
           iconBg="bg-blue-50"
         />
         <StatCard
-          label="Trzby dnes"
+          label="Tržby dnes"
           value={formatCurrency(stats.revenueToday)}
-          subtitle={`Vcera: ${stats.revenueYesterday.toLocaleString("sk-SK")} EUR`}
+          subtitle={`Včera: ${stats.revenueYesterday.toLocaleString("sk-SK")} EUR`}
           icon={
             <TrendingUp
               className="w-6 h-6 text-teal-600"
@@ -146,7 +146,7 @@ export function DashboardStatCards({ stats }: Props) {
 
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <StatCard
-          label="Zakaznici"
+          label="Zákazníci"
           value={String(stats.totalCustomers)}
           icon={
             <Users className="w-6 h-6 text-blue-600" strokeWidth={1.5} />
@@ -154,7 +154,7 @@ export function DashboardStatCards({ stats }: Props) {
           iconBg="bg-blue-50"
         />
         <StatCard
-          label="Cakajuce platby"
+          label="Čakajúce platby"
           value={String(stats.pendingPayments)}
           icon={
             <Clock className="w-6 h-6 text-amber-600" strokeWidth={1.5} />
@@ -171,9 +171,9 @@ export function DashboardStatCards({ stats }: Props) {
           iconBg="bg-blue-50"
         />
         <StatCard
-          label="Priemerne hodnotenie"
+          label="Priemerné hodnotenie"
           value={stats.reviewStats.averageRating.toFixed(1)}
-          subtitle={`z ${stats.reviewStats.totalReviews} recenzii`}
+          subtitle={`z ${stats.reviewStats.totalReviews} recenzií`}
           icon={
             <Star className="w-6 h-6 text-amber-500" strokeWidth={1.5} />
           }

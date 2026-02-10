@@ -21,7 +21,7 @@ export function DashboardCharts({ stats }: Props) {
         ...cat,
         color: CATEGORY_COLORS[idx % CATEGORY_COLORS.length],
       }))
-    : [{ name: "Bez kategorii", value: 100, color: "#9ca3af" }];
+    : [{ name: "Bez kategórií", value: 100, color: "#9ca3af" }];
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-3 gap-4">
@@ -36,10 +36,10 @@ export function DashboardCharts({ stats }: Props) {
             </div>
             <div>
               <h3 className="font-semibold text-gray-900">
-                Trzby za rok {new Date().getFullYear()}
+                Tržby za rok {new Date().getFullYear()}
               </h3>
               <p className="text-sm text-gray-500">
-                Mesacny prehlad trzieb
+                Mesačný prehľad tržieb
               </p>
             </div>
           </div>
@@ -86,9 +86,9 @@ export function DashboardCharts({ stats }: Props) {
           </div>
           <div>
             <h3 className="font-semibold text-gray-900">
-              Predaj podla kategorii
+              Predaj podľa kategórií
             </h3>
-            <p className="text-sm text-gray-500">Rozdelenie trzieb</p>
+            <p className="text-sm text-gray-500">Rozdelenie tržieb</p>
           </div>
         </div>
         <div className="flex justify-center">
