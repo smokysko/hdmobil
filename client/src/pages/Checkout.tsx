@@ -8,6 +8,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
 import { useCart } from "@/contexts/CartContext";
+import { supabase } from "@/lib/supabase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Banknote, Building2, CheckCircle2, CreditCard, Truck } from "lucide-react";
 import { useState } from "react";
@@ -61,26 +62,13 @@ export default function Checkout() {
     setIsProcessing(true);
 
     try {
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-      if (!supabaseUrl || !supabaseKey) {
-        throw new Error("Konfiguracia nie je k dispozicii");
-      }
-
       const orderItems = items.map((item) => ({
         productId: item.id,
         quantity: item.quantity,
       }));
 
-      const response = await fetch(`${supabaseUrl}/functions/v1/orders/create`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${supabaseKey}`,
-          apikey: supabaseKey,
-        },
-        body: JSON.stringify({
+      const { data: result, error: fnError } = await supabase.functions.invoke('orders/create', {
+        body: {
           items: orderItems,
           billingFirstName: data.firstName,
           billingLastName: data.lastName,
@@ -92,22 +80,24 @@ export default function Checkout() {
           billingCountry: data.country === "Slovensko" ? "SK" : data.country,
           customerNote: data.note,
           discountCode: appliedDiscount?.code,
-        }),
+        },
       });
 
-      const result = await response.json();
-
-      if (!result.success) {
-        throw new Error(result.error || "Nepodarilo sa vytvorit objednavku");
+      if (fnError) {
+        throw new Error("Nepodarilo sa vytvoriť objednávku");
       }
 
-      toast.success("Objednavka bola uspesne odoslana!");
+      if (!result.success) {
+        throw new Error(result.error || "Nepodarilo sa vytvoriť objednávku");
+      }
+
+      toast.success("Objednávka bola úspešne odoslaná!");
       clearCart();
       setLocation(
         `/success?orderId=${result.data.orderId}&orderNumber=${encodeURIComponent(result.data.orderNumber)}`
       );
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Nastala chyba pri odosielani objednavky");
+      toast.error(error instanceof Error ? error.message : "Nastala chyba pri odosielaní objednávky");
       setIsProcessing(false);
     }
   };

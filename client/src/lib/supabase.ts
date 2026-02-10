@@ -1,10 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = 'https://uenmpipmzowoxnylpgws.supabase.co';
-const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVlbm1waXBtem93b3hueWxwZ3dzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxOTI4NDgsImV4cCI6MjA4Mzc2ODg0OH0.RE4daw6z2KdQTx7ZT9N5sFPH86VBRCK24ND8S3KMLpo';
-
-const supabaseUrl = SUPABASE_URL;
-const supabaseAnonKey = SUPABASE_ANON_KEY;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://uenmpipmzowoxnylpgws.supabase.co';
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVlbm1waXBtem93b3hueWxwZ3dzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgxOTI4NDgsImV4cCI6MjA4Mzc2ODg0OH0.RE4daw6z2KdQTx7ZT9N5sFPH86VBRCK24ND8S3KMLpo';
 
 export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
 
