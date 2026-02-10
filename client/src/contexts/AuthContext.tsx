@@ -101,10 +101,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     supabase.auth
       .getSession()
-      .then(({ data: { session } }) => {
+      .then(async ({ data: { session } }) => {
         setSession(session);
         setUser(session?.user ?? null);
-        checkAdminStatus(session?.user ?? null);
+        await checkAdminStatus(session?.user ?? null);
         setLoading(false);
       })
       .catch((error) => {
@@ -117,8 +117,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
       setUser(session?.user ?? null);
-      checkAdminStatus(session?.user ?? null);
-      setLoading(false);
+      setLoading(true);
+      (async () => {
+        await checkAdminStatus(session?.user ?? null);
+        setLoading(false);
+      })();
     });
 
     return () => subscription.unsubscribe();
