@@ -24,18 +24,36 @@ Deno.serve(async (req: Request) => {
 
     const authHeader = req.headers.get("Authorization");
     let customerId: string | null = null;
+    let authUser: { id: string; email?: string } | null = null;
 
     if (authHeader) {
       const {
         data: { user },
       } = await supabase.auth.getUser(authHeader.replace("Bearer ", ""));
       if (user) {
+        authUser = user;
         const { data: customer } = await supabase
           .from("customers")
           .select("id")
           .eq("auth_user_id", user.id)
-          .single();
-        customerId = customer?.id || null;
+          .maybeSingle();
+
+        if (customer) {
+          customerId = customer.id;
+        } else {
+          const { data: newCustomer } = await supabase
+            .from("customers")
+            .insert({
+              auth_user_id: user.id,
+              email: user.email || "",
+              first_name: user.user_metadata?.full_name?.split(" ")[0] || "",
+              last_name: user.user_metadata?.full_name?.split(" ").slice(1).join(" ") || "",
+              phone: user.user_metadata?.phone || null,
+            })
+            .select("id")
+            .single();
+          customerId = newCustomer?.id || null;
+        }
       }
     }
 

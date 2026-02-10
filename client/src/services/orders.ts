@@ -264,12 +264,22 @@ export async function getOrdersByCustomer(params: {
   page?: number;
   limit?: number;
 }): Promise<{ orders: Order[]; total: number }> {
-  const { customerId, page = 1, limit = 10 } = params;
+  const { customerId: authUserId, page = 1, limit = 10 } = params;
+
+  const { data: customer } = await supabase
+    .from('customers')
+    .select('id')
+    .eq('auth_user_id', authUserId)
+    .maybeSingle();
+
+  if (!customer) {
+    return { orders: [], total: 0 };
+  }
 
   const { data: orders, error, count } = await supabase
     .from('orders')
     .select('*', { count: 'exact' })
-    .eq('customer_id', customerId)
+    .eq('customer_id', customer.id)
     .range((page - 1) * limit, page * limit - 1)
     .order('created_at', { ascending: false });
 
