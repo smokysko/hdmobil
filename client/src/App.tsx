@@ -37,6 +37,7 @@ const AdminCMS = lazy(() => import("./pages/admin/cms"));
 const AdminDiscounts = lazy(() => import("./pages/admin/discounts"));
 const AdminMarketing = lazy(() => import("./pages/admin/marketing"));
 const AdminReviews = lazy(() => import("./pages/admin/reviews"));
+const AdminModules = lazy(() => import("./pages/admin/modules"));
 
 function Router() {
   return (
@@ -73,6 +74,7 @@ function Router() {
         <Route path="/admin/discounts" component={AdminDiscounts} />
         <Route path="/admin/marketing" component={AdminMarketing} />
         <Route path="/admin/reviews" component={AdminReviews} />
+        <Route path="/admin/modules" component={AdminModules} />
         <Route component={NotFound} />
       </Switch>
       </RouteErrorBoundary>
