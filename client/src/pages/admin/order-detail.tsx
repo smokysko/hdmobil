@@ -49,6 +49,8 @@ interface OrderDetail {
   customer_note: string;
   admin_note: string;
   tracking_number: string;
+  packeta_point_id: string | null;
+  packeta_point_name: string | null;
   invoice_id: string;
   items: {
     id: string;
@@ -371,6 +373,12 @@ export default function AdminOrderDetail() {
                     <Truck className="w-3.5 h-3.5 text-teal-500" />
                     <span className="font-medium text-gray-700">{order.shipping_method_name}</span>
                   </p>
+                  {order.packeta_point_name && (
+                    <p className="flex items-center gap-1.5 mt-1">
+                      <MapPin className="w-3.5 h-3.5 text-orange-500" />
+                      <span className="text-gray-600">{order.packeta_point_name}</span>
+                    </p>
+                  )}
                 </div>
               </div>
             </div>

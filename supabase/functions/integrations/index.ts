@@ -13,7 +13,7 @@ const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 const DPD_API_KEY = Deno.env.get("DPD_API_KEY") || "";
 const DPD_CUSTOMER_ID = Deno.env.get("DPD_CUSTOMER_ID") || "";
 const PACKETA_API_KEY = Deno.env.get("PACKETA_API_KEY") || "";
-const PACKETA_SENDER_ID = Deno.env.get("PACKETA_SENDER_ID") || "";
+const PACKETA_API_PASSWORD = Deno.env.get("PACKETA_API_PASSWORD") || "";
 const SPS_API_KEY = Deno.env.get("SPS_API_KEY") || "";
 
 interface ShipmentData {
@@ -103,13 +103,17 @@ async function createPacketaShipment(
 ): Promise<{ trackingNumber: string; labelUrl: string }> {
   const apiUrl = "https://www.zasilkovna.cz/api/rest";
 
+  const recipientNameParts = data.recipientName.trim().split(" ");
+  const recipientFirstName = recipientNameParts[0] || "";
+  const recipientLastName = recipientNameParts.slice(1).join(" ") || recipientFirstName;
+
   const xmlRequest = `<?xml version="1.0" encoding="utf-8"?>
 <createPacket>
-  <apiPassword>${PACKETA_API_KEY}</apiPassword>
+  <apiPassword>${PACKETA_API_PASSWORD}</apiPassword>
   <packetAttributes>
     <number>${data.orderId}</number>
-    <name>${escapeXml(data.recipientName)}</name>
-    <surname></surname>
+    <name>${escapeXml(recipientFirstName)}</name>
+    <surname>${escapeXml(recipientLastName)}</surname>
     <email>${data.recipientEmail || ""}</email>
     <phone>${data.recipientPhone}</phone>
     <addressId>${data.pickupPointId || ""}</addressId>
@@ -119,7 +123,6 @@ async function createPacketaShipment(
     <country>${data.country || "sk"}</country>
     <value>${data.codAmount || 0}</value>
     <weight>${data.weight}</weight>
-    <eshop>${PACKETA_SENDER_ID}</eshop>
     ${data.codAmount ? `<cod>${data.codAmount}</cod>` : ""}
   </packetAttributes>
 </createPacket>`;
@@ -141,7 +144,7 @@ async function createPacketaShipment(
 
   return {
     trackingNumber,
-    labelUrl: `https://www.zasilkovna.cz/api/labels/${trackingNumber}?apiPassword=${PACKETA_API_KEY}`,
+    labelUrl: `https://www.zasilkovna.cz/api/labels/${trackingNumber}?apiPassword=${PACKETA_API_PASSWORD}`,
   };
 }
 
@@ -249,8 +252,8 @@ Deno.serve(async (req: Request) => {
           country: order.shipping_country,
           weight: 0.5,
           codAmount: order.payment_method?.code === "cod" ? order.total : undefined,
-          note: order.note,
-          pickupPointId: order.pickup_point_id,
+          note: order.customer_note,
+          pickupPointId: order.packeta_point_id,
         };
 
         let result;

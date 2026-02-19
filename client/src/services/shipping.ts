@@ -2,31 +2,36 @@ import { supabase } from '@/lib/supabase';
 
 export interface ShippingMethod {
   id: string;
+  code: string;
   name_sk: string;
   name_cs: string | null;
+  name_pl: string | null;
   description_sk: string | null;
   description_cs: string | null;
   price: number;
-  estimated_days_min: number | null;
-  estimated_days_max: number | null;
+  free_shipping_threshold: number | null;
+  delivery_days_min: number | null;
+  delivery_days_max: number | null;
+  api_provider: string | null;
+  api_config: Record<string, unknown>;
   is_active: boolean;
   sort_order: number;
   created_at: string;
-  updated_at: string;
 }
 
 export interface PaymentMethod {
   id: string;
+  code: string;
+  payment_type: string;
   name_sk: string;
   name_cs: string | null;
   description_sk: string | null;
   description_cs: string | null;
   fee_fixed: number;
-  fee_percent: number;
+  fee_percentage: number;
   is_active: boolean;
   sort_order: number;
   created_at: string;
-  updated_at: string;
 }
 
 export async function getShippingMethods(): Promise<ShippingMethod[]> {

@@ -198,6 +198,8 @@ Deno.serve(async (req: Request) => {
           paymentMethodId,
           customerNote,
           discountCode,
+          packetaPointId,
+          packetaPointName,
         } = body;
 
         if (!items || items.length === 0) {
@@ -334,7 +336,11 @@ Deno.serve(async (req: Request) => {
           }
         }
 
-        const shippingCost = shippingMethod?.price || 0;
+        const cartTotalForShipping = subtotalWithoutVat + vatTotal;
+        const freeThreshold = shippingMethod?.free_shipping_threshold;
+        const shippingCost = (shippingMethod && freeThreshold && cartTotalForShipping >= freeThreshold)
+          ? 0
+          : (shippingMethod?.price || 0);
         const paymentFee = paymentMethod?.fee_fixed || 0;
         const total = subtotalWithoutVat + vatTotal + shippingCost + paymentFee - discountAmount;
 
@@ -366,10 +372,13 @@ Deno.serve(async (req: Request) => {
             billing_country: billingCountry || "SK",
             shipping_first_name: billingFirstName,
             shipping_last_name: billingLastName,
-            shipping_street: billingStreet,
+            shipping_street: packetaPointId ? (packetaPointName || "Packeta") : billingStreet,
             shipping_city: billingCity,
             shipping_zip: billingZip,
             shipping_country: billingCountry || "SK",
+            shipping_phone: billingPhone || null,
+            packeta_point_id: packetaPointId || null,
+            packeta_point_name: packetaPointName || null,
             customer_note: customerNote || null,
           })
           .select()
