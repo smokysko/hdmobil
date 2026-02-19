@@ -131,7 +131,7 @@ export default function AdminCustomers() {
       }
     } catch (err) {
       console.error("Error fetching customers:", err);
-      toast.error("Nepodarilo sa nacitat zakaznikov");
+      toast.error("Nepodarilo sa načítať zákazníkov");
     } finally {
       setLoading(false);
     }
@@ -174,12 +174,12 @@ export default function AdminCustomers() {
 
   const getStatusBadge = (status: string) => {
     const statusMap: Record<string, { bg: string; text: string; label: string }> = {
-      pending: { bg: "bg-amber-50", text: "text-amber-700", label: "Cakajuca" },
-      confirmed: { bg: "bg-blue-50", text: "text-blue-700", label: "Potvrdena" },
-      processing: { bg: "bg-blue-50", text: "text-blue-700", label: "Spracovava sa" },
-      shipped: { bg: "bg-violet-50", text: "text-violet-700", label: "Odoslana" },
-      delivered: { bg: "bg-blue-50", text: "text-blue-700", label: "Dorucena" },
-      cancelled: { bg: "bg-red-50", text: "text-red-700", label: "Zrusena" },
+      pending: { bg: "bg-amber-50", text: "text-amber-700", label: "Čakajúca" },
+      confirmed: { bg: "bg-blue-50", text: "text-blue-700", label: "Potvrdená" },
+      processing: { bg: "bg-blue-50", text: "text-blue-700", label: "Spracováva sa" },
+      shipped: { bg: "bg-violet-50", text: "text-violet-700", label: "Odoslaná" },
+      delivered: { bg: "bg-blue-50", text: "text-blue-700", label: "Doručená" },
+      cancelled: { bg: "bg-red-50", text: "text-red-700", label: "Zrušená" },
     };
     const s = statusMap[status] || statusMap.pending;
     return (
@@ -196,9 +196,9 @@ export default function AdminCustomers() {
       <div className="max-w-[1400px] mx-auto space-y-6">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900">Zakaznici</h2>
+                <h2 className="text-2xl font-semibold text-gray-900">Zákazníci</h2>
                 <p className="text-gray-500 text-sm mt-1">
-                  Spravujte zakaznikov a ich objednavky ({totalCount} celkom)
+                  Spravujte zákazníkov a ich objednávky ({totalCount} celkom)
                 </p>
               </div>
             </div>
@@ -226,7 +226,7 @@ export default function AdminCustomers() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {stats.individuals}
                     </p>
-                    <p className="text-sm text-gray-500">Fyzicke osoby</p>
+                    <p className="text-sm text-gray-500">Fyzické osoby</p>
                   </div>
                 </div>
               </div>
@@ -252,7 +252,7 @@ export default function AdminCustomers() {
                     <p className="text-2xl font-semibold text-gray-900">
                       {stats.newThisMonth}
                     </p>
-                    <p className="text-sm text-gray-500">Novi tento mesiac</p>
+                    <p className="text-sm text-gray-500">Noví tento mesiac</p>
                   </div>
                 </div>
               </div>
@@ -263,7 +263,7 @@ export default function AdminCustomers() {
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Hladat podla mena, emailu, telefonu alebo firmy..."
+                  placeholder="Hľadať podľa mena, emailu, telefónu alebo firmy..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
@@ -282,7 +282,7 @@ export default function AdminCustomers() {
                     <thead>
                       <tr className="border-b border-gray-100 bg-gray-50/50">
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Zakaznik
+                          Zákazník
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Kontakt
@@ -291,13 +291,13 @@ export default function AdminCustomers() {
                           Typ
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Objednavky
+                          Objednávky
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Utratil
                         </th>
                         <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Registracia
+                          Registrácia
                         </th>
                         <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Akcie
@@ -401,7 +401,7 @@ export default function AdminCustomers() {
                             colSpan={7}
                             className="px-5 py-12 text-center text-gray-500"
                           >
-                            Ziadni zakaznici
+                            Žiadni zákazníci
                           </td>
                         </tr>
                       )}
@@ -412,13 +412,13 @@ export default function AdminCustomers() {
 
               <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
                 <p className="text-sm text-gray-500">
-                  Zobrazenych{" "}
+                  Zobrazených{" "}
                   <span className="font-medium text-gray-700">
                     {filteredCustomers.length}
                   </span>{" "}
                   z{" "}
                   <span className="font-medium text-gray-700">{totalCount}</span>{" "}
-                  zakaznikov
+                  zákazníkov
                 </p>
                 {totalPages > 1 && (
                   <div className="flex items-center gap-2">
@@ -479,7 +479,7 @@ export default function AdminCustomers() {
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
                   <div>
                     <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                      Kontaktne udaje
+                      Kontaktné údaje
                     </h4>
                     <div className="space-y-3">
                       <div className="flex items-center gap-3 text-sm">
@@ -517,14 +517,14 @@ export default function AdminCustomers() {
 
                   <div>
                     <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                      Statistiky
+                      Štatistiky
                     </h4>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="bg-gray-50 rounded-lg p-3 text-center">
                         <p className="text-2xl font-bold text-gray-900">
                           {selectedCustomer.orders_count || 0}
                         </p>
-                        <p className="text-xs text-gray-500">Objednavok</p>
+                        <p className="text-xs text-gray-500">Objednávok</p>
                       </div>
                       <div className="bg-gray-50 rounded-lg p-3 text-center">
                         <p className="text-2xl font-bold text-blue-600">
@@ -539,7 +539,7 @@ export default function AdminCustomers() {
                 {selectedCustomer.customer_type === "company" && (
                   <div className="mb-6">
                     <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                      Firemne udaje
+                      Firemné údaje
                     </h4>
                     <div className="bg-gray-50 rounded-lg p-4 grid grid-cols-3 gap-4 text-sm">
                       {selectedCustomer.ico && (
@@ -564,7 +564,7 @@ export default function AdminCustomers() {
 
                 <div>
                   <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                    Posledne objednavky
+                    Posledné objednávky
                   </h4>
                   {loadingOrders ? (
                     <div className="flex items-center justify-center py-8">
@@ -576,10 +576,10 @@ export default function AdminCustomers() {
                         <thead>
                           <tr className="border-b border-gray-200">
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                              Cislo
+                              Číslo
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                              Datum
+                              Dátum
                             </th>
                             <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                               Stav
@@ -618,7 +618,7 @@ export default function AdminCustomers() {
                     </div>
                   ) : (
                     <p className="text-sm text-gray-500 text-center py-8 bg-gray-50 rounded-lg">
-                      Zakaznik zatial nema ziadne objednavky
+                      Zákazník zatiaľ nemá žiadne objednávky
                     </p>
                   )}
                 </div>
