@@ -29,7 +29,7 @@ interface Order {
   billing_last_name: string;
   billing_email: string;
   invoice_id: string;
-  items: { id: string }[];
+  items: { id: string; quantity: number }[];
 }
 
 interface OrderStats {
@@ -245,7 +245,7 @@ export default function AdminOrders() {
     try {
       let query = supabase
         .from("orders")
-        .select("id, order_number, status, payment_status, total, created_at, billing_first_name, billing_last_name, billing_email, invoice_id, items:order_items(id)", { count: "exact" })
+        .select("id, order_number, status, payment_status, total, created_at, billing_first_name, billing_last_name, billing_email, invoice_id, items:order_items(id,quantity)", { count: "exact" })
         .order("created_at", { ascending: false });
 
       if (filterStatus !== "all") query = query.eq("status", filterStatus);
@@ -489,7 +489,7 @@ export default function AdminOrders() {
                         </div>
                       </td>
                       <td className="px-5 py-4 text-sm text-gray-600">
-                        {order.items?.length || 0} ks
+                        {order.items?.reduce((sum, i) => sum + (i.quantity || 0), 0) || 0} ks
                       </td>
                       <td className="px-5 py-4 text-sm font-semibold text-gray-900">
                         {parseFloat(String(order.total)).toLocaleString()} EUR
