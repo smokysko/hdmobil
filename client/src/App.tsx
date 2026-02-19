@@ -38,6 +38,7 @@ const AdminDiscounts = lazy(() => import("./pages/admin/discounts"));
 const AdminMarketing = lazy(() => import("./pages/admin/marketing"));
 const AdminReviews = lazy(() => import("./pages/admin/reviews"));
 const AdminModules = lazy(() => import("./pages/admin/modules"));
+const AdminOrderDetail = lazy(() => import("./pages/admin/order-detail"));
 
 function Router() {
   return (
@@ -66,6 +67,7 @@ function Router() {
         <Route path="/admin/login" component={AdminLogin} />
         <Route path="/admin/dashboard" component={AdminDashboard} />
         <Route path="/admin/products" component={AdminProducts} />
+        <Route path="/admin/orders/:id" component={AdminOrderDetail} />
         <Route path="/admin/orders" component={AdminOrders} />
         <Route path="/admin/settings" component={AdminSettings} />
         <Route path="/admin/customers" component={AdminCustomers} />

@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   Search,
   ChevronDown,
-  Eye,
   FileText,
   Truck,
-  X,
   CheckCircle,
   Clock,
   AlertCircle,
@@ -13,10 +11,12 @@ import {
   Download,
   ChevronLeft,
   ChevronRight,
+  ArrowRight,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
+import { useLocation } from "wouter";
 
 interface Order {
   id: string;
@@ -24,42 +24,12 @@ interface Order {
   status: string;
   payment_status: string;
   total: number;
-  subtotal: number;
-  vat_total: number;
-  shipping_cost: number;
-  discount_amount: number;
   created_at: string;
   billing_first_name: string;
   billing_last_name: string;
   billing_email: string;
-  billing_phone: string;
-  billing_street: string;
-  billing_city: string;
-  billing_zip: string;
-  billing_country: string;
-  billing_company_name: string;
-  billing_ico: string;
-  shipping_first_name: string;
-  shipping_last_name: string;
-  shipping_street: string;
-  shipping_city: string;
-  shipping_zip: string;
-  shipping_country: string;
-  shipping_method_name: string;
-  payment_method_name: string;
-  customer_note: string;
-  admin_note: string;
-  tracking_number: string;
   invoice_id: string;
-  items: {
-    id: string;
-    product_name: string;
-    product_sku: string;
-    quantity: number;
-    price_with_vat: number;
-    line_total: number;
-    product_image_url: string;
-  }[];
+  items: { id: string }[];
 }
 
 interface OrderStats {
@@ -70,29 +40,197 @@ interface OrderStats {
 }
 
 const ORDER_STATUSES = [
-  { value: "pending", label: "Čakajúca", color: "amber" },
-  { value: "confirmed", label: "Potvrdená", color: "blue" },
-  { value: "processing", label: "Spracováva sa", color: "blue" },
-  { value: "shipped", label: "Odoslaná", color: "violet" },
-  { value: "delivered", label: "Doručená", color: "green" },
-  { value: "cancelled", label: "Zrušená", color: "red" },
+  { value: "pending", label: "Čakajúca", dot: "bg-amber-500", bg: "bg-amber-50", text: "text-amber-700" },
+  { value: "confirmed", label: "Potvrdená", dot: "bg-blue-500", bg: "bg-blue-50", text: "text-blue-700" },
+  { value: "processing", label: "Spracováva sa", dot: "bg-blue-500", bg: "bg-blue-50", text: "text-blue-700" },
+  { value: "shipped", label: "Odoslaná", dot: "bg-teal-500", bg: "bg-teal-50", text: "text-teal-700" },
+  { value: "delivered", label: "Doručená", dot: "bg-green-500", bg: "bg-green-50", text: "text-green-700" },
+  { value: "cancelled", label: "Zrušená", dot: "bg-red-500", bg: "bg-red-50", text: "text-red-700" },
 ];
 
+const PAYMENT_STATUSES = [
+  { value: "paid", label: "Zaplatené", icon: "check" },
+  { value: "pending", label: "Nezaplatené", icon: "alert" },
+];
+
+function InlineStatusSelect({
+  orderId,
+  currentStatus,
+  onUpdated,
+}: {
+  orderId: string;
+  currentStatus: string;
+  onUpdated: (id: string, newStatus: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  const current = ORDER_STATUSES.find((s) => s.value === currentStatus) || ORDER_STATUSES[0];
+
+  async function select(value: string) {
+    if (value === currentStatus) { setOpen(false); return; }
+    setUpdating(true);
+    setOpen(false);
+    const updates: Record<string, unknown> = { status: value };
+    if (value === "shipped") updates.shipped_at = new Date().toISOString();
+    if (value === "delivered") updates.delivered_at = new Date().toISOString();
+    const { error } = await supabase.from("orders").update(updates).eq("id", orderId);
+    if (!error) {
+      onUpdated(orderId, value);
+      toast.success("Stav objednávky aktualizovaný");
+    } else {
+      toast.error("Nepodarilo sa aktualizovať stav");
+    }
+    setUpdating(false);
+  }
+
+  return (
+    <div ref={ref} className="relative inline-block">
+      <button
+        onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
+        disabled={updating}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:ring-2 hover:ring-offset-1 hover:ring-gray-300 ${current.bg} ${current.text} disabled:opacity-60`}
+      >
+        {updating ? (
+          <Loader2 className="w-3 h-3 animate-spin" />
+        ) : (
+          <span className={`w-1.5 h-1.5 rounded-full ${current.dot}`} />
+        )}
+        {current.label}
+        <ChevronDown className="w-3 h-3 opacity-60" />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-lg shadow-gray-200/60 py-1 min-w-[160px]">
+          {ORDER_STATUSES.map((s) => (
+            <button
+              key={s.value}
+              onClick={() => select(s.value)}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                s.value === currentStatus ? "font-medium" : "text-gray-700"
+              }`}
+            >
+              <span className={`w-2 h-2 rounded-full ${s.dot}`} />
+              {s.label}
+              {s.value === currentStatus && (
+                <CheckCircle className="w-3.5 h-3.5 text-green-500 ml-auto" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+function InlinePaymentSelect({
+  orderId,
+  currentStatus,
+  onUpdated,
+}: {
+  orderId: string;
+  currentStatus: string;
+  onUpdated: (id: string, newStatus: string) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [updating, setUpdating] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    function handleClick(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
+
+  async function select(value: string) {
+    if (value === currentStatus) { setOpen(false); return; }
+    setUpdating(true);
+    setOpen(false);
+    const { error } = await supabase.from("orders").update({ payment_status: value }).eq("id", orderId);
+    if (!error) {
+      onUpdated(orderId, value);
+      toast.success("Stav platby aktualizovaný");
+    } else {
+      toast.error("Nepodarilo sa aktualizovať platbu");
+    }
+    setUpdating(false);
+  }
+
+  const isPaid = currentStatus === "paid";
+
+  return (
+    <div ref={ref} className="relative inline-block">
+      <button
+        onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
+        disabled={updating}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:ring-2 hover:ring-offset-1 hover:ring-gray-300 disabled:opacity-60 ${
+          isPaid
+            ? "bg-green-50 text-green-700"
+            : "bg-red-50 text-red-700"
+        }`}
+      >
+        {updating ? (
+          <Loader2 className="w-3 h-3 animate-spin" />
+        ) : isPaid ? (
+          <CheckCircle className="w-3 h-3" />
+        ) : (
+          <AlertCircle className="w-3 h-3" />
+        )}
+        {isPaid ? "Zaplatené" : "Nezaplatené"}
+        <ChevronDown className="w-3 h-3 opacity-60" />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-lg shadow-gray-200/60 py-1 min-w-[160px]">
+          {PAYMENT_STATUSES.map((s) => (
+            <button
+              key={s.value}
+              onClick={() => select(s.value)}
+              className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                s.value === currentStatus ? "font-medium" : "text-gray-700"
+              }`}
+            >
+              {s.value === "paid" ? (
+                <CheckCircle className="w-4 h-4 text-green-500" />
+              ) : (
+                <AlertCircle className="w-4 h-4 text-red-400" />
+              )}
+              {s.label}
+              {s.value === currentStatus && (
+                <CheckCircle className="w-3.5 h-3.5 text-green-500 ml-auto" />
+              )}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function AdminOrders() {
+  const [, navigate] = useLocation();
   const [orders, setOrders] = useState<Order[]>([]);
-  const [stats, setStats] = useState<OrderStats>({
-    pending: 0,
-    processing: 0,
-    shipped: 0,
-    delivered: 0,
-  });
+  const [stats, setStats] = useState<OrderStats>({ pending: 0, processing: 0, shipped: 0, delivered: 0 });
   const [loading, setLoading] = useState(true);
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterPayment, setFilterPayment] = useState("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [updatingStatus, setUpdatingStatus] = useState(false);
-  const [generatingInvoice, setGeneratingInvoice] = useState(false);
+  const [generatingInvoice, setGeneratingInvoice] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 20;
@@ -106,42 +244,27 @@ export default function AdminOrders() {
     try {
       let query = supabase
         .from("orders")
-        .select(
-          `
-          *,
-          items:order_items(*)
-        `,
-          { count: "exact" }
-        )
+        .select("id, order_number, status, payment_status, total, created_at, billing_first_name, billing_last_name, billing_email, invoice_id, items:order_items(id)", { count: "exact" })
         .order("created_at", { ascending: false });
 
-      if (filterStatus !== "all") {
-        query = query.eq("status", filterStatus);
-      }
-      if (filterPayment !== "all") {
-        query = query.eq("payment_status", filterPayment);
-      }
+      if (filterStatus !== "all") query = query.eq("status", filterStatus);
+      if (filterPayment !== "all") query = query.eq("payment_status", filterPayment);
 
       const offset = (page - 1) * pageSize;
       query = query.range(offset, offset + pageSize - 1);
 
       const { data, count, error } = await query;
-
       if (error) throw error;
 
       setOrders(data || []);
       setTotalCount(count || 0);
 
-      const statsRes = await supabase
-        .from("orders")
-        .select("status");
-
+      const statsRes = await supabase.from("orders").select("status");
       if (statsRes.data) {
         const statusCounts = statsRes.data.reduce(
           (acc, o) => {
             if (o.status === "pending") acc.pending++;
-            else if (o.status === "processing" || o.status === "confirmed")
-              acc.processing++;
+            else if (o.status === "processing" || o.status === "confirmed") acc.processing++;
             else if (o.status === "shipped") acc.shipped++;
             else if (o.status === "delivered") acc.delivered++;
             return acc;
@@ -150,83 +273,62 @@ export default function AdminOrders() {
         );
         setStats(statusCounts);
       }
-    } catch (err) {
-      console.error("Error fetching orders:", err);
+    } catch {
       toast.error("Nepodarilo sa načítať objednávky");
     } finally {
       setLoading(false);
     }
   }
 
-  async function updateOrderStatus(orderId: string, newStatus: string) {
-    setUpdatingStatus(true);
-    try {
-      const updates: Record<string, unknown> = { status: newStatus };
-      if (newStatus === "shipped") {
-        updates.shipped_at = new Date().toISOString();
-      } else if (newStatus === "delivered") {
-        updates.delivered_at = new Date().toISOString();
-      }
-
-      const { error } = await supabase
-        .from("orders")
-        .update(updates)
-        .eq("id", orderId);
-
-      if (error) throw error;
-
-      toast.success("Stav objednávky bol aktualizovaný");
-      fetchOrders();
-      if (selectedOrder?.id === orderId) {
-        setSelectedOrder({ ...selectedOrder, status: newStatus });
-      }
-    } catch (err) {
-      console.error("Error updating order:", err);
-      toast.error("Nepodarilo sa aktualizovať stav");
-    } finally {
-      setUpdatingStatus(false);
+  function handleStatusUpdated(orderId: string, newStatus: string) {
+    setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o)));
+    const updated = orders.find((o) => o.id === orderId);
+    if (updated) {
+      setStats((prev) => {
+        const next = { ...prev };
+        if (updated.status === "pending") next.pending = Math.max(0, next.pending - 1);
+        else if (updated.status === "processing" || updated.status === "confirmed") next.processing = Math.max(0, next.processing - 1);
+        else if (updated.status === "shipped") next.shipped = Math.max(0, next.shipped - 1);
+        else if (updated.status === "delivered") next.delivered = Math.max(0, next.delivered - 1);
+        if (newStatus === "pending") next.pending++;
+        else if (newStatus === "processing" || newStatus === "confirmed") next.processing++;
+        else if (newStatus === "shipped") next.shipped++;
+        else if (newStatus === "delivered") next.delivered++;
+        return next;
+      });
     }
   }
 
-  async function generateInvoice(orderId: string) {
-    setGeneratingInvoice(true);
+  function handlePaymentUpdated(orderId: string, newStatus: string) {
+    setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, payment_status: newStatus } : o)));
+  }
+
+  async function generateInvoice(orderId: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    setGeneratingInvoice(orderId);
     try {
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invoices/generate`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
-          },
-          body: JSON.stringify({ orderId }),
-        }
-      );
-
+      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invoices/generate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}` },
+        body: JSON.stringify({ orderId }),
+      });
       const result = await response.json();
-
       if (result.success) {
         toast.success("Faktúra bola vytvorená");
         fetchOrders();
       } else {
         toast.error(result.error || "Nepodarilo sa vytvoriť faktúru");
       }
-    } catch (err) {
-      console.error("Error generating invoice:", err);
+    } catch {
       toast.error("Nepodarilo sa vytvoriť faktúru");
     } finally {
-      setGeneratingInvoice(false);
+      setGeneratingInvoice(null);
     }
   }
 
-  async function downloadInvoice(orderId: string) {
-    try {
-      const url = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invoices/download?orderId=${orderId}`;
-      window.open(url, "_blank");
-    } catch (err) {
-      console.error("Error downloading invoice:", err);
-      toast.error("Nepodarilo sa stiahnuť faktúru");
-    }
+  function downloadInvoice(orderId: string, e: React.MouseEvent) {
+    e.stopPropagation();
+    window.open(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invoices/download?orderId=${orderId}`, "_blank");
   }
 
   const filteredOrders = orders.filter((order) => {
@@ -234,649 +336,253 @@ export default function AdminOrders() {
     const query = searchQuery.toLowerCase();
     return (
       order.order_number.toLowerCase().includes(query) ||
-      `${order.billing_first_name} ${order.billing_last_name}`
-        .toLowerCase()
-        .includes(query) ||
+      `${order.billing_first_name} ${order.billing_last_name}`.toLowerCase().includes(query) ||
       order.billing_email?.toLowerCase().includes(query)
     );
   });
-
-  const getStatusBadge = (status: string) => {
-    const statusMap: Record<
-      string,
-      { bg: string; text: string; label: string; dot: string }
-    > = {
-      pending: {
-        bg: "bg-amber-50",
-        text: "text-amber-700",
-        label: "Čakajúca",
-        dot: "bg-amber-500",
-      },
-      confirmed: {
-        bg: "bg-blue-50",
-        text: "text-blue-700",
-        label: "Potvrdená",
-        dot: "bg-blue-500",
-      },
-      processing: {
-        bg: "bg-blue-50",
-        text: "text-blue-700",
-        label: "Spracováva sa",
-        dot: "bg-blue-500",
-      },
-      shipped: {
-        bg: "bg-violet-50",
-        text: "text-violet-700",
-        label: "Odoslaná",
-        dot: "bg-violet-500",
-      },
-      delivered: {
-        bg: "bg-blue-50",
-        text: "text-blue-700",
-        label: "Doručená",
-        dot: "bg-blue-500",
-      },
-      cancelled: {
-        bg: "bg-red-50",
-        text: "text-red-700",
-        label: "Zrušená",
-        dot: "bg-red-500",
-      },
-    };
-    const s = statusMap[status] || statusMap.pending;
-    return (
-      <span
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${s.bg} ${s.text}`}
-      >
-        <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`}></span>
-        {s.label}
-      </span>
-    );
-  };
-
-  const getPaymentBadge = (payment: string) => {
-    return payment === "paid" ? (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
-        <CheckCircle className="w-3 h-3" />
-        Zaplatené
-      </span>
-    ) : (
-      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-700">
-        <AlertCircle className="w-3 h-3" />
-        Nezaplatené
-      </span>
-    );
-  };
 
   const totalPages = Math.ceil(totalCount / pageSize);
 
   return (
     <AdminLayout>
       <div className="max-w-[1400px] mx-auto space-y-6">
-            <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-gray-900">Objednávky</h2>
+            <p className="text-gray-500 text-sm mt-1">
+              Spravujte objednávky a sledujte ich stav ({totalCount} celkom)
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-4 gap-4">
+          <div className="bg-white rounded-xl border border-gray-200/80 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
+                <Clock className="w-5 h-5 text-amber-600" strokeWidth={1.5} />
+              </div>
               <div>
-                <h2 className="text-2xl font-semibold text-gray-900">
-                  Objednávky
-                </h2>
-                <p className="text-gray-500 text-sm mt-1">
-                  Spravujte objednávky a sledujte ich stav ({totalCount} celkom)
-                </p>
+                <p className="text-2xl font-semibold text-gray-900">{stats.pending}</p>
+                <p className="text-sm text-gray-500">Čakajúce</p>
               </div>
             </div>
-
-            <div className="grid grid-cols-4 gap-4">
-              <div className="bg-white rounded-xl border border-gray-200/80 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-amber-50 flex items-center justify-center">
-                    <Clock className="w-5 h-5 text-amber-600" strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-semibold text-gray-900">
-                      {stats.pending}
-                    </p>
-                    <p className="text-sm text-gray-500">Čakajúce</p>
-                  </div>
-                </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200/80 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
+                <AlertCircle className="w-5 h-5 text-blue-600" strokeWidth={1.5} />
               </div>
-              <div className="bg-white rounded-xl border border-gray-200/80 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                    <AlertCircle
-                      className="w-5 h-5 text-blue-600"
-                      strokeWidth={1.5}
-                    />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-semibold text-gray-900">
-                      {stats.processing}
-                    </p>
-                    <p className="text-sm text-gray-500">Spracovávané</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl border border-gray-200/80 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-violet-50 flex items-center justify-center">
-                    <Truck className="w-5 h-5 text-violet-600" strokeWidth={1.5} />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-semibold text-gray-900">
-                      {stats.shipped}
-                    </p>
-                    <p className="text-sm text-gray-500">Odoslané</p>
-                  </div>
-                </div>
-              </div>
-              <div className="bg-white rounded-xl border border-gray-200/80 p-4">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center">
-                    <CheckCircle
-                      className="w-5 h-5 text-blue-600"
-                      strokeWidth={1.5}
-                    />
-                  </div>
-                  <div>
-                    <p className="text-2xl font-semibold text-gray-900">
-                      {stats.delivered}
-                    </p>
-                    <p className="text-sm text-gray-500">Doručené</p>
-                  </div>
-                </div>
+              <div>
+                <p className="text-2xl font-semibold text-gray-900">{stats.processing}</p>
+                <p className="text-sm text-gray-500">Spracovávané</p>
               </div>
             </div>
-
-            <div className="bg-white rounded-xl border border-gray-200/80 p-4">
-              <div className="flex flex-col sm:flex-row gap-4">
-                <div className="flex-1 relative">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Hľadať podľa čísla objednávky alebo mena..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
-                  />
-                </div>
-                <div className="flex gap-3">
-                  <div className="relative">
-                    <select
-                      value={filterStatus}
-                      onChange={(e) => {
-                        setFilterStatus(e.target.value);
-                        setPage(1);
-                      }}
-                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
-                    >
-                      <option value="all">Všetky stavy</option>
-                      <option value="pending">Čakajúce</option>
-                      <option value="confirmed">Potvrdené</option>
-                      <option value="processing">Spracovávané</option>
-                      <option value="shipped">Odoslané</option>
-                      <option value="delivered">Doručené</option>
-                      <option value="cancelled">Zrušené</option>
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                  </div>
-                  <div className="relative">
-                    <select
-                      value={filterPayment}
-                      onChange={(e) => {
-                        setFilterPayment(e.target.value);
-                        setPage(1);
-                      }}
-                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
-                    >
-                      <option value="all">Všetky platby</option>
-                      <option value="paid">Zaplatené</option>
-                      <option value="pending">Nezaplatené</option>
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                  </div>
-                </div>
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200/80 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-teal-50 flex items-center justify-center">
+                <Truck className="w-5 h-5 text-teal-600" strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="text-2xl font-semibold text-gray-900">{stats.shipped}</p>
+                <p className="text-sm text-gray-500">Odoslané</p>
               </div>
             </div>
-
-            <div className="bg-white rounded-xl border border-gray-200/80 overflow-hidden">
-              {loading ? (
-                <div className="flex items-center justify-center py-20">
-                  <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full">
-                    <thead>
-                      <tr className="border-b border-gray-100 bg-gray-50/50">
-                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Objednávka
-                        </th>
-                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Zákazník
-                        </th>
-                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Položky
-                        </th>
-                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Suma
-                        </th>
-                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Stav
-                        </th>
-                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Platba
-                        </th>
-                        <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Dátum
-                        </th>
-                        <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
-                          Akcie
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-gray-50">
-                      {filteredOrders.map((order) => (
-                        <tr
-                          key={order.id}
-                          className="hover:bg-gray-50/50 transition-colors"
-                        >
-                          <td className="px-5 py-4">
-                            <button
-                              onClick={() => setSelectedOrder(order)}
-                              className="text-sm font-medium text-blue-600 hover:text-blue-700"
-                            >
-                              {order.order_number}
-                            </button>
-                          </td>
-                          <td className="px-5 py-4">
-                            <div>
-                              <p className="text-sm font-medium text-gray-900">
-                                {order.billing_first_name} {order.billing_last_name}
-                              </p>
-                              <p className="text-xs text-gray-500">
-                                {order.billing_email}
-                              </p>
-                            </div>
-                          </td>
-                          <td className="px-5 py-4 text-sm text-gray-600">
-                            {order.items?.length || 0} ks
-                          </td>
-                          <td className="px-5 py-4 text-sm font-semibold text-gray-900">
-                            {parseFloat(String(order.total)).toLocaleString()} EUR
-                          </td>
-                          <td className="px-5 py-4">
-                            {getStatusBadge(order.status)}
-                          </td>
-                          <td className="px-5 py-4">
-                            {getPaymentBadge(order.payment_status)}
-                          </td>
-                          <td className="px-5 py-4 text-sm text-gray-500">
-                            {new Date(order.created_at).toLocaleDateString("sk-SK")}
-                          </td>
-                          <td className="px-5 py-4">
-                            <div className="flex items-center justify-end gap-1">
-                              <button
-                                onClick={() => setSelectedOrder(order)}
-                                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                              >
-                                <Eye className="w-4 h-4" />
-                              </button>
-                              {order.invoice_id ? (
-                                <button
-                                  onClick={() => downloadInvoice(order.id)}
-                                  className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                >
-                                  <Download className="w-4 h-4" />
-                                </button>
-                              ) : (
-                                <button
-                                  onClick={() => generateInvoice(order.id)}
-                                  disabled={generatingInvoice}
-                                  className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
-                                >
-                                  <FileText className="w-4 h-4" />
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                      {filteredOrders.length === 0 && (
-                        <tr>
-                          <td
-                            colSpan={8}
-                            className="px-5 py-12 text-center text-gray-500"
-                          >
-                            Žiadne objednávky
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-
-              <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
-                <p className="text-sm text-gray-500">
-                  Zobrazených{" "}
-                  <span className="font-medium text-gray-700">
-                    {filteredOrders.length}
-                  </span>{" "}
-                  z{" "}
-                  <span className="font-medium text-gray-700">{totalCount}</span>{" "}
-                  objednávok
-                </p>
-                {totalPages > 1 && (
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setPage((p) => Math.max(1, p - 1))}
-                      disabled={page === 1}
-                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
-                    >
-                      <ChevronLeft className="w-4 h-4" />
-                    </button>
-                    <span className="text-sm text-gray-600">
-                      {page} / {totalPages}
-                    </span>
-                    <button
-                      onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
-                      disabled={page === totalPages}
-                      className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
-                    >
-                      <ChevronRight className="w-4 h-4" />
-                    </button>
-                  </div>
-                )}
+          </div>
+          <div className="bg-white rounded-xl border border-gray-200/80 p-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center">
+                <CheckCircle className="w-5 h-5 text-green-600" strokeWidth={1.5} />
+              </div>
+              <div>
+                <p className="text-2xl font-semibold text-gray-900">{stats.delivered}</p>
+                <p className="text-sm text-gray-500">Doručené</p>
               </div>
             </div>
+          </div>
+        </div>
 
-            {selectedOrder && (
-              <div className="bg-white rounded-xl border border-gray-200/80 p-6">
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900">
-                      Detail objednávky {selectedOrder.order_number}
-                    </h3>
-                    <p className="text-sm text-gray-500">
-                      Vytvorená{" "}
-                      {new Date(selectedOrder.created_at).toLocaleString("sk-SK")}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setSelectedOrder(null)}
-                    className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
+        <div className="bg-white rounded-xl border border-gray-200/80 p-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Hľadať podľa čísla objednávky alebo mena..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+              />
+            </div>
+            <div className="flex gap-3">
+              <div className="relative">
+                <select
+                  value={filterStatus}
+                  onChange={(e) => { setFilterStatus(e.target.value); setPage(1); }}
+                  className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
+                >
+                  <option value="all">Všetky stavy</option>
+                  <option value="pending">Čakajúce</option>
+                  <option value="confirmed">Potvrdené</option>
+                  <option value="processing">Spracovávané</option>
+                  <option value="shipped">Odoslané</option>
+                  <option value="delivered">Doručené</option>
+                  <option value="cancelled">Zrušené</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
+              <div className="relative">
+                <select
+                  value={filterPayment}
+                  onChange={(e) => { setFilterPayment(e.target.value); setPage(1); }}
+                  className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
+                >
+                  <option value="all">Všetky platby</option>
+                  <option value="paid">Zaplatené</option>
+                  <option value="pending">Nezaplatené</option>
+                </select>
+                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+          </div>
+        </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                      Fakturačné údaje
-                    </h4>
-                    <div className="bg-gray-50 rounded-lg p-4 space-y-1 text-sm">
-                      <p className="font-medium text-gray-900">
-                        {selectedOrder.billing_first_name}{" "}
-                        {selectedOrder.billing_last_name}
-                      </p>
-                      {selectedOrder.billing_company_name && (
-                        <p className="text-gray-600">
-                          {selectedOrder.billing_company_name}
-                        </p>
-                      )}
-                      <p className="text-gray-600">{selectedOrder.billing_street}</p>
-                      <p className="text-gray-600">
-                        {selectedOrder.billing_zip} {selectedOrder.billing_city}
-                      </p>
-                      <p className="text-gray-600">{selectedOrder.billing_country}</p>
-                      <p className="text-gray-600 mt-2">
-                        {selectedOrder.billing_email}
-                      </p>
-                      {selectedOrder.billing_phone && (
-                        <p className="text-gray-600">
-                          {selectedOrder.billing_phone}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                      Doručovacie údaje
-                    </h4>
-                    <div className="bg-gray-50 rounded-lg p-4 space-y-1 text-sm">
-                      <p className="font-medium text-gray-900">
-                        {selectedOrder.shipping_first_name}{" "}
-                        {selectedOrder.shipping_last_name}
-                      </p>
-                      <p className="text-gray-600">
-                        {selectedOrder.shipping_street}
-                      </p>
-                      <p className="text-gray-600">
-                        {selectedOrder.shipping_zip} {selectedOrder.shipping_city}
-                      </p>
-                      <p className="text-gray-600">
-                        {selectedOrder.shipping_country}
-                      </p>
-                      <p className="text-blue-600 mt-2 font-medium">
-                        {selectedOrder.shipping_method_name}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div>
-                    <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                      Platba a stav
-                    </h4>
-                    <div className="bg-gray-50 rounded-lg p-4 space-y-3 text-sm">
-                      <div className="flex justify-between">
-                        <span className="text-gray-600">Spôsob platby:</span>
-                        <span className="font-medium">
-                          {selectedOrder.payment_method_name}
+        <div className="bg-white rounded-xl border border-gray-200/80 overflow-hidden">
+          {loading ? (
+            <div className="flex items-center justify-center py-20">
+              <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-gray-100 bg-gray-50/50">
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Objednávka</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Zákazník</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Položky</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Suma</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stav</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Platba</th>
+                    <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dátum</th>
+                    <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Akcie</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-50">
+                  {filteredOrders.map((order) => (
+                    <tr
+                      key={order.id}
+                      onClick={() => navigate(`/admin/orders/${order.id}`)}
+                      className="hover:bg-blue-50/30 transition-colors cursor-pointer group"
+                    >
+                      <td className="px-5 py-4">
+                        <span className="text-sm font-medium text-blue-600 group-hover:text-blue-700">
+                          {order.order_number}
                         </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Stav platby:</span>
-                        {getPaymentBadge(selectedOrder.payment_status)}
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-gray-600">Stav objednávky:</span>
-                        {getStatusBadge(selectedOrder.status)}
-                      </div>
-                      {selectedOrder.tracking_number && (
-                        <div className="flex justify-between">
-                          <span className="text-gray-600">Sledovacie číslo:</span>
-                          <span className="font-medium">
-                            {selectedOrder.tracking_number}
-                          </span>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">
+                            {order.billing_first_name} {order.billing_last_name}
+                          </p>
+                          <p className="text-xs text-gray-500">{order.billing_email}</p>
                         </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                <div className="mb-6">
-                  <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-3">
-                    Položky objednávky
-                  </h4>
-                  <div className="bg-gray-50 rounded-lg overflow-hidden">
-                    <table className="w-full">
-                      <thead>
-                        <tr className="border-b border-gray-200">
-                          <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-                            Produkt
-                          </th>
-                          <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                            Cena
-                          </th>
-                          <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                            Množstvo
-                          </th>
-                          <th className="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase">
-                            Spolu
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-gray-200">
-                        {selectedOrder.items?.map((item) => (
-                          <tr key={item.id}>
-                            <td className="px-4 py-3">
-                              <div className="flex items-center gap-3">
-                                {item.product_image_url && (
-                                  <img
-                                    src={item.product_image_url}
-                                    alt={item.product_name}
-                                    className="w-10 h-10 object-contain rounded"
-                                  />
-                                )}
-                                <div>
-                                  <p className="font-medium text-gray-900">
-                                    {item.product_name}
-                                  </p>
-                                  {item.product_sku && (
-                                    <p className="text-xs text-gray-500">
-                                      SKU: {item.product_sku}
-                                    </p>
-                                  )}
-                                </div>
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 text-right text-gray-600">
-                              {parseFloat(String(item.price_with_vat)).toLocaleString()}{" "}
-                              EUR
-                            </td>
-                            <td className="px-4 py-3 text-right text-gray-600">
-                              {item.quantity}x
-                            </td>
-                            <td className="px-4 py-3 text-right font-medium text-gray-900">
-                              {parseFloat(String(item.line_total)).toLocaleString()} EUR
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                      <tfoot className="border-t-2 border-gray-200">
-                        <tr>
-                          <td colSpan={3} className="px-4 py-2 text-right text-gray-600">
-                            Medzisúčet:
-                          </td>
-                          <td className="px-4 py-2 text-right font-medium">
-                            {parseFloat(String(selectedOrder.subtotal)).toLocaleString()}{" "}
-                            EUR
-                          </td>
-                        </tr>
-                        <tr>
-                          <td colSpan={3} className="px-4 py-2 text-right text-gray-600">
-                            DPH:
-                          </td>
-                          <td className="px-4 py-2 text-right font-medium">
-                            {parseFloat(String(selectedOrder.vat_total)).toLocaleString()}{" "}
-                            EUR
-                          </td>
-                        </tr>
-                        {parseFloat(String(selectedOrder.shipping_cost)) > 0 && (
-                          <tr>
-                            <td
-                              colSpan={3}
-                              className="px-4 py-2 text-right text-gray-600"
+                      </td>
+                      <td className="px-5 py-4 text-sm text-gray-600">
+                        {order.items?.length || 0} ks
+                      </td>
+                      <td className="px-5 py-4 text-sm font-semibold text-gray-900">
+                        {parseFloat(String(order.total)).toLocaleString()} EUR
+                      </td>
+                      <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
+                        <InlineStatusSelect
+                          orderId={order.id}
+                          currentStatus={order.status}
+                          onUpdated={handleStatusUpdated}
+                        />
+                      </td>
+                      <td className="px-5 py-4" onClick={(e) => e.stopPropagation()}>
+                        <InlinePaymentSelect
+                          orderId={order.id}
+                          currentStatus={order.payment_status}
+                          onUpdated={handlePaymentUpdated}
+                        />
+                      </td>
+                      <td className="px-5 py-4 text-sm text-gray-500">
+                        {new Date(order.created_at).toLocaleDateString("sk-SK")}
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex items-center justify-end gap-1">
+                          {order.invoice_id ? (
+                            <button
+                              onClick={(e) => downloadInvoice(order.id, e)}
+                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              title="Stiahnuť faktúru"
                             >
-                              Doprava:
-                            </td>
-                            <td className="px-4 py-2 text-right font-medium">
-                              {parseFloat(
-                                String(selectedOrder.shipping_cost)
-                              ).toLocaleString()}{" "}
-                              EUR
-                            </td>
-                          </tr>
-                        )}
-                        {parseFloat(String(selectedOrder.discount_amount)) > 0 && (
-                          <tr>
-                            <td
-                              colSpan={3}
-                              className="px-4 py-2 text-right text-gray-600"
+                              <Download className="w-4 h-4" />
+                            </button>
+                          ) : (
+                            <button
+                              onClick={(e) => generateInvoice(order.id, e)}
+                              disabled={generatingInvoice === order.id}
+                              className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                              title="Vytvoriť faktúru"
                             >
-                              Zľava:
-                            </td>
-                            <td className="px-4 py-2 text-right font-medium text-red-600">
-                              -
-                              {parseFloat(
-                                String(selectedOrder.discount_amount)
-                              ).toLocaleString()}{" "}
-                              EUR
-                            </td>
-                          </tr>
-                        )}
-                        <tr className="bg-gray-100">
-                          <td
-                            colSpan={3}
-                            className="px-4 py-3 text-right font-semibold text-gray-900"
+                              {generatingInvoice === order.id ? (
+                                <Loader2 className="w-4 h-4 animate-spin" />
+                              ) : (
+                                <FileText className="w-4 h-4" />
+                              )}
+                            </button>
+                          )}
+                          <button
+                            onClick={() => navigate(`/admin/orders/${order.id}`)}
+                            className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100"
+                            title="Zobraziť detail"
                           >
-                            Celkom:
-                          </td>
-                          <td className="px-4 py-3 text-right font-bold text-lg text-blue-600">
-                            {parseFloat(String(selectedOrder.total)).toLocaleString()}{" "}
-                            EUR
-                          </td>
-                        </tr>
-                      </tfoot>
-                    </table>
-                  </div>
-                </div>
-
-                {selectedOrder.customer_note && (
-                  <div className="mb-6">
-                    <h4 className="text-sm font-medium text-gray-500 uppercase tracking-wider mb-2">
-                      Poznámka zákazníka
-                    </h4>
-                    <p className="text-sm text-gray-600 bg-amber-50 p-3 rounded-lg">
-                      {selectedOrder.customer_note}
-                    </p>
-                  </div>
-                )}
-
-                <div className="flex flex-wrap gap-3 justify-end">
-                  <div className="relative">
-                    <select
-                      value={selectedOrder.status}
-                      onChange={(e) =>
-                        updateOrderStatus(selectedOrder.id, e.target.value)
-                      }
-                      disabled={updatingStatus}
-                      className="appearance-none pl-4 pr-10 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white disabled:opacity-50"
-                    >
-                      {ORDER_STATUSES.map((s) => (
-                        <option key={s.value} value={s.value}>
-                          {s.label}
-                        </option>
-                      ))}
-                    </select>
-                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" />
-                  </div>
-
-                  {selectedOrder.invoice_id ? (
-                    <button
-                      onClick={() => downloadInvoice(selectedOrder.id)}
-                      className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors"
-                    >
-                      <Download className="w-4 h-4" />
-                      Stiahnuť faktúru
-                    </button>
-                  ) : (
-                    <button
-                      onClick={() => generateInvoice(selectedOrder.id)}
-                      disabled={generatingInvoice}
-                      className="flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50 font-medium transition-colors disabled:opacity-50"
-                    >
-                      {generatingInvoice ? (
-                        <Loader2 className="w-4 h-4 animate-spin" />
-                      ) : (
-                        <FileText className="w-4 h-4" />
-                      )}
-                      Vytvoriť faktúru
-                    </button>
+                            <ArrowRight className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                  {filteredOrders.length === 0 && (
+                    <tr>
+                      <td colSpan={8} className="px-5 py-12 text-center text-gray-500">
+                        Žiadne objednávky
+                      </td>
+                    </tr>
                   )}
-                </div>
+                </tbody>
+              </table>
+            </div>
+          )}
+
+          <div className="px-5 py-4 border-t border-gray-100 flex items-center justify-between">
+            <p className="text-sm text-gray-500">
+              Zobrazených <span className="font-medium text-gray-700">{filteredOrders.length}</span> z{" "}
+              <span className="font-medium text-gray-700">{totalCount}</span> objednávok
+            </p>
+            {totalPages > 1 && (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={page === 1}
+                  className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <span className="text-sm text-gray-600">{page} / {totalPages}</span>
+                <button
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  disabled={page === totalPages}
+                  className="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors disabled:opacity-50"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
               </div>
             )}
+          </div>
+        </div>
       </div>
     </AdminLayout>
   );
