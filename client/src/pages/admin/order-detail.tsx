@@ -15,7 +15,7 @@ import {
 import { supabase } from "../../lib/supabase";
 import AdminLayout from "../../components/AdminLayout";
 import { toast } from "sonner";
-import { useLocation, useParams } from "wouter";
+import { useLocation, useRoute } from "wouter";
 
 interface OrderDetail {
   id: string;
@@ -68,10 +68,24 @@ const ORDER_STATUSES = [
   { value: "shipped", label: "Odoslaná", dot: "bg-teal-500", bg: "bg-teal-50", text: "text-teal-700" },
   { value: "delivered", label: "Doručená", dot: "bg-green-500", bg: "bg-green-50", text: "text-green-700" },
   { value: "cancelled", label: "Zrušená", dot: "bg-red-500", bg: "bg-red-50", text: "text-red-700" },
+  { value: "returned", label: "Vrátená", dot: "bg-gray-400", bg: "bg-gray-100", text: "text-gray-600" },
 ];
 
+const PAYMENT_STATUSES = [
+  { value: "paid", label: "Zaplatené", bg: "bg-green-50", text: "text-green-700", activeBg: "bg-green-100" },
+  { value: "pending", label: "Nezaplatené", bg: "bg-orange-50", text: "text-orange-700", activeBg: "bg-orange-100" },
+  { value: "failed", label: "Zlyhala", bg: "bg-red-50", text: "text-red-700", activeBg: "bg-red-100" },
+  { value: "refunded", label: "Vrátená platba", bg: "bg-gray-100", text: "text-gray-600", activeBg: "bg-gray-200" },
+];
+
+function getPaymentStyle(status: string) {
+  return (
+    PAYMENT_STATUSES.find((s) => s.value === status) || PAYMENT_STATUSES[1]
+  );
+}
+
 export default function AdminOrderDetail() {
-  const params = useParams<{ id: string }>();
+  const [, params] = useRoute("/admin/orders/:id");
   const [, navigate] = useLocation();
   const [order, setOrder] = useState<OrderDetail | null>(null);
   const [loading, setLoading] = useState(true);
@@ -83,8 +97,8 @@ export default function AdminOrderDetail() {
   const [savingNote, setSavingNote] = useState(false);
 
   useEffect(() => {
-    if (params.id) fetchOrder(params.id);
-  }, [params.id]);
+    if (params?.id) fetchOrder(params.id);
+  }, [params?.id]);
 
   async function fetchOrder(id: string) {
     setLoading(true);
@@ -124,7 +138,9 @@ export default function AdminOrderDetail() {
   async function updatePayment(newStatus: string) {
     if (!order) return;
     setUpdatingPayment(true);
-    const { error } = await supabase.from("orders").update({ payment_status: newStatus }).eq("id", order.id);
+    const updates: Record<string, unknown> = { payment_status: newStatus };
+    if (newStatus === "paid") updates.paid_at = new Date().toISOString();
+    const { error } = await supabase.from("orders").update(updates).eq("id", order.id);
     if (!error) {
       setOrder({ ...order, payment_status: newStatus });
       toast.success("Stav platby aktualizovaný");
@@ -137,7 +153,10 @@ export default function AdminOrderDetail() {
   async function saveAdminNote() {
     if (!order) return;
     setSavingNote(true);
-    const { error } = await supabase.from("orders").update({ admin_note: adminNote, tracking_number: trackingNumber }).eq("id", order.id);
+    const { error } = await supabase
+      .from("orders")
+      .update({ admin_note: adminNote, tracking_number: trackingNumber })
+      .eq("id", order.id);
     if (!error) {
       setOrder({ ...order, admin_note: adminNote, tracking_number: trackingNumber });
       toast.success("Poznámka uložená");
@@ -151,11 +170,17 @@ export default function AdminOrderDetail() {
     if (!order) return;
     setGeneratingInvoice(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invoices/generate`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}` },
-        body: JSON.stringify({ orderId: order.id }),
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invoices/generate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: JSON.stringify({ orderId: order.id }),
+        }
+      );
       const result = await response.json();
       if (result.success) {
         toast.success("Faktúra bola vytvorená");
@@ -172,11 +197,11 @@ export default function AdminOrderDetail() {
 
   function downloadInvoice() {
     if (!order) return;
-    window.open(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invoices/download?orderId=${order.id}`, "_blank");
+    window.open(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invoices/download?orderId=${order.id}`,
+      "_blank"
+    );
   }
-
-  const currentStatus = ORDER_STATUSES.find((s) => s.value === order?.status) || ORDER_STATUSES[0];
-  const isPaid = order?.payment_status === "paid";
 
   if (loading) {
     return (
@@ -190,10 +215,13 @@ export default function AdminOrderDetail() {
 
   if (!order) return null;
 
+  const currentStatus = ORDER_STATUSES.find((s) => s.value === order.status) || ORDER_STATUSES[0];
+  const paymentStyle = getPaymentStyle(order.payment_status);
+
   return (
     <AdminLayout>
       <div className="max-w-[1200px] mx-auto space-y-6">
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-4 flex-wrap">
           <button
             onClick={() => navigate("/admin/orders")}
             className="flex items-center gap-2 text-gray-500 hover:text-gray-700 text-sm px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -207,9 +235,13 @@ export default function AdminOrderDetail() {
             <span className={`w-1.5 h-1.5 rounded-full ${currentStatus.dot}`} />
             {currentStatus.label}
           </span>
-          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${isPaid ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
-            {isPaid ? <CheckCircle className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
-            {isPaid ? "Zaplatené" : "Nezaplatené"}
+          <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${paymentStyle.bg} ${paymentStyle.text}`}>
+            {order.payment_status === "paid" ? (
+              <CheckCircle className="w-3 h-3" />
+            ) : (
+              <AlertCircle className="w-3 h-3" />
+            )}
+            {paymentStyle.label}
           </span>
           <p className="text-sm text-gray-400 ml-auto">
             {new Date(order.created_at).toLocaleString("sk-SK")}
@@ -227,7 +259,7 @@ export default function AdminOrderDetail() {
                 <thead>
                   <tr className="border-b border-gray-100 bg-gray-50/50">
                     <th className="px-5 py-3 text-left text-xs font-medium text-gray-500 uppercase">Produkt</th>
-                    <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cena</th>
+                    <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase">Cena/ks</th>
                     <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase">Mn.</th>
                     <th className="px-5 py-3 text-right text-xs font-medium text-gray-500 uppercase">Spolu</th>
                   </tr>
@@ -238,11 +270,17 @@ export default function AdminOrderDetail() {
                       <td className="px-5 py-4">
                         <div className="flex items-center gap-3">
                           {item.product_image_url && (
-                            <img src={item.product_image_url} alt={item.product_name} className="w-10 h-10 object-contain rounded-lg bg-gray-50" />
+                            <img
+                              src={item.product_image_url}
+                              alt={item.product_name}
+                              className="w-10 h-10 object-contain rounded-lg bg-gray-50"
+                            />
                           )}
                           <div>
                             <p className="text-sm font-medium text-gray-900">{item.product_name}</p>
-                            {item.product_sku && <p className="text-xs text-gray-400">SKU: {item.product_sku}</p>}
+                            {item.product_sku && (
+                              <p className="text-xs text-gray-400">SKU: {item.product_sku}</p>
+                            )}
                           </div>
                         </div>
                       </td>
@@ -259,16 +297,22 @@ export default function AdminOrderDetail() {
                 <tfoot className="border-t-2 border-gray-100">
                   <tr>
                     <td colSpan={3} className="px-5 py-2 text-right text-sm text-gray-500">Medzisúčet:</td>
-                    <td className="px-5 py-2 text-right text-sm font-medium">{parseFloat(String(order.subtotal)).toLocaleString()} EUR</td>
+                    <td className="px-5 py-2 text-right text-sm font-medium">
+                      {parseFloat(String(order.subtotal)).toLocaleString()} EUR
+                    </td>
                   </tr>
                   <tr>
                     <td colSpan={3} className="px-5 py-2 text-right text-sm text-gray-500">DPH:</td>
-                    <td className="px-5 py-2 text-right text-sm font-medium">{parseFloat(String(order.vat_total)).toLocaleString()} EUR</td>
+                    <td className="px-5 py-2 text-right text-sm font-medium">
+                      {parseFloat(String(order.vat_total)).toLocaleString()} EUR
+                    </td>
                   </tr>
                   {parseFloat(String(order.shipping_cost)) > 0 && (
                     <tr>
                       <td colSpan={3} className="px-5 py-2 text-right text-sm text-gray-500">Doprava:</td>
-                      <td className="px-5 py-2 text-right text-sm font-medium">{parseFloat(String(order.shipping_cost)).toLocaleString()} EUR</td>
+                      <td className="px-5 py-2 text-right text-sm font-medium">
+                        {parseFloat(String(order.shipping_cost)).toLocaleString()} EUR
+                      </td>
                     </tr>
                   )}
                   {parseFloat(String(order.discount_amount)) > 0 && (
@@ -296,9 +340,13 @@ export default function AdminOrderDetail() {
                   <h3 className="text-sm font-semibold text-gray-700">Fakturačné údaje</h3>
                 </div>
                 <div className="space-y-1 text-sm text-gray-600">
-                  <p className="font-medium text-gray-900">{order.billing_first_name} {order.billing_last_name}</p>
+                  <p className="font-medium text-gray-900">
+                    {order.billing_first_name} {order.billing_last_name}
+                  </p>
                   {order.billing_company_name && <p>{order.billing_company_name}</p>}
-                  {order.billing_ico && <p className="text-gray-400">IČO: {order.billing_ico}</p>}
+                  {order.billing_ico && (
+                    <p className="text-gray-400">IČO: {order.billing_ico}</p>
+                  )}
                   <p className="pt-1">{order.billing_street}</p>
                   <p>{order.billing_zip} {order.billing_city}</p>
                   <p>{order.billing_country}</p>
@@ -313,7 +361,9 @@ export default function AdminOrderDetail() {
                   <h3 className="text-sm font-semibold text-gray-700">Doručovacie údaje</h3>
                 </div>
                 <div className="space-y-1 text-sm text-gray-600">
-                  <p className="font-medium text-gray-900">{order.shipping_first_name} {order.shipping_last_name}</p>
+                  <p className="font-medium text-gray-900">
+                    {order.shipping_first_name} {order.shipping_last_name}
+                  </p>
                   <p className="pt-1">{order.shipping_street}</p>
                   <p>{order.shipping_zip} {order.shipping_city}</p>
                   <p>{order.shipping_country}</p>
@@ -327,7 +377,9 @@ export default function AdminOrderDetail() {
 
             {order.customer_note && (
               <div className="bg-amber-50 border border-amber-200/60 rounded-xl p-4">
-                <p className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-1">Poznámka zákazníka</p>
+                <p className="text-xs font-semibold text-amber-700 uppercase tracking-wider mb-1">
+                  Poznámka zákazníka
+                </p>
                 <p className="text-sm text-amber-800">{order.customer_note}</p>
               </div>
             )}
@@ -336,7 +388,9 @@ export default function AdminOrderDetail() {
               <h3 className="text-sm font-semibold text-gray-700 mb-4">Interná poznámka & sledovanie</h3>
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Sledovacie číslo zásielky</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">
+                    Sledovacie číslo zásielky
+                  </label>
                   <input
                     type="text"
                     value={trackingNumber}
@@ -346,7 +400,9 @@ export default function AdminOrderDetail() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-gray-500 mb-1.5">Interná poznámka (vidí len admin)</label>
+                  <label className="block text-xs font-medium text-gray-500 mb-1.5">
+                    Interná poznámka (vidí len admin)
+                  </label>
                   <textarea
                     value={adminNote}
                     onChange={(e) => setAdminNote(e.target.value)}
@@ -379,36 +435,47 @@ export default function AdminOrderDetail() {
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-500">Stav:</span>
-                  <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${isPaid ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>
-                    {isPaid ? <CheckCircle className="w-3 h-3" /> : <AlertCircle className="w-3 h-3" />}
-                    {isPaid ? "Zaplatené" : "Nezaplatené"}
+                  <span className={`inline-flex items-center gap-1 text-xs font-medium px-2 py-0.5 rounded-full ${paymentStyle.bg} ${paymentStyle.text}`}>
+                    {order.payment_status === "paid" ? (
+                      <CheckCircle className="w-3 h-3" />
+                    ) : (
+                      <AlertCircle className="w-3 h-3" />
+                    )}
+                    {paymentStyle.label}
                   </span>
                 </div>
               </div>
               <div className="border-t border-gray-100 pt-4">
                 <p className="text-xs font-medium text-gray-500 mb-2">Zmeniť stav platby</p>
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => updatePayment("paid")}
-                    disabled={updatingPayment || isPaid}
-                    className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 ${isPaid ? "bg-green-100 text-green-700 cursor-default" : "bg-gray-100 text-gray-700 hover:bg-green-100 hover:text-green-700"}`}
-                  >
-                    {updatingPayment ? <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto" /> : "Zaplatené"}
-                  </button>
-                  <button
-                    onClick={() => updatePayment("pending")}
-                    disabled={updatingPayment || !isPaid}
-                    className={`flex-1 py-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-40 ${!isPaid ? "bg-red-100 text-red-700 cursor-default" : "bg-gray-100 text-gray-700 hover:bg-red-100 hover:text-red-700"}`}
-                  >
-                    Nezaplatené
-                  </button>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {PAYMENT_STATUSES.map((ps) => {
+                    const isActive = order.payment_status === ps.value;
+                    return (
+                      <button
+                        key={ps.value}
+                        onClick={() => updatePayment(ps.value)}
+                        disabled={updatingPayment || isActive}
+                        className={`py-2 px-2 text-xs font-medium rounded-lg transition-colors disabled:opacity-50 ${
+                          isActive
+                            ? `${ps.activeBg} ${ps.text} cursor-default`
+                            : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                        }`}
+                      >
+                        {updatingPayment && isActive ? (
+                          <Loader2 className="w-3.5 h-3.5 animate-spin mx-auto" />
+                        ) : (
+                          ps.label
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
             <div className="bg-white rounded-xl border border-gray-200/80 p-5">
-              <h3 className="text-sm font-semibold text-gray-700 mb-4">Stav objednávky</h3>
-              <div className="space-y-1.5">
+              <h3 className="text-sm font-semibold text-gray-700 mb-3">Stav objednávky</h3>
+              <div className="space-y-1">
                 {ORDER_STATUSES.map((s) => {
                   const isActive = order.status === s.value;
                   return (
@@ -422,10 +489,11 @@ export default function AdminOrderDetail() {
                           : "hover:bg-gray-50 text-gray-600"
                       } disabled:opacity-60`}
                     >
-                      <span className={`w-2 h-2 rounded-full ${s.dot}`} />
+                      <span className={`w-2 h-2 rounded-full flex-shrink-0 ${s.dot}`} />
                       {s.label}
-                      {isActive && <CheckCircle className="w-3.5 h-3.5 ml-auto" />}
-                      {updatingStatus && isActive && <Loader2 className="w-3.5 h-3.5 ml-auto animate-spin" />}
+                      {isActive && (
+                        <CheckCircle className="w-3.5 h-3.5 ml-auto flex-shrink-0" />
+                      )}
                     </button>
                   );
                 })}
@@ -437,7 +505,7 @@ export default function AdminOrderDetail() {
               {order.invoice_id ? (
                 <button
                   onClick={downloadInvoice}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-lg shadow-blue-500/20"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors shadow-sm shadow-blue-500/20"
                 >
                   <Download className="w-4 h-4" />
                   Stiahnuť faktúru
@@ -448,7 +516,11 @@ export default function AdminOrderDetail() {
                   disabled={generatingInvoice}
                   className="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-gray-200 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-60"
                 >
-                  {generatingInvoice ? <Loader2 className="w-4 h-4 animate-spin" /> : <FileText className="w-4 h-4" />}
+                  {generatingInvoice ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <FileText className="w-4 h-4" />
+                  )}
                   Vytvoriť faktúru
                 </button>
               )}

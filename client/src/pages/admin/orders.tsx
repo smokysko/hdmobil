@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, type ReactNode } from "react";
 import {
   Search,
   ChevronDown,
@@ -46,11 +46,14 @@ const ORDER_STATUSES = [
   { value: "shipped", label: "Odoslaná", dot: "bg-teal-500", bg: "bg-teal-50", text: "text-teal-700" },
   { value: "delivered", label: "Doručená", dot: "bg-green-500", bg: "bg-green-50", text: "text-green-700" },
   { value: "cancelled", label: "Zrušená", dot: "bg-red-500", bg: "bg-red-50", text: "text-red-700" },
+  { value: "returned", label: "Vrátená", dot: "bg-gray-400", bg: "bg-gray-100", text: "text-gray-600" },
 ];
 
 const PAYMENT_STATUSES = [
-  { value: "paid", label: "Zaplatené", icon: "check" },
-  { value: "pending", label: "Nezaplatené", icon: "alert" },
+  { value: "paid", label: "Zaplatené" },
+  { value: "pending", label: "Nezaplatené" },
+  { value: "failed", label: "Zlyhala" },
+  { value: "refunded", label: "Vrátená" },
 ];
 
 function InlineStatusSelect({
@@ -171,51 +174,49 @@ function InlinePaymentSelect({
     setUpdating(false);
   }
 
-  const isPaid = currentStatus === "paid";
+  const paymentStyle = {
+    paid: { bg: "bg-green-50", text: "text-green-700", icon: <CheckCircle className="w-3 h-3" />, label: "Zaplatené" },
+    pending: { bg: "bg-orange-50", text: "text-orange-700", icon: <AlertCircle className="w-3 h-3" />, label: "Nezaplatené" },
+    failed: { bg: "bg-red-50", text: "text-red-700", icon: <AlertCircle className="w-3 h-3" />, label: "Zlyhala" },
+    refunded: { bg: "bg-gray-100", text: "text-gray-600", icon: <CheckCircle className="w-3 h-3" />, label: "Vrátená" },
+  } as Record<string, { bg: string; text: string; icon: ReactNode; label: string }>;
+
+  const cur = paymentStyle[currentStatus] || paymentStyle.pending;
 
   return (
     <div ref={ref} className="relative inline-block">
       <button
         onClick={(e) => { e.stopPropagation(); setOpen((o) => !o); }}
         disabled={updating}
-        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:ring-2 hover:ring-offset-1 hover:ring-gray-300 disabled:opacity-60 ${
-          isPaid
-            ? "bg-green-50 text-green-700"
-            : "bg-red-50 text-red-700"
-        }`}
+        className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium transition-all hover:ring-2 hover:ring-offset-1 hover:ring-gray-300 disabled:opacity-60 ${cur.bg} ${cur.text}`}
       >
-        {updating ? (
-          <Loader2 className="w-3 h-3 animate-spin" />
-        ) : isPaid ? (
-          <CheckCircle className="w-3 h-3" />
-        ) : (
-          <AlertCircle className="w-3 h-3" />
-        )}
-        {isPaid ? "Zaplatené" : "Nezaplatené"}
+        {updating ? <Loader2 className="w-3 h-3 animate-spin" /> : cur.icon}
+        {cur.label}
         <ChevronDown className="w-3 h-3 opacity-60" />
       </button>
 
       {open && (
         <div className="absolute left-0 top-full mt-1 z-50 bg-white border border-gray-200 rounded-xl shadow-lg shadow-gray-200/60 py-1 min-w-[160px]">
-          {PAYMENT_STATUSES.map((s) => (
-            <button
-              key={s.value}
-              onClick={() => select(s.value)}
-              className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
-                s.value === currentStatus ? "font-medium" : "text-gray-700"
-              }`}
-            >
-              {s.value === "paid" ? (
-                <CheckCircle className="w-4 h-4 text-green-500" />
-              ) : (
-                <AlertCircle className="w-4 h-4 text-red-400" />
-              )}
-              {s.label}
-              {s.value === currentStatus && (
-                <CheckCircle className="w-3.5 h-3.5 text-green-500 ml-auto" />
-              )}
-            </button>
-          ))}
+          {PAYMENT_STATUSES.map((s) => {
+            const style = paymentStyle[s.value];
+            return (
+              <button
+                key={s.value}
+                onClick={() => select(s.value)}
+                className={`w-full flex items-center gap-2.5 px-3 py-2 text-sm hover:bg-gray-50 transition-colors ${
+                  s.value === currentStatus ? "font-medium" : "text-gray-700"
+                }`}
+              >
+                <span className={`inline-flex items-center justify-center w-5 h-5 rounded-full ${style.bg} ${style.text}`}>
+                  {style.icon}
+                </span>
+                {s.label}
+                {s.value === currentStatus && (
+                  <CheckCircle className="w-3.5 h-3.5 text-green-500 ml-auto" />
+                )}
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
