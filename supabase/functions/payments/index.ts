@@ -10,8 +10,11 @@ const corsHeaders = {
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const STRIPE_SECRET_KEY = Deno.env.get("STRIPE_SECRET_KEY") || "";
-const TRUSTPAY_PROJECT_ID = Deno.env.get("TRUSTPAY_PROJECT_ID") || "";
+const FINBY_API_KEY = "mhEBk0gVYutUu0lBvCypxLhlaQxrmIky";
+const FINBY_ACCOUNT_ID = "4107647532";
+
+const FINBY_CARD_URL = "https://amapi.finby.eu/mapi5/Card/PayPopup";
+const FINBY_WIRE_URL = "https://amapi.finby.eu/mapi5/wire/paypopup";
 
 const BANK_DETAILS = {
   iban: "SK12 1234 5678 9012 3456 7890",
@@ -20,99 +23,130 @@ const BANK_DETAILS = {
   accountHolder: "HDmobil s.r.o.",
 };
 
-interface PaymentRequest {
+async function computeHmacSha256(message: string, key: string): Promise<string> {
+  const encoder = new TextEncoder();
+  const cryptoKey = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(key),
+    { name: "HMAC", hash: "SHA-256" },
+    false,
+    ["sign"]
+  );
+  const signature = await crypto.subtle.sign("HMAC", cryptoKey, encoder.encode(message));
+  return Array.from(new Uint8Array(signature))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("")
+    .toUpperCase();
+}
+
+function sanitizePostcode(postcode: string): string {
+  return (postcode || "").replace(/[^a-zA-Z0-9]/g, "");
+}
+
+interface CardPaymentParams {
   orderId: string;
+  orderNumber: string;
   amount: number;
   currency: string;
-  method: "card" | "google_pay" | "apple_pay" | "bank_transfer" | "cod";
+  cardHolder: string;
+  email: string;
+  billingStreet: string;
+  billingCity: string;
+  billingCountry: string;
+  billingPostcode: string;
   returnUrl: string;
-  customerEmail?: string;
+  cancelUrl: string;
+  notificationUrl: string;
 }
 
-async function createStripePayment(
-  data: PaymentRequest
-): Promise<{ paymentUrl: string; paymentId: string }> {
-  const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: new URLSearchParams({
-      "payment_method_types[]": "card",
-      "line_items[0][price_data][currency]": data.currency.toLowerCase(),
-      "line_items[0][price_data][product_data][name]": `Objednavka ${data.orderId}`,
-      "line_items[0][price_data][unit_amount]": String(Math.round(data.amount * 100)),
-      "line_items[0][quantity]": "1",
-      mode: "payment",
-      success_url: `${data.returnUrl}?status=success&order=${data.orderId}`,
-      cancel_url: `${data.returnUrl}?status=cancelled&order=${data.orderId}`,
-      "metadata[order_id]": data.orderId,
-      customer_email: data.customerEmail || "",
-      "payment_intent_data[metadata][order_id]": data.orderId,
-    }),
-  });
+async function createFinbyCardPayment(p: CardPaymentParams): Promise<{ paymentUrl: string; paymentId: string }> {
+  const amount = p.amount.toFixed(2);
+  const postcode = sanitizePostcode(p.billingPostcode);
+  const cardHolder = p.cardHolder.length < 3 ? p.cardHolder.padEnd(3, " ") : p.cardHolder;
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`Stripe error: ${error.error?.message || "Unknown error"}`);
-  }
+  const sigMessage = `${FINBY_ACCOUNT_ID}/${amount}/${p.currency}/${p.orderNumber}/0/${p.billingCity}/${p.billingCountry}/${postcode}/${p.billingStreet}/${cardHolder}/${p.email}`;
+  const signature = await computeHmacSha256(sigMessage, FINBY_API_KEY);
 
-  const session = await response.json();
-  return { paymentUrl: session.url, paymentId: session.id };
-}
-
-function createTrustPayPayment(
-  data: PaymentRequest
-): { paymentUrl: string; paymentId: string } {
-  const paymentId = `TP${Date.now()}`;
   const params = new URLSearchParams({
-    AID: TRUSTPAY_PROJECT_ID,
-    AMT: data.amount.toFixed(2),
-    CUR: data.currency,
-    REF: data.orderId,
-    RURL: data.returnUrl,
-    NURL: `${supabaseUrl}/functions/v1/payments/webhook-trustpay`,
-    CURL: `${data.returnUrl}?status=cancelled`,
-    LNG: "SK",
-    SIG: "",
+    AccountId: FINBY_ACCOUNT_ID,
+    Amount: amount,
+    Currency: p.currency,
+    Reference: p.orderNumber,
+    PaymentType: "0",
+    CardHolder: cardHolder,
+    BillingCity: p.billingCity,
+    BillingCountry: p.billingCountry,
+    BillingPostcode: postcode,
+    BillingStreet: p.billingStreet,
+    Email: p.email,
+    ReturnUrl: p.returnUrl,
+    CancelUrl: p.cancelUrl,
+    ErrorUrl: p.cancelUrl,
+    NotificationUrl: p.notificationUrl,
+    Localization: "SK",
+    Signature: signature,
   });
 
   return {
-    paymentUrl: `https://pay.trustpay.eu/v2/Checkout?${params.toString()}`,
-    paymentId,
+    paymentUrl: `${FINBY_CARD_URL}?${params.toString()}`,
+    paymentId: `FINBY_CARD_${p.orderNumber}`,
   };
 }
 
-function createBankTransferPayment(data: PaymentRequest): {
-  paymentId: string;
-  bankDetails: typeof BANK_DETAILS & {
-    variableSymbol: string;
-    amount: number;
-    currency: string;
-    qrCode: string;
+interface WirePaymentParams {
+  orderNumber: string;
+  amount: number;
+  currency: string;
+  email?: string;
+  returnUrl: string;
+  cancelUrl: string;
+  notificationUrl: string;
+}
+
+async function createFinbyWirePayment(p: WirePaymentParams): Promise<{ paymentUrl: string; paymentId: string }> {
+  const amount = p.amount.toFixed(2);
+  const sigMessage = `${FINBY_ACCOUNT_ID}/${amount}/${p.currency}/${p.orderNumber}/0`;
+  const signature = await computeHmacSha256(sigMessage, FINBY_API_KEY);
+
+  const params = new URLSearchParams({
+    AccountId: FINBY_ACCOUNT_ID,
+    Amount: amount,
+    Currency: p.currency,
+    Reference: p.orderNumber,
+    PaymentType: "0",
+    ReturnUrl: p.returnUrl,
+    CancelUrl: p.cancelUrl,
+    ErrorUrl: p.cancelUrl,
+    NotificationUrl: p.notificationUrl,
+    Localization: "SK",
+    Signature: signature,
+  });
+
+  if (p.email) params.set("Email", p.email);
+
+  return {
+    paymentUrl: `${FINBY_WIRE_URL}?${params.toString()}`,
+    paymentId: `FINBY_WIRE_${p.orderNumber}`,
   };
-} {
-  const variableSymbol = data.orderId.replace(/\D/g, "").slice(-10);
+}
+
+function createBankTransferPayment(orderId: string, orderNumber: string, amount: number, currency: string) {
+  const variableSymbol = orderNumber.replace(/\D/g, "").slice(-10);
   const qrData = [
     "SPD*1.0",
     `ACC:${BANK_DETAILS.iban.replace(/\s/g, "")}`,
-    `AM:${data.amount.toFixed(2)}`,
-    `CC:${data.currency}`,
+    `AM:${amount.toFixed(2)}`,
+    `CC:${currency}`,
     `X-VS:${variableSymbol}`,
-    `MSG:Objednavka ${data.orderId}`,
+    `MSG:Objednavka ${orderNumber}`,
     `RN:${BANK_DETAILS.accountHolder}`,
   ].join("*");
   const qrCode = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrData)}`;
 
   return {
     paymentId: `BT${Date.now()}`,
-    bankDetails: { ...BANK_DETAILS, variableSymbol, amount: data.amount, currency: data.currency, qrCode },
+    bankDetails: { ...BANK_DETAILS, variableSymbol, amount, currency, qrCode },
   };
-}
-
-function createCodPayment(data: PaymentRequest): { paymentId: string; codAmount: number } {
-  return { paymentId: `COD${Date.now()}`, codAmount: data.amount };
 }
 
 Deno.serve(async (req: Request) => {
@@ -124,103 +158,98 @@ Deno.serve(async (req: Request) => {
 
   try {
     const url = new URL(req.url);
-    const action = url.pathname.split("/").pop();
+    const pathParts = url.pathname.split("/").filter(Boolean);
+    const action = pathParts[pathParts.length - 1];
 
-    if (action === "webhook-stripe") {
-      const body = await req.text();
-      const event = JSON.parse(body);
-      if (event.type === "checkout.session.completed") {
-        const session = event.data.object;
-        const orderId = session.metadata?.order_id;
-        if (orderId) {
-          await supabase
-            .from("orders")
-            .update({ payment_status: "paid", payment_reference: session.payment_intent, paid_at: new Date().toISOString() })
-            .eq("order_number", orderId);
-        }
-      }
-      return new Response(JSON.stringify({ received: true }), {
-        headers: { "Content-Type": "application/json" },
-      });
-    }
+    if (action === "webhook-finby") {
+      const reference = url.searchParams.get("Reference") || url.searchParams.get("REF");
+      const resultCode = url.searchParams.get("ResultCode") || url.searchParams.get("RES");
+      const paymentRequestId = url.searchParams.get("PaymentRequestId") || url.searchParams.get("PID");
 
-    if (action === "webhook-trustpay") {
-      const formData = await req.formData();
-      const result = formData.get("RES");
-      const orderId = formData.get("REF");
-      if (result === "0" && orderId) {
+      if (resultCode === "0" && reference) {
         await supabase
           .from("orders")
-          .update({ payment_status: "paid", payment_reference: formData.get("PID"), paid_at: new Date().toISOString() })
-          .eq("order_number", orderId);
+          .update({
+            payment_status: "paid",
+            payment_reference: paymentRequestId || reference,
+            paid_at: new Date().toISOString(),
+          })
+          .eq("order_number", reference);
       }
-      return new Response("OK");
+      return new Response("OK", { status: 200 });
     }
 
-    const body = await req.json();
+    const body = req.method === "POST" ? await req.json() : {};
 
     switch (action) {
       case "create": {
-        const { orderId, method } = body;
+        const { orderId, method, returnUrl, cancelUrl } = body;
         if (!orderId || !method) throw new Error("orderId a method su povinne");
 
-        const { data: order } = await supabase
+        const { data: order, error: orderError } = await supabase
           .from("orders")
-          .select("*, customer:customers(email)")
+          .select("id, order_number, total, billing_email, billing_first_name, billing_last_name, billing_street, billing_city, billing_zip, billing_country, payment_status")
           .eq("id", orderId)
           .single();
 
-        if (!order) throw new Error("Objednavka nebola najdena");
+        if (orderError || !order) throw new Error("Objednavka nebola najdena");
         if (order.payment_status === "paid") throw new Error("Objednavka je uz zaplatena");
 
-        const paymentData: PaymentRequest = {
-          orderId: order.order_number,
-          amount: order.total,
-          currency: order.currency || "EUR",
-          method,
-          returnUrl: body.returnUrl || "https://hdmobil.sk/order/complete",
-          customerEmail: order.customer?.email,
-        };
+        const notificationUrl = `${supabaseUrl}/functions/v1/payments/webhook-finby`;
+        const baseReturnUrl = returnUrl || "https://hdmobil.sk/success";
+        const baseCancelUrl = cancelUrl || "https://hdmobil.sk/checkout";
+        const currency = "EUR";
+        const cardHolder = `${order.billing_first_name || ""} ${order.billing_last_name || ""}`.trim() || "Zakaznik";
 
-        let result;
-        switch (method) {
-          case "card":
-          case "google_pay":
-          case "apple_pay": {
-            if (STRIPE_SECRET_KEY) {
-              result = await createStripePayment(paymentData);
-            } else if (TRUSTPAY_PROJECT_ID) {
-              result = createTrustPayPayment(paymentData);
-            } else {
-              throw new Error("Platobna brana nie je nakonfigurovana");
-            }
-            await supabase.from("orders").update({ payment_status: "pending", payment_reference: result.paymentId }).eq("id", orderId);
-            return new Response(
-              JSON.stringify({ success: true, data: { type: "redirect", paymentUrl: result.paymentUrl, paymentId: result.paymentId } }),
-              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-          }
+        let result: { paymentUrl: string; paymentId: string };
 
-          case "bank_transfer": {
-            result = createBankTransferPayment(paymentData);
-            await supabase.from("orders").update({ payment_status: "awaiting", payment_reference: result.paymentId }).eq("id", orderId);
-            return new Response(JSON.stringify({ success: true, data: { type: "bank_transfer", ...result } }), {
-              headers: { ...corsHeaders, "Content-Type": "application/json" },
-            });
-          }
-
-          case "cod": {
-            result = createCodPayment(paymentData);
-            await supabase.from("orders").update({ payment_status: "cod", payment_reference: result.paymentId }).eq("id", orderId);
-            return new Response(
-              JSON.stringify({ success: true, data: { type: "cod", ...result, message: "Platba bude vybrana pri doruceni" } }),
-              { headers: { ...corsHeaders, "Content-Type": "application/json" } }
-            );
-          }
-
-          default:
-            throw new Error(`Neznamy sposob platby: ${method}`);
+        if (method === "card") {
+          result = await createFinbyCardPayment({
+            orderId: order.id,
+            orderNumber: order.order_number,
+            amount: parseFloat(order.total),
+            currency,
+            cardHolder,
+            email: order.billing_email || "",
+            billingStreet: order.billing_street || "N/A",
+            billingCity: order.billing_city || "N/A",
+            billingCountry: order.billing_country || "SK",
+            billingPostcode: order.billing_zip || "00000",
+            returnUrl: `${baseReturnUrl}?orderNumber=${encodeURIComponent(order.order_number)}&orderId=${order.id}`,
+            cancelUrl: baseCancelUrl,
+            notificationUrl,
+          });
+        } else if (method === "wire") {
+          result = await createFinbyWirePayment({
+            orderNumber: order.order_number,
+            amount: parseFloat(order.total),
+            currency,
+            email: order.billing_email || undefined,
+            returnUrl: `${baseReturnUrl}?orderNumber=${encodeURIComponent(order.order_number)}&orderId=${order.id}`,
+            cancelUrl: baseCancelUrl,
+            notificationUrl,
+          });
+        } else if (method === "bank_transfer") {
+          const bt = createBankTransferPayment(order.id, order.order_number, parseFloat(order.total), currency);
+          await supabase.from("orders").update({ payment_status: "awaiting", payment_reference: bt.paymentId }).eq("id", orderId);
+          return new Response(JSON.stringify({ success: true, data: { type: "bank_transfer", ...bt } }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        } else if (method === "cod") {
+          await supabase.from("orders").update({ payment_status: "cod", payment_reference: `COD${Date.now()}` }).eq("id", orderId);
+          return new Response(JSON.stringify({ success: true, data: { type: "cod", message: "Platba bude vybrana pri doruceni" } }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        } else {
+          throw new Error(`Neznamy sposob platby: ${method}`);
         }
+
+        await supabase.from("orders").update({ payment_status: "pending", payment_reference: result.paymentId }).eq("id", orderId);
+
+        return new Response(
+          JSON.stringify({ success: true, data: { type: "redirect", paymentUrl: result.paymentUrl, paymentId: result.paymentId } }),
+          { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
       }
 
       case "verify": {
@@ -261,7 +290,6 @@ Deno.serve(async (req: Request) => {
 
       case "methods": {
         const { data: methods } = await supabase.from("payment_methods").select("*").eq("is_active", true).order("sort_order");
-
         return new Response(JSON.stringify({ success: true, data: methods || [] }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });

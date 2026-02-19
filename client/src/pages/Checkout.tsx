@@ -18,6 +18,9 @@ import { useLocation } from "wouter";
 import { z } from "zod";
 import { useDocumentTitle } from "@/hooks/useDocumentTitle";
 
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL as string;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY as string;
+
 const checkoutSchema = z.object({
   email: z.string().email("Neplatna emailova adresa"),
   firstName: z.string().min(2, "Meno je povinne"),
@@ -27,7 +30,7 @@ const checkoutSchema = z.object({
   city: z.string().min(2, "Mesto je povinne"),
   zipCode: z.string().min(3, "PSC je povinne"),
   country: z.string().min(2, "Krajina je povinna"),
-  paymentMethod: z.enum(["bank_transfer", "cod"]),
+  paymentMethod: z.enum(["card", "bank_transfer", "cod"]),
   note: z.string().optional(),
 });
 
@@ -49,7 +52,7 @@ export default function Checkout() {
     resolver: zodResolver(checkoutSchema),
     defaultValues: {
       country: "Slovensko",
-      paymentMethod: "bank_transfer",
+      paymentMethod: "card",
     },
   });
 
@@ -83,16 +86,39 @@ export default function Checkout() {
         },
       });
 
-      if (fnError) {
-        throw new Error("Nepodarilo sa vytvoriť objednávku");
-      }
+      if (fnError) throw new Error("Nepodarilo sa vytvoriť objednávku");
+      if (!result.success) throw new Error(result.error || "Nepodarilo sa vytvoriť objednávku");
 
-      if (!result.success) {
-        throw new Error(result.error || "Nepodarilo sa vytvoriť objednávku");
+      clearCart();
+
+      if (data.paymentMethod === "card") {
+        const origin = window.location.origin;
+        const paymentRes = await fetch(`${SUPABASE_URL}/functions/v1/payments/create`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${SUPABASE_ANON_KEY}`,
+            apikey: SUPABASE_ANON_KEY,
+          },
+          body: JSON.stringify({
+            orderId: result.data.orderId,
+            method: "card",
+            returnUrl: `${origin}/success`,
+            cancelUrl: `${origin}/checkout`,
+          }),
+        });
+
+        const paymentResult = await paymentRes.json();
+
+        if (!paymentResult.success || !paymentResult.data?.paymentUrl) {
+          throw new Error(paymentResult.error || "Nepodarilo sa inicializovať platobnú bránu");
+        }
+
+        window.location.href = paymentResult.data.paymentUrl;
+        return;
       }
 
       toast.success("Objednávka bola úspešne odoslaná!");
-      clearCart();
       setLocation(
         `/success?orderId=${result.data.orderId}&orderNumber=${encodeURIComponent(result.data.orderNumber)}`
       );
@@ -253,10 +279,21 @@ export default function Checkout() {
                   <RadioGroup
                     value={selectedPayment}
                     onValueChange={(value) =>
-                      setValue("paymentMethod", value as "bank_transfer" | "cod")
+                      setValue("paymentMethod", value as "card" | "bank_transfer" | "cod")
                     }
-                    className="grid gap-4 sm:grid-cols-2"
+                    className="grid gap-4 sm:grid-cols-3"
                   >
+                    <div>
+                      <RadioGroupItem value="card" id="card" className="peer sr-only" />
+                      <Label
+                        htmlFor="card"
+                        className="flex cursor-pointer flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 transition-all hover:bg-secondary hover:text-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary"
+                      >
+                        <CreditCard className="mb-3 h-6 w-6" />
+                        <span className="font-medium">Kartou online</span>
+                        <span className="mt-1 text-xs text-muted-foreground">Zdarma · Finby</span>
+                      </Label>
+                    </div>
                     <div>
                       <RadioGroupItem value="bank_transfer" id="bank_transfer" className="peer sr-only" />
                       <Label
@@ -264,7 +301,7 @@ export default function Checkout() {
                         className="flex cursor-pointer flex-col items-center justify-between rounded-xl border-2 border-muted bg-popover p-4 transition-all hover:bg-secondary hover:text-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 [&:has([data-state=checked])]:border-primary"
                       >
                         <Building2 className="mb-3 h-6 w-6" />
-                        <span className="font-medium">Bankovy prevod</span>
+                        <span className="font-medium">Bankový prevod</span>
                         <span className="mt-1 text-xs text-muted-foreground">Zdarma</span>
                       </Label>
                     </div>
@@ -292,10 +329,12 @@ export default function Checkout() {
                 {isProcessing ? (
                   <>
                     <Spinner className="mr-2 h-5 w-5" />
-                    SPRACOVAVA SA...
+                    SPRACOVÁVA SA...
                   </>
+                ) : selectedPayment === "card" ? (
+                  `ZAPLATIŤ KARTOU – ${total.toFixed(2)} EUR`
                 ) : (
-                  `ODOSLAT OBJEDNAVKU - ${total.toFixed(2)} EUR`
+                  `OBJEDNAŤ – ${total.toFixed(2)} EUR`
                 )}
               </Button>
             </form>

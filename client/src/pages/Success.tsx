@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
-import { CheckCircle2, Download, FileText, Home, ShoppingBag } from "lucide-react";
+import { AlertCircle, CheckCircle2, Download, FileText, Home, ShoppingBag, XCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link, useSearch } from "wouter";
 
@@ -17,6 +17,12 @@ export default function Success() {
   const params = new URLSearchParams(searchString);
   const orderId = params.get("orderId");
   const orderNumber = params.get("orderNumber");
+  const resultCode = params.get("ResultCode");
+  const paymentRequestId = params.get("PaymentRequestId");
+
+  const isFromFinby = resultCode !== null;
+  const paymentFailed = isFromFinby && resultCode !== "0";
+  const wasCancelled = resultCode === "1005";
 
   const [invoice, setInvoice] = useState<InvoiceData | null>(null);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -75,6 +81,63 @@ export default function Success() {
     window.open(downloadUrl, "_blank");
   };
 
+  if (paymentFailed) {
+    return (
+      <Layout>
+        <div className="container flex min-h-[60vh] flex-col items-center justify-center py-12 text-center">
+          <div className="mb-8 rounded-full bg-red-50 p-8 animate-in zoom-in duration-700">
+            {wasCancelled ? (
+              <XCircle className="h-20 w-20 text-red-400" />
+            ) : (
+              <AlertCircle className="h-20 w-20 text-red-500" />
+            )}
+          </div>
+
+          <h1 className="mb-6 font-display text-4xl font-bold tracking-tight text-foreground md:text-5xl">
+            {wasCancelled ? "Platba zrušená" : "Platba sa nepodarila"}
+          </h1>
+
+          <div className="h-1 w-24 rounded-full bg-red-300 mb-8"></div>
+
+          <p className="mb-8 max-w-lg text-xl leading-relaxed text-muted-foreground">
+            {wasCancelled
+              ? "Platbu ste zrušili. Vaša objednávka bola uložená a môžete sa vrátiť a skúsiť znova."
+              : "Pri spracovaní platby nastala chyba. Skúste to prosím znova alebo zvoľte iný spôsob platby."}
+          </p>
+
+          {orderNumber && (
+            <p className="mb-8 text-sm text-muted-foreground">
+              Číslo objednávky: <span className="font-medium text-foreground">{orderNumber}</span>
+            </p>
+          )}
+
+          <div className="flex w-full max-w-md flex-col gap-4 sm:flex-row justify-center">
+            <Button
+              size="lg"
+              className="h-14 rounded-full px-8 font-display text-base tracking-wide shadow-lg transition-all hover:shadow-xl"
+              asChild
+            >
+              <Link href="/checkout">
+                Skúsiť znova
+              </Link>
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="h-14 rounded-full border-border px-8 font-display text-base hover:bg-secondary hover:text-foreground"
+              asChild
+            >
+              <Link href="/">
+                <Home className="mr-2 h-5 w-5" />
+                Domov
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="container flex min-h-[60vh] flex-col items-center justify-center py-12 text-center">
@@ -83,19 +146,26 @@ export default function Success() {
         </div>
 
         <h1 className="mb-6 font-display text-4xl font-bold tracking-tight text-foreground md:text-6xl">
-          Objednavka potvrdena!
+          {isFromFinby ? "Platba úspešná!" : "Objednávka potvrdená!"}
         </h1>
 
         <div className="h-1 w-24 rounded-full bg-primary mb-8"></div>
 
         <p className="mb-6 max-w-lg text-xl leading-relaxed text-muted-foreground">
-          Dakujeme za vas nakup. Odoslali sme vam potvrdzujuci email s detailmi objednavky.
-          Vas tovar bude coskoro odoslany.
+          {isFromFinby
+            ? "Platba bola úspešne spracovaná. Odošleme vám potvrdenie emailom."
+            : "Ďakujeme za váš nákup. Odoslali sme vám potvrdzujúci email s detailmi objednávky. Váš tovar bude čoskoro odoslaný."}
         </p>
+
+        {isFromFinby && paymentRequestId && (
+          <p className="mb-2 text-xs text-muted-foreground">
+            ID transakcie: <span className="font-mono">{paymentRequestId}</span>
+          </p>
+        )}
 
         {orderNumber && (
           <p className="mb-8 text-lg font-medium text-foreground">
-            Cislo objednavky: <span className="text-primary">{orderNumber}</span>
+            Číslo objednávky: <span className="text-primary">{orderNumber}</span>
           </p>
         )}
 
@@ -104,7 +174,7 @@ export default function Success() {
             <CardContent className="p-6">
               <div className="flex items-center gap-3 mb-4">
                 <FileText className="h-5 w-5 text-primary" />
-                <h3 className="font-display text-lg font-bold">Faktura</h3>
+                <h3 className="font-display text-lg font-bold">Faktúra</h3>
               </div>
 
               <Separator className="mb-4" />
