@@ -72,7 +72,9 @@ export default function AccountSettings() {
 
     const { error } = await supabase
       .from('customers')
-      .update({
+      .upsert({
+        auth_user_id: user.id,
+        email: user.email,
         first_name: data.first_name,
         last_name: data.last_name,
         phone: data.phone || null,
@@ -81,8 +83,7 @@ export default function AccountSettings() {
         billing_zip: data.billing_zip || null,
         billing_country: data.billing_country || 'SK',
         updated_at: new Date().toISOString(),
-      })
-      .eq('auth_user_id', user.id);
+      }, { onConflict: 'auth_user_id' });
 
     setIsSaving(false);
 
