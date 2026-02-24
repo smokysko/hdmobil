@@ -1,9 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
-import Layout from '@/components/Layout';
-import { useLocation } from 'wouter';
+import AccountLayout from '@/components/AccountLayout';
 import { useEffect, useState } from 'react';
 import { Star, Gift, Users, Copy, CheckCircle, ChevronRight, TrendingUp } from 'lucide-react';
-import { Link } from 'wouter';
 import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
@@ -32,8 +30,7 @@ interface ReferralReward {
 }
 
 export default function LoyaltyPage() {
-  const { user, profile, isAuthenticated, loading: isLoading } = useAuth();
-  const [, setLocation] = useLocation();
+  const { user, profile } = useAuth();
   useDocumentTitle('Vernostný program');
 
   const [transactions, setTransactions] = useState<LoyaltyTransaction[]>([]);
@@ -41,12 +38,6 @@ export default function LoyaltyPage() {
   const [referralReward, setReferralReward] = useState<ReferralReward | null>(null);
   const [loadingData, setLoadingData] = useState(true);
   const [copied, setCopied] = useState(false);
-
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      setLocation('/prihlasenie');
-    }
-  }, [isLoading, isAuthenticated, setLocation]);
 
   useEffect(() => {
     if (user) {
@@ -89,63 +80,14 @@ export default function LoyaltyPage() {
     setTimeout(() => setCopied(false), 2000);
   }
 
-  if (isLoading || !isAuthenticated || !user) {
-    return (
-      <Layout>
-        <div className="container py-12 flex items-center justify-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-        </div>
-      </Layout>
-    );
-  }
-
   const loyaltyPoints = profile?.loyalty_points ?? 0;
   const vipLevel = profile?.vip_level ?? 'standard';
   const currentTier = vipTiers.find((t) => t.name === vipLevel);
   const nextTier = vipTiers.find((t) => t.min_spend > (currentTier?.min_spend ?? 0));
 
   return (
-    <Layout>
-      <div className="container py-8">
-        <div className="grid lg:grid-cols-4 gap-8">
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-              <div className="flex items-center gap-4 mb-6">
-                <div className="w-16 h-16 rounded-full bg-primary text-primary-foreground flex items-center justify-center text-2xl font-bold">
-                  {(user.user_metadata?.full_name || user.email || 'U').charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <h2 className="font-bold text-lg">{user.user_metadata?.full_name || user.email?.split('@')[0]}</h2>
-                  <p className="text-sm text-muted-foreground">{user.email}</p>
-                </div>
-              </div>
-              <nav className="space-y-1">
-                <Link href="/moj-ucet">
-                  <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 cursor-pointer">
-                    <span>Prehľad</span>
-                  </div>
-                </Link>
-                <Link href="/moje-objednavky">
-                  <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 cursor-pointer">
-                    <span>Moje objednávky</span>
-                  </div>
-                </Link>
-                <Link href="/oblubene">
-                  <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 cursor-pointer">
-                    <span>Obľúbené</span>
-                  </div>
-                </Link>
-                <Link href="/vernostny-program">
-                  <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium cursor-pointer">
-                    <Star className="h-5 w-5" />
-                    <span>Vernostný program</span>
-                  </div>
-                </Link>
-              </nav>
-            </div>
-          </div>
-
-          <div className="lg:col-span-3 space-y-6">
+    <AccountLayout>
+      <div className="space-y-6">
             <div className="grid sm:grid-cols-3 gap-4">
               <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-5">
                 <div className="flex items-center gap-3 mb-2">
@@ -291,9 +233,7 @@ export default function LoyaltyPage() {
                 </div>
               )}
             </div>
-          </div>
-        </div>
       </div>
-    </Layout>
+    </AccountLayout>
   );
 }

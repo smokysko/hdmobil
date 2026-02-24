@@ -1,7 +1,6 @@
 import { useAuth } from '@/contexts/AuthContext';
-import Layout from '@/components/Layout';
-import { useLocation } from 'wouter';
-import { useEffect, useState } from 'react';
+import AccountLayout from '@/components/AccountLayout';
+import { useState } from 'react';
 import { Package, ChevronRight, Search, RotateCcw, Download, X } from 'lucide-react';
 import { Link } from 'wouter';
 import { Input } from '@/components/ui/input';
@@ -13,8 +12,7 @@ import { supabase } from '@/lib/supabase';
 import { toast } from 'sonner';
 
 export default function OrdersPage() {
-  const { user, isAuthenticated, loading: isLoading } = useAuth();
-  const [, setLocation] = useLocation();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   useDocumentTitle('Moje objednávky');
   const [statusFilter, setStatusFilter] = useState('all');
@@ -29,32 +27,10 @@ export default function OrdersPage() {
   });
   const orders = ordersData?.orders ?? [];
 
-  useEffect(() => {
-    if (!isLoading && !isAuthenticated) {
-      setLocation('/prihlasenie');
-    }
-  }, [isLoading, isAuthenticated, setLocation]);
-
-  if (isLoading) {
-    return (
-      <Layout>
-        <div className="container py-12">
-          <div className="flex items-center justify-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
-
-  if (!isAuthenticated || !user) {
-    return null;
-  }
-
   const statusLabels: Record<string, { label: string; color: string }> = {
     pending: { label: 'Čakajúca', color: 'bg-yellow-100 text-yellow-800' },
     processing: { label: 'Spracováva sa', color: 'bg-blue-100 text-blue-800' },
-    shipped: { label: 'Odoslaná', color: 'bg-purple-100 text-purple-800' },
+    shipped: { label: 'Odoslaná', color: 'bg-blue-100 text-blue-800' },
     delivered: { label: 'Doručená', color: 'bg-green-100 text-green-800' },
     cancelled: { label: 'Zrušená', color: 'bg-red-100 text-red-800' },
   };
@@ -97,14 +73,8 @@ export default function OrdersPage() {
   });
 
   return (
-    <Layout>
-      <div className="container py-8">
-        <div className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-          <Link href="/moj-ucet"><span className="hover:text-primary cursor-pointer">Môj účet</span></Link>
-          <ChevronRight className="h-4 w-4" />
-          <span className="text-foreground">Moje objednávky</span>
-        </div>
-
+    <AccountLayout>
+      <div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h1 className="text-2xl font-bold">Moje objednávky</h1>
 
@@ -178,7 +148,7 @@ export default function OrdersPage() {
                 </div>
 
                 <div className="p-4 sm:p-6">
-                  <div className="mt-0 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                     <div className="text-sm text-muted-foreground">
                       {order.shipping_method_name && (
                         <span className="mr-4">Doprava: {order.shipping_method_name}</span>
@@ -201,7 +171,7 @@ export default function OrdersPage() {
                         <Download className="h-3.5 w-3.5 mr-1.5" />
                         Faktúra
                       </Button>
-                      {(order.status === 'delivered') && (
+                      {order.status === 'delivered' && (
                         <Button
                           variant="outline"
                           size="sm"
@@ -267,6 +237,6 @@ export default function OrdersPage() {
           </div>
         </div>
       )}
-    </Layout>
+    </AccountLayout>
   );
 }
