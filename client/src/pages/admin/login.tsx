@@ -22,7 +22,13 @@ export default function AdminLogin() {
   }, [user, isAdmin, authLoading]);
 
   useEffect(() => {
-    if (waitingForAdmin && !authLoading && user && !isAdmin) {
+    if (!waitingForAdmin) return;
+    if (authLoading) return;
+    if (!user) return;
+
+    if (isAdmin) {
+      setWaitingForAdmin(false);
+    } else {
       setError('Nemáte oprávnenie na prístup do administrácie');
       setWaitingForAdmin(false);
       setLoading(false);
