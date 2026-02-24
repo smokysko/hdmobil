@@ -48,20 +48,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .from("users")
-        .select(
-          "id, email, full_name, phone, is_admin, avatar_url, discount_percentage, voucher_balance, loyalty_points, vip_level, referral_code"
-        )
-        .eq("id", userId)
+      const { data: adminRecord } = await supabase
+        .from("admin_users")
+        .select("id, email, name, role, is_active")
+        .eq("auth_user_id", userId)
+        .eq("is_active", true)
         .maybeSingle();
 
-      if (error) {
-        console.warn("Could not fetch user profile:", error.message);
-        return null;
+      if (adminRecord) {
+        return {
+          id: userId,
+          email: adminRecord.email,
+          full_name: adminRecord.name,
+          phone: null,
+          is_admin: true,
+          avatar_url: null,
+          discount_percentage: 0,
+          voucher_balance: 0,
+          loyalty_points: 0,
+          vip_level: "standard",
+          referral_code: null,
+        } as UserProfile;
       }
 
-      return data as UserProfile | null;
+      return null;
     } catch (err) {
       console.error("Error fetching user profile:", err);
       return null;

@@ -39,6 +39,7 @@ const AdminMarketing = lazy(() => import("./pages/admin/marketing"));
 const AdminReviews = lazy(() => import("./pages/admin/reviews"));
 const AdminModules = lazy(() => import("./pages/admin/modules"));
 const AdminOrderDetail = lazy(() => import("./pages/admin/order-detail"));
+const AdminUsers = lazy(() => import("./pages/admin/admin-users"));
 
 function Router() {
   return (
@@ -77,6 +78,7 @@ function Router() {
         <Route path="/admin/marketing" component={AdminMarketing} />
         <Route path="/admin/reviews" component={AdminReviews} />
         <Route path="/admin/modules" component={AdminModules} />
+        <Route path="/admin/admin-users" component={AdminUsers} />
         <Route component={NotFound} />
       </Switch>
       </RouteErrorBoundary>

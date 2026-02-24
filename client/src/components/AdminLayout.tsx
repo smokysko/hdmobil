@@ -15,6 +15,7 @@ import {
   ExternalLink,
   Loader2,
   Puzzle,
+  UserCog,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useI18n } from '../i18n';
@@ -30,6 +31,7 @@ const navItems = [
   { href: '/admin/marketing', icon: Megaphone, label: 'Marketing' },
   { href: '/admin/cms', icon: FileEdit, label: 'Obsah stránky' },
   { href: '/admin/modules', icon: Puzzle, label: 'Moduly' },
+  { href: '/admin/admin-users', icon: UserCog, label: 'Admin používatelia' },
   { href: '/admin/settings', icon: Settings, label: 'Nastavenia' },
 ];
 
