@@ -10,8 +10,8 @@ const corsHeaders = {
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-const FINBY_API_KEY = "mhEBk0gVYutUu0lBvCypxLhlaQxrmIky";
-const FINBY_ACCOUNT_ID = "4107647532";
+const FINBY_API_KEY = Deno.env.get("FINBY_API_KEY")!;
+const FINBY_ACCOUNT_ID = Deno.env.get("FINBY_ACCOUNT_ID")!;
 
 const FINBY_CARD_URL = "https://amapi.finby.eu/mapi5/Card/PayPopup";
 const FINBY_WIRE_URL = "https://amapi.finby.eu/mapi5/wire/paypopup";
