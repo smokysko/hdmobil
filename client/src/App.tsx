@@ -22,6 +22,7 @@ import CustomerRegister from "./pages/auth/register";
 import AccountPage from "./pages/account/index";
 import OrdersPage from "./pages/account/orders";
 import LoyaltyPage from "./pages/account/loyalty";
+import AccountSettings from "./pages/account/settings";
 import Search from "./pages/Search";
 import Wishlist from "./pages/Wishlist";
 import Unsubscribe from "./pages/Unsubscribe";
@@ -67,6 +68,7 @@ function Router() {
         <Route path="/moj-ucet" component={AccountPage} />
         <Route path="/moje-objednavky" component={OrdersPage} />
         <Route path="/vernostny-program" component={LoyaltyPage} />
+        <Route path="/nastavenia-uctu" component={AccountSettings} />
         <Route path="/admin">{() => { window.location.href = '/admin/login'; return null; }}</Route>
         <Route path="/admin/login" component={AdminLogin} />
         <Route path="/admin/dashboard" component={AdminDashboard} />

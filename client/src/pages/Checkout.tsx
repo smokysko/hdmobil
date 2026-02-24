@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { Spinner } from "@/components/ui/spinner";
+import { useAuth } from "@/contexts/AuthContext";
 import { useCart } from "@/contexts/CartContext";
 import { useShippingMethods, usePaymentMethods } from "@/hooks/useShipping";
 import type { ShippingMethod, PaymentMethod } from "@/services/shipping";
@@ -95,6 +96,7 @@ function getPaymentIcon(code: string) {
 
 export default function Checkout() {
   const { items, cartTotal, clearCart, appliedDiscount, discountAmount } = useCart();
+  const { user, isAuthenticated } = useAuth();
   const [, setLocation] = useLocation();
   const [isProcessing, setIsProcessing] = useState(false);
   const [selectedShipping, setSelectedShipping] = useState<ShippingMethod | null>(null);
@@ -132,11 +134,37 @@ export default function Checkout() {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<CheckoutForm>({
     resolver: zodResolver(checkoutSchema),
     defaultValues: { country: "SK" },
   });
+
+  useEffect(() => {
+    if (!isAuthenticated || !user) return;
+    supabase
+      .from('customers')
+      .select('first_name, last_name, email, phone, billing_street, billing_city, billing_zip, billing_country')
+      .eq('auth_user_id', user.id)
+      .maybeSingle()
+      .then(({ data }) => {
+        if (data) {
+          reset({
+            email: data.email || user.email || '',
+            firstName: data.first_name || '',
+            lastName: data.last_name || '',
+            phone: data.phone || '',
+            address: data.billing_street || '',
+            city: data.billing_city || '',
+            zipCode: data.billing_zip || '',
+            country: data.billing_country || 'SK',
+          });
+        } else {
+          reset({ email: user.email || '', country: 'SK' });
+        }
+      });
+  }, [isAuthenticated, user, reset]);
 
   const isPacketaZbox = selectedShipping?.code === "packeta_zbox";
 

@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/Layout';
 import { useLocation } from 'wouter';
 import { useEffect } from 'react';
-import { Package, User, Heart, Star } from 'lucide-react';
+import { Package, User, Heart, Star, Settings } from 'lucide-react';
 import { Link } from 'wouter';
 
 interface AccountLayoutProps {
@@ -41,6 +41,7 @@ export default function AccountLayout({ children }: AccountLayoutProps) {
     { href: '/moje-objednavky', icon: Package, label: 'Moje objednávky' },
     { href: '/oblubene', icon: Heart, label: 'Obľúbené' },
     { href: '/vernostny-program', icon: Star, label: 'Vernostný program' },
+    { href: '/nastavenia-uctu', icon: Settings, label: 'Nastavenia' },
   ];
 
   return (

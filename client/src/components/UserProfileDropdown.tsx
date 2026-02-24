@@ -76,7 +76,7 @@ export default function UserProfileDropdown() {
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild className="cursor-pointer">
-          <Link href="/nastavenia">
+          <Link href="/nastavenia-uctu">
             <Settings className="mr-2 h-4 w-4" />
             <span>Nastavenia</span>
           </Link>
