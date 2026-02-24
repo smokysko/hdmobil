@@ -130,6 +130,11 @@ export default function LoyaltyPage() {
                     <span>Moje objednávky</span>
                   </div>
                 </Link>
+                <Link href="/oblubene">
+                  <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 cursor-pointer">
+                    <span>Obľúbené</span>
+                  </div>
+                </Link>
                 <Link href="/vernostny-program">
                   <div className="flex items-center gap-3 px-4 py-3 rounded-lg bg-primary/10 text-primary font-medium cursor-pointer">
                     <Star className="h-5 w-5" />

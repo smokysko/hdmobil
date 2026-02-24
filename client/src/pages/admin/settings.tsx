@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
 import AdminLayout from '../../components/AdminLayout';
 import { loadSettings, saveSettings, type ShopSettings } from '../../lib/settings';
+import { supabase } from '../../lib/supabase';
 
 const EMPTY: ShopSettings = {
   shopName: '',
@@ -18,16 +19,53 @@ const EMPTY: ShopSettings = {
   language: 'sk',
 };
 
+interface FeatureToggles {
+  loyalty_enabled: boolean;
+  newsletter_enabled: boolean;
+}
+
 export default function AdminSettings() {
   const [settings, setSettings] = useState<ShopSettings>(EMPTY);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [features, setFeatures] = useState<FeatureToggles>({ loyalty_enabled: true, newsletter_enabled: true });
+  const [savingFeature, setSavingFeature] = useState<string | null>(null);
 
   useEffect(() => {
     loadSettings()
       .then((data) => setSettings(data))
       .finally(() => setLoading(false));
+    loadFeatureToggles();
   }, []);
+
+  async function loadFeatureToggles() {
+    const { data } = await supabase
+      .from('module_settings')
+      .select('module_id, is_enabled')
+      .in('module_id', ['loyalty', 'newsletter']);
+    if (data) {
+      const map: Record<string, boolean> = {};
+      data.forEach((row) => { map[row.module_id] = row.is_enabled; });
+      setFeatures({
+        loyalty_enabled: map['loyalty'] ?? true,
+        newsletter_enabled: map['newsletter'] ?? true,
+      });
+    }
+  }
+
+  async function toggleFeature(moduleId: string, enabled: boolean) {
+    setSavingFeature(moduleId);
+    const { error } = await supabase
+      .from('module_settings')
+      .upsert({ module_id: moduleId, is_enabled: enabled, config: {} }, { onConflict: 'module_id' });
+    if (!error) {
+      setFeatures((prev) => ({ ...prev, [`${moduleId}_enabled`]: enabled }));
+      toast.success(enabled ? 'Modul zapnutý' : 'Modul vypnutý');
+    } else {
+      toast.error('Chyba pri ukladaní');
+    }
+    setSavingFeature(null);
+  }
 
   const set = (patch: Partial<ShopSettings>) => setSettings((prev) => ({ ...prev, ...patch }));
 
@@ -208,6 +246,49 @@ export default function AdminSettings() {
                 <option value="cs">Čeština</option>
               </select>
             </div>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl border border-gray-200/80 p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-1">Funkcie obchodu</h3>
+          <p className="text-sm text-gray-500 mb-5">Zapnite alebo vypnite jednotlivé funkcie obchodu.</p>
+          <div className="divide-y divide-gray-100">
+            {[
+              {
+                id: 'loyalty',
+                key: 'loyalty_enabled' as keyof FeatureToggles,
+                label: 'Vernostný program',
+                desc: 'Zákazníci zbierajú body za nákupy, VIP úrovne a referral odmeny.',
+              },
+              {
+                id: 'newsletter',
+                key: 'newsletter_enabled' as keyof FeatureToggles,
+                label: 'Newsletter',
+                desc: 'Zobrazuje newsletter popup a formulár na prihlásenie do odberu.',
+              },
+            ].map((feat) => (
+              <div key={feat.id} className="flex items-center justify-between py-4">
+                <div>
+                  <p className="text-sm font-medium text-gray-900">{feat.label}</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{feat.desc}</p>
+                </div>
+                <button
+                  onClick={() => toggleFeature(feat.id, !features[feat.key])}
+                  disabled={savingFeature === feat.id}
+                  className={`relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 focus:outline-none disabled:opacity-60 ${
+                    features[feat.key] ? 'bg-blue-600' : 'bg-gray-200'
+                  }`}
+                  role="switch"
+                  aria-checked={features[feat.key]}
+                >
+                  <span
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ${
+                      features[feat.key] ? 'translate-x-5' : 'translate-x-0'
+                    }`}
+                  />
+                </button>
+              </div>
+            ))}
           </div>
         </div>
 
