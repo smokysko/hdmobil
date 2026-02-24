@@ -22,6 +22,7 @@ import {
 } from "@/lib/products";
 import { useReviewStats, useUserReview } from "@/hooks/useReviews";
 import { useAuth } from "@/_core/hooks/useAuth";
+import { useMetaTags } from "@/hooks/useMetaTags";
 import {
   Check,
   ChevronDown,
@@ -56,6 +57,13 @@ export default function ProductDetail() {
 
   const { data: reviewStats } = useReviewStats(product?.id);
   const { data: userReview } = useUserReview(product?.id, user?.id);
+
+  useMetaTags({
+    title: product?.name,
+    description: product?.description || undefined,
+    image: product?.image || undefined,
+    url: product ? `${window.location.origin}/product/${product.slug}` : undefined,
+  });
 
   useEffect(() => {
     window.scrollTo(0, 0);

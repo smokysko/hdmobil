@@ -53,6 +53,8 @@ export interface CreateProductData {
   is_active?: boolean;
   is_new?: boolean;
   is_featured?: boolean;
+  meta_title?: string;
+  meta_description?: string;
 }
 
 export interface UpdateProductData extends Partial<CreateProductData> {
@@ -125,6 +127,8 @@ export async function createProduct(productData: CreateProductData): Promise<{ s
       is_active: productData.is_active ?? true,
       is_new: productData.is_new ?? false,
       is_featured: productData.is_featured ?? false,
+      meta_title: productData.meta_title || null,
+      meta_description: productData.meta_description || null,
     })
     .select(`
       *,
@@ -164,6 +168,8 @@ export async function updateProduct(productData: UpdateProductData): Promise<{ s
   if (productData.is_active !== undefined) updates.is_active = productData.is_active;
   if (productData.is_new !== undefined) updates.is_new = productData.is_new;
   if (productData.is_featured !== undefined) updates.is_featured = productData.is_featured;
+  if (productData.meta_title !== undefined) updates.meta_title = productData.meta_title || null;
+  if (productData.meta_description !== undefined) updates.meta_description = productData.meta_description || null;
 
   updates.updated_at = new Date().toISOString();
 

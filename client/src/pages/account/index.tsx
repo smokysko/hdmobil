@@ -3,7 +3,7 @@ import { useI18n } from '@/i18n';
 import Layout from '@/components/Layout';
 import { useLocation } from 'wouter';
 import { useEffect } from 'react';
-import { Package, User, Heart, Settings, CreditCard, MapPin } from 'lucide-react';
+import { Package, User, Heart, Settings, CreditCard, MapPin, Star } from 'lucide-react';
 import { Link } from 'wouter';
 import { useCustomerOrders } from '@/hooks/useOrders';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
@@ -87,6 +87,12 @@ export default function AccountPage() {
                   <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 cursor-pointer">
                     <Heart className="h-5 w-5" />
                     <span>Obľúbené</span>
+                  </div>
+                </Link>
+                <Link href="/vernostny-program">
+                  <div className="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-50 text-gray-700 cursor-pointer">
+                    <Star className="h-5 w-5" />
+                    <span>Vernostný program</span>
                   </div>
                 </Link>
                 <Link href="/adresy">

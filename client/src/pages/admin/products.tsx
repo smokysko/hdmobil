@@ -11,6 +11,10 @@ import {
   X,
   Loader2,
   Upload,
+  Download,
+  FileSpreadsheet,
+  CheckCircle,
+  AlertCircle,
 } from 'lucide-react';
 import {
   getAdminProducts,
@@ -25,6 +29,7 @@ import {
 } from '@/lib/admin-products';
 import AdminLayout from '../../components/AdminLayout';
 import { toast } from 'sonner';
+import { supabase } from '@/lib/supabase';
 
 type Language = 'sk' | 'cs' | 'pl';
 
@@ -51,6 +56,8 @@ interface ProductFormData {
   is_active: boolean;
   is_new: boolean;
   is_featured: boolean;
+  meta_title: string;
+  meta_description: string;
 }
 
 const emptyFormData: ProductFormData = {
@@ -69,6 +76,8 @@ const emptyFormData: ProductFormData = {
   is_active: true,
   is_new: false,
   is_featured: false,
+  meta_title: '',
+  meta_description: '',
 };
 
 export default function AdminProducts() {
@@ -84,6 +93,12 @@ export default function AdminProducts() {
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [showImportModal, setShowImportModal] = useState(false);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [isImporting, setIsImporting] = useState(false);
+  const [importResults, setImportResults] = useState<{ success: boolean; created: number; updated: number; errors: number; total: number; results: { row: number; sku: string; name: string; status: string; error?: string }[] } | null>(null);
+  const csvInputRef = useRef<HTMLInputElement>(null);
 
   const [formData, setFormData] = useState<ProductFormData>(emptyFormData);
   const [activeLanguage, setActiveLanguage] = useState<Language>('sk');
@@ -101,6 +116,52 @@ export default function AdminProducts() {
     setProducts(prods);
     setCategories(cats);
     setIsLoading(false);
+  }
+
+  function downloadCsvTemplate() {
+    const headers = ['name_sk', 'name_cs', 'name_pl', 'sku', 'price_with_vat', 'original_price', 'stock_quantity', 'category_slug', 'description_sk', 'is_active', 'is_new', 'is_featured', 'meta_title', 'meta_description'];
+    const example = ['iPhone 15 Pro', 'iPhone 15 Pro', 'iPhone 15 Pro', 'IPH15P-256', '1299.00', '1499.00', '10', 'smartphones', 'Najvýkonnejší iPhone.', 'true', 'true', 'false', 'iPhone 15 Pro | HDmobil', ''];
+    const csv = [headers.join(','), example.join(',')].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'import_sablona.csv';
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  async function handleImport() {
+    if (!importFile) return;
+    setIsImporting(true);
+    setImportResults(null);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const formData = new FormData();
+      formData.append('file', importFile);
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/product-import`,
+        {
+          method: 'POST',
+          headers: {
+            Authorization: `Bearer ${session?.access_token || import.meta.env.VITE_SUPABASE_ANON_KEY}`,
+          },
+          body: formData,
+        }
+      );
+      const result = await response.json();
+      setImportResults(result);
+      if (result.success) {
+        toast.success(`Import dokončený: ${result.created} nových, ${result.updated} aktualizovaných`);
+        loadData();
+      } else {
+        toast.error(result.error || 'Chyba pri importe');
+      }
+    } catch (err) {
+      toast.error('Nepodarilo sa spojiť so serverom');
+    } finally {
+      setIsImporting(false);
+    }
   }
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -159,6 +220,8 @@ export default function AdminProducts() {
         is_active: formData.is_active,
         is_new: formData.is_new,
         is_featured: formData.is_featured,
+        meta_title: formData.meta_title || undefined,
+        meta_description: formData.meta_description || undefined,
       });
 
       setIsSaving(false);
@@ -187,6 +250,8 @@ export default function AdminProducts() {
         is_active: formData.is_active,
         is_new: formData.is_new,
         is_featured: formData.is_featured,
+        meta_title: formData.meta_title || undefined,
+        meta_description: formData.meta_description || undefined,
       });
 
       setIsSaving(false);
@@ -225,6 +290,8 @@ export default function AdminProducts() {
       is_active: product.is_active,
       is_new: product.is_new,
       is_featured: product.is_featured,
+      meta_title: (product as unknown as Record<string, unknown>).meta_title as string || '',
+      meta_description: (product as unknown as Record<string, unknown>).meta_description as string || '',
     });
     setActiveLanguage('sk');
     setEditMode(true);
@@ -292,13 +359,22 @@ export default function AdminProducts() {
                   produktov)
                 </p>
               </div>
-              <button
-                onClick={openCreateModal}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-blue-500/20"
-              >
-                <Plus className="w-5 h-5" />
-                Nový produkt
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => { setShowImportModal(true); setImportResults(null); setImportFile(null); }}
+                  className="flex items-center gap-2 border border-gray-200 bg-white hover:bg-gray-50 text-gray-700 px-4 py-2.5 rounded-lg font-medium transition-colors"
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  Import CSV
+                </button>
+                <button
+                  onClick={openCreateModal}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-lg font-medium transition-colors shadow-lg shadow-blue-500/20"
+                >
+                  <Plus className="w-5 h-5" />
+                  Nový produkt
+                </button>
+              </div>
             </div>
 
             <div className="bg-white rounded-xl border border-gray-200/80 p-4">
@@ -739,6 +815,40 @@ export default function AdminProducts() {
                   <span className="text-sm text-gray-700">Odporúčaný</span>
                 </label>
               </div>
+
+              <div className="border border-gray-200 rounded-lg p-4 space-y-4">
+                <h3 className="text-sm font-semibold text-gray-700">SEO nastavenia</h3>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Meta názov
+                    <span className="text-gray-400 font-normal ml-2">(max 60 znakov)</span>
+                  </label>
+                  <input
+                    type="text"
+                    maxLength={60}
+                    placeholder="napr. iPhone 15 Pro | HDmobil"
+                    value={formData.meta_title}
+                    onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                  />
+                  <p className="mt-1 text-xs text-gray-400">{formData.meta_title.length}/60</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Meta popis
+                    <span className="text-gray-400 font-normal ml-2">(max 160 znakov)</span>
+                  </label>
+                  <textarea
+                    rows={2}
+                    maxLength={160}
+                    placeholder="Stručný popis produktu pre vyhľadávače..."
+                    value={formData.meta_description}
+                    onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
+                    className="w-full px-4 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none text-sm"
+                  />
+                  <p className="mt-1 text-xs text-gray-400">{formData.meta_description.length}/160</p>
+                </div>
+              </div>
             </div>
             <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
               <button
@@ -755,6 +865,127 @@ export default function AdminProducts() {
                 {isSaving && <Loader2 className="w-4 h-4 animate-spin" />}
                 {editMode ? 'Uložiť zmeny' : 'Vytvoriť produkt'}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {showImportModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
+              <div>
+                <h2 className="text-xl font-semibold text-gray-900">Hromadný import produktov</h2>
+                <p className="text-sm text-gray-500 mt-1">Nahrajte CSV súbor s produktmi. SKU sa použije na detekciu duplicít.</p>
+              </div>
+              <button onClick={() => setShowImportModal(false)} className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-6 overflow-y-auto flex-1 space-y-5">
+              <div className="flex items-center gap-3 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                <FileSpreadsheet className="w-5 h-5 text-blue-500 flex-shrink-0" />
+                <div className="flex-1 text-sm text-blue-700">
+                  <p className="font-medium">Formát CSV súboru</p>
+                  <p className="text-blue-600 mt-0.5">Povinné stĺpce: name_sk, price_with_vat. Voliteľné: sku, category_slug, stock_quantity, description_sk, is_active, is_new, is_featured, meta_title, meta_description</p>
+                </div>
+                <button
+                  onClick={downloadCsvTemplate}
+                  className="flex items-center gap-1.5 text-sm text-blue-600 font-medium hover:text-blue-700 px-3 py-1.5 hover:bg-blue-100 rounded-lg transition-colors flex-shrink-0"
+                >
+                  <Download className="w-4 h-4" />
+                  Šablóna
+                </button>
+              </div>
+
+              <div>
+                <input
+                  ref={csvInputRef}
+                  type="file"
+                  accept=".csv,text/csv"
+                  onChange={(e) => setImportFile(e.target.files?.[0] || null)}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => csvInputRef.current?.click()}
+                  className={`w-full border-2 border-dashed rounded-xl p-8 flex flex-col items-center gap-3 transition-colors ${
+                    importFile ? 'border-blue-300 bg-blue-50' : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50/30'
+                  }`}
+                >
+                  <Upload className={`w-8 h-8 ${importFile ? 'text-blue-500' : 'text-gray-400'}`} />
+                  {importFile ? (
+                    <div className="text-center">
+                      <p className="font-medium text-blue-700">{importFile.name}</p>
+                      <p className="text-sm text-blue-500">{(importFile.size / 1024).toFixed(1)} KB</p>
+                    </div>
+                  ) : (
+                    <div className="text-center">
+                      <p className="text-sm font-medium text-gray-700">Kliknite pre výber CSV súboru</p>
+                      <p className="text-xs text-gray-400 mt-1">alebo presuňte súbor sem</p>
+                    </div>
+                  )}
+                </button>
+              </div>
+
+              {importResults && (
+                <div className="space-y-3">
+                  <div className="grid grid-cols-4 gap-3">
+                    {[
+                      { label: 'Spolu', value: importResults.total, color: 'bg-gray-50 text-gray-700' },
+                      { label: 'Nové', value: importResults.created, color: 'bg-green-50 text-green-700' },
+                      { label: 'Aktualizované', value: importResults.updated, color: 'bg-blue-50 text-blue-700' },
+                      { label: 'Chyby', value: importResults.errors, color: 'bg-red-50 text-red-700' },
+                    ].map((stat) => (
+                      <div key={stat.label} className={`${stat.color} rounded-lg p-3 text-center`}>
+                        <p className="text-2xl font-bold">{stat.value}</p>
+                        <p className="text-xs mt-0.5">{stat.label}</p>
+                      </div>
+                    ))}
+                  </div>
+
+                  {importResults.results.filter((r) => r.status === 'error').length > 0 && (
+                    <div className="border border-red-100 rounded-lg overflow-hidden">
+                      <p className="px-4 py-2 text-xs font-semibold text-red-700 bg-red-50 border-b border-red-100">Chybné riadky</p>
+                      <div className="divide-y divide-gray-50 max-h-40 overflow-y-auto">
+                        {importResults.results.filter((r) => r.status === 'error').map((r) => (
+                          <div key={r.row} className="px-4 py-2 flex items-start gap-2">
+                            <AlertCircle className="w-4 h-4 text-red-500 flex-shrink-0 mt-0.5" />
+                            <div>
+                              <p className="text-xs font-medium text-gray-800">Riadok {r.row}: {r.name || r.sku || '–'}</p>
+                              <p className="text-xs text-red-600">{r.error}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            <div className="p-6 border-t border-gray-100 flex justify-end gap-3 bg-gray-50/50">
+              <button onClick={() => setShowImportModal(false)} className="px-5 py-2.5 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition-colors">
+                {importResults ? 'Zatvoriť' : 'Zrušiť'}
+              </button>
+              {!importResults && (
+                <button
+                  onClick={handleImport}
+                  disabled={!importFile || isImporting}
+                  className="flex items-center gap-2 px-5 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium transition-colors shadow-lg shadow-blue-500/20 disabled:opacity-50"
+                >
+                  {isImporting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Importuje sa...
+                    </>
+                  ) : (
+                    <>
+                      <CheckCircle className="w-4 h-4" />
+                      Spustiť import
+                    </>
+                  )}
+                </button>
+              )}
             </div>
           </div>
         </div>

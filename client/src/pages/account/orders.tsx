@@ -2,13 +2,15 @@ import { useAuth } from '@/contexts/AuthContext';
 import Layout from '@/components/Layout';
 import { useLocation } from 'wouter';
 import { useEffect, useState } from 'react';
-import { Package, ChevronRight, Search } from 'lucide-react';
+import { Package, ChevronRight, Search, RotateCcw, Download, X } from 'lucide-react';
 import { Link } from 'wouter';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useCustomerOrders } from '@/hooks/useOrders';
 import type { Order } from '@/services/orders';
 import { useDocumentTitle } from '@/hooks/useDocumentTitle';
+import { supabase } from '@/lib/supabase';
+import { toast } from 'sonner';
 
 export default function OrdersPage() {
   const { user, isAuthenticated, loading: isLoading } = useAuth();
@@ -16,6 +18,9 @@ export default function OrdersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   useDocumentTitle('Moje objednávky');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [refundModal, setRefundModal] = useState<{ orderId: string; orderNumber: string; total: number } | null>(null);
+  const [refundReason, setRefundReason] = useState('');
+  const [submittingRefund, setSubmittingRefund] = useState(false);
 
   const { data: ordersData, isLoading: ordersLoading } = useCustomerOrders({
     customerId: user?.id,
@@ -53,6 +58,37 @@ export default function OrdersPage() {
     delivered: { label: 'Doručená', color: 'bg-green-100 text-green-800' },
     cancelled: { label: 'Zrušená', color: 'bg-red-100 text-red-800' },
   };
+
+  async function handleRefundSubmit() {
+    if (!refundModal || !user) return;
+    if (!refundReason.trim()) {
+      toast.error('Zadajte dôvod vrátenia');
+      return;
+    }
+    setSubmittingRefund(true);
+    const { error } = await supabase.from('refunds').insert({
+      order_id: refundModal.orderId,
+      requested_by: user.id,
+      amount: refundModal.total,
+      reason: refundReason,
+      status: 'requested',
+    });
+    setSubmittingRefund(false);
+    if (!error) {
+      toast.success('Žiadosť o vrátenie bola odoslaná');
+      setRefundModal(null);
+      setRefundReason('');
+    } else {
+      toast.error('Nepodarilo sa odoslať žiadosť');
+    }
+  }
+
+  function handleDownloadInvoice(orderId: string) {
+    window.open(
+      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/invoices/download?orderId=${orderId}`,
+      '_blank'
+    );
+  }
 
   const filteredOrders = orders.filter((order) => {
     const matchesSearch = order.order_number.toLowerCase().includes(searchQuery.toLowerCase());
@@ -151,15 +187,31 @@ export default function OrdersPage() {
                         <span>Platba: {order.payment_method_name}</span>
                       )}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex flex-wrap gap-2">
                       {order.tracking_number && (
                         <Button variant="outline" size="sm">
                           Sledovať zásielku
                         </Button>
                       )}
-                      <Button variant="outline" size="sm">
-                        Stiahnuť faktúru
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handleDownloadInvoice(order.id)}
+                      >
+                        <Download className="h-3.5 w-3.5 mr-1.5" />
+                        Faktúra
                       </Button>
+                      {(order.status === 'delivered') && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setRefundModal({ orderId: order.id, orderNumber: order.order_number, total: order.total })}
+                          className="text-orange-600 border-orange-200 hover:bg-orange-50"
+                        >
+                          <RotateCcw className="h-3.5 w-3.5 mr-1.5" />
+                          Vrátiť
+                        </Button>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -168,6 +220,53 @@ export default function OrdersPage() {
           </div>
         )}
       </div>
+
+      {refundModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-bold">Žiadosť o vrátenie</h2>
+              <button
+                onClick={() => { setRefundModal(null); setRefundReason(''); }}
+                className="text-gray-400 hover:text-gray-600 p-1"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Objednávka <span className="font-semibold">{refundModal.orderNumber}</span> – {refundModal.total.toFixed(2)} €
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Dôvod vrátenia *
+              </label>
+              <textarea
+                rows={4}
+                value={refundReason}
+                onChange={(e) => setRefundReason(e.target.value)}
+                placeholder="Opíšte dôvod vrátenia tovaru..."
+                className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 resize-none"
+              />
+            </div>
+            <div className="flex gap-3">
+              <Button
+                variant="outline"
+                className="flex-1"
+                onClick={() => { setRefundModal(null); setRefundReason(''); }}
+              >
+                Zrušiť
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={handleRefundSubmit}
+                disabled={submittingRefund}
+              >
+                {submittingRefund ? 'Odosiela sa...' : 'Odoslať žiadosť'}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 }

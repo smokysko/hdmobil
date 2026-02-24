@@ -21,6 +21,7 @@ import CustomerLogin from "./pages/auth/login";
 import CustomerRegister from "./pages/auth/register";
 import AccountPage from "./pages/account/index";
 import OrdersPage from "./pages/account/orders";
+import LoyaltyPage from "./pages/account/loyalty";
 import Search from "./pages/Search";
 import Wishlist from "./pages/Wishlist";
 import Unsubscribe from "./pages/Unsubscribe";
@@ -40,6 +41,7 @@ const AdminReviews = lazy(() => import("./pages/admin/reviews"));
 const AdminModules = lazy(() => import("./pages/admin/modules"));
 const AdminOrderDetail = lazy(() => import("./pages/admin/order-detail"));
 const AdminUsers = lazy(() => import("./pages/admin/admin-users"));
+const AdminLoyalty = lazy(() => import("./pages/admin/loyalty"));
 
 function Router() {
   return (
@@ -64,6 +66,7 @@ function Router() {
         <Route path="/reset-password" component={ResetPassword} />
         <Route path="/moj-ucet" component={AccountPage} />
         <Route path="/moje-objednavky" component={OrdersPage} />
+        <Route path="/vernostny-program" component={LoyaltyPage} />
         <Route path="/admin">{() => { window.location.href = '/admin/login'; return null; }}</Route>
         <Route path="/admin/login" component={AdminLogin} />
         <Route path="/admin/dashboard" component={AdminDashboard} />
@@ -79,6 +82,7 @@ function Router() {
         <Route path="/admin/reviews" component={AdminReviews} />
         <Route path="/admin/modules" component={AdminModules} />
         <Route path="/admin/admin-users" component={AdminUsers} />
+        <Route path="/admin/loyalty" component={AdminLoyalty} />
         <Route component={NotFound} />
       </Switch>
       </RouteErrorBoundary>

@@ -16,6 +16,7 @@ import {
   Loader2,
   Puzzle,
   UserCog,
+  Gift,
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useI18n } from '../i18n';
@@ -29,6 +30,7 @@ const navItems = [
   { href: '/admin/invoices', icon: FileText, label: 'Faktúry' },
   { href: '/admin/discounts', icon: Tag, label: 'Kupóny' },
   { href: '/admin/marketing', icon: Megaphone, label: 'Marketing' },
+  { href: '/admin/loyalty', icon: Gift, label: 'Vernostný program' },
   { href: '/admin/cms', icon: FileEdit, label: 'Obsah stránky' },
   { href: '/admin/modules', icon: Puzzle, label: 'Moduly' },
   { href: '/admin/admin-users', icon: UserCog, label: 'Admin používatelia' },

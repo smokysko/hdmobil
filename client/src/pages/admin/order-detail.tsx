@@ -11,6 +11,7 @@ import {
   CreditCard,
   Package,
   User,
+  RotateCcw,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import AdminLayout from "../../components/AdminLayout";
@@ -97,9 +98,14 @@ export default function AdminOrderDetail() {
   const [adminNote, setAdminNote] = useState("");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [savingNote, setSavingNote] = useState(false);
+  const [refunds, setRefunds] = useState<{ id: string; amount: number; reason: string; status: string; created_at: string; admin_note: string }[]>([]);
+  const [processingRefund, setProcessingRefund] = useState<string | null>(null);
 
   useEffect(() => {
-    if (params?.id) fetchOrder(params.id);
+    if (params?.id) {
+      fetchOrder(params.id);
+      fetchRefunds(params.id);
+    }
   }, [params?.id]);
 
   async function fetchOrder(id: string) {
@@ -119,6 +125,34 @@ export default function AdminOrderDetail() {
     setAdminNote(data.admin_note || "");
     setTrackingNumber(data.tracking_number || "");
     setLoading(false);
+  }
+
+  async function fetchRefunds(orderId: string) {
+    const { data } = await supabase
+      .from("refunds")
+      .select("id, amount, reason, status, created_at, admin_note")
+      .eq("order_id", orderId)
+      .order("created_at", { ascending: false });
+    if (data) setRefunds(data);
+  }
+
+  async function handleRefundAction(refundId: string, newStatus: "approved" | "rejected" | "completed", adminNoteText?: string) {
+    if (!order) return;
+    setProcessingRefund(refundId);
+    const updates: Record<string, unknown> = { status: newStatus };
+    if (adminNoteText !== undefined) updates.admin_note = adminNoteText;
+    const { error } = await supabase.from("refunds").update(updates).eq("id", refundId);
+    if (!error) {
+      if (newStatus === "completed") {
+        await supabase.from("orders").update({ payment_status: "refunded", status: "returned" }).eq("id", order.id);
+        setOrder({ ...order, payment_status: "refunded", status: "returned" });
+      }
+      toast.success("Refund aktualizovaný");
+      fetchRefunds(order.id);
+    } else {
+      toast.error("Nepodarilo sa aktualizovať refund");
+    }
+    setProcessingRefund(null);
   }
 
   async function updateStatus(newStatus: string) {
@@ -507,6 +541,63 @@ export default function AdminOrderDetail() {
                 })}
               </div>
             </div>
+
+            {refunds.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-200/80 p-5">
+                <div className="flex items-center gap-2 mb-3">
+                  <RotateCcw className="w-4 h-4 text-gray-400" />
+                  <h3 className="text-sm font-semibold text-gray-700">Žiadosti o vrátenie</h3>
+                </div>
+                <div className="space-y-3">
+                  {refunds.map((refund) => (
+                    <div key={refund.id} className="border border-gray-100 rounded-lg p-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-medium text-gray-900">{parseFloat(String(refund.amount)).toFixed(2)} EUR</span>
+                        <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                          refund.status === 'requested' ? 'bg-amber-50 text-amber-700' :
+                          refund.status === 'approved' ? 'bg-blue-50 text-blue-700' :
+                          refund.status === 'completed' ? 'bg-green-50 text-green-700' :
+                          'bg-red-50 text-red-700'
+                        }`}>
+                          {refund.status === 'requested' ? 'Žiadosť' :
+                           refund.status === 'approved' ? 'Schválené' :
+                           refund.status === 'completed' ? 'Dokončené' : 'Zamietnuté'}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500">{refund.reason}</p>
+                      <p className="text-xs text-gray-400">{new Date(refund.created_at).toLocaleString('sk-SK')}</p>
+                      {refund.status === 'requested' && (
+                        <div className="flex gap-2 pt-1">
+                          <button
+                            onClick={() => handleRefundAction(refund.id, 'approved')}
+                            disabled={processingRefund === refund.id}
+                            className="flex-1 py-1.5 text-xs font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-60"
+                          >
+                            Schváliť
+                          </button>
+                          <button
+                            onClick={() => handleRefundAction(refund.id, 'rejected')}
+                            disabled={processingRefund === refund.id}
+                            className="flex-1 py-1.5 text-xs font-medium border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-60"
+                          >
+                            Zamietnuť
+                          </button>
+                        </div>
+                      )}
+                      {refund.status === 'approved' && (
+                        <button
+                          onClick={() => handleRefundAction(refund.id, 'completed')}
+                          disabled={processingRefund === refund.id}
+                          className="w-full py-1.5 text-xs font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 disabled:opacity-60"
+                        >
+                          Označiť ako vrátené
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className="bg-white rounded-xl border border-gray-200/80 p-5">
               <h3 className="text-sm font-semibold text-gray-700 mb-3">Faktúra</h3>
