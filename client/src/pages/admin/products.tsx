@@ -323,7 +323,7 @@ export default function AdminProducts() {
     const result = await toggleProductStatus(id, !currentStatus);
     if (result.success) {
       toast.success(
-        currentStatus ? 'Produkt bol deaktivovany' : 'Produkt bol aktivovany'
+        currentStatus ? 'Produkt bol deaktivovaný' : 'Produkt bol aktivovaný'
       );
       loadData();
     } else {
