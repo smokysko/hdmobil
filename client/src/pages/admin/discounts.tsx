@@ -17,6 +17,7 @@ import {
   ChevronRight,
   ToggleLeft,
   ToggleRight,
+  ChevronDown,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import AdminLayout from "../../components/AdminLayout";
@@ -60,8 +61,24 @@ const emptyDiscount: Omit<Discount, "id" | "current_uses" | "created_at"> = {
   is_active: true,
 };
 
+interface Category {
+  id: string;
+  name_sk: string;
+}
+
+interface Product {
+  id: string;
+  name_sk: string;
+  sku: string | null;
+}
+
 export default function AdminDiscounts() {
   const [discounts, setDiscounts] = useState<Discount[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [showProductDropdown, setShowProductDropdown] = useState(false);
+  const [productSearch, setProductSearch] = useState("");
   const [stats, setStats] = useState<DiscountStats>({
     total: 0,
     active: 0,
@@ -81,6 +98,18 @@ export default function AdminDiscounts() {
   useEffect(() => {
     fetchDiscounts();
   }, [page]);
+
+  useEffect(() => {
+    async function loadCategoriesAndProducts() {
+      const [catsRes, prodsRes] = await Promise.all([
+        supabase.from("categories").select("id, name_sk").eq("is_active", true).order("name_sk"),
+        supabase.from("products").select("id, name_sk, sku").eq("is_active", true).order("name_sk"),
+      ]);
+      if (catsRes.data) setCategories(catsRes.data);
+      if (prodsRes.data) setProducts(prodsRes.data);
+    }
+    loadCategoriesAndProducts();
+  }, []);
 
   async function fetchDiscounts() {
     setLoading(true);
@@ -206,6 +235,9 @@ export default function AdminDiscounts() {
 
   function openEditModal(discount: Discount) {
     setEditingDiscount(discount);
+    setShowCategoryDropdown(false);
+    setShowProductDropdown(false);
+    setProductSearch("");
     setFormData({
       code: discount.code,
       discount_type: discount.discount_type,
@@ -226,6 +258,9 @@ export default function AdminDiscounts() {
     setEditingDiscount(null);
     setFormData(emptyDiscount);
     setShowModal(true);
+    setShowCategoryDropdown(false);
+    setShowProductDropdown(false);
+    setProductSearch("");
   }
 
   function generateCode() {
@@ -625,6 +660,136 @@ export default function AdminDiscounts() {
                     className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
                   />
                 </div>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Platí pre kategórie
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => { setShowCategoryDropdown(!showCategoryDropdown); setShowProductDropdown(false); }}
+                    className="w-full flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
+                  >
+                    <span className="text-gray-600">
+                      {(formData.applies_to_categories?.length || 0) === 0
+                        ? "Všetky kategórie"
+                        : `Vybrané: ${formData.applies_to_categories?.length}`}
+                    </span>
+                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                  </button>
+                  {showCategoryDropdown && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {categories.map((cat) => {
+                        const selected = (formData.applies_to_categories || []).includes(cat.id);
+                        return (
+                          <label key={cat.id} className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={selected}
+                              onChange={() => {
+                                const current = formData.applies_to_categories || [];
+                                setFormData({
+                                  ...formData,
+                                  applies_to_categories: selected
+                                    ? current.filter((id) => id !== cat.id)
+                                    : [...current, cat.id],
+                                });
+                              }}
+                              className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                            />
+                            <span className="text-sm text-gray-700">{cat.name_sk}</span>
+                          </label>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+                {(formData.applies_to_categories?.length || 0) > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, applies_to_categories: null })}
+                    className="mt-1 text-xs text-red-500 hover:text-red-700"
+                  >
+                    Zrušiť výber kategórií
+                  </button>
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                  Platí pre produkty
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => { setShowProductDropdown(!showProductDropdown); setShowCategoryDropdown(false); }}
+                    className="w-full flex items-center justify-between px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm bg-white"
+                  >
+                    <span className="text-gray-600">
+                      {(formData.applies_to_products?.length || 0) === 0
+                        ? "Všetky produkty"
+                        : `Vybrané: ${formData.applies_to_products?.length}`}
+                    </span>
+                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                  </button>
+                  {showProductDropdown && (
+                    <div className="absolute z-10 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg">
+                      <div className="p-2 border-b border-gray-100">
+                        <input
+                          type="text"
+                          placeholder="Hľadať produkt..."
+                          value={productSearch}
+                          onChange={(e) => setProductSearch(e.target.value)}
+                          className="w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:border-blue-500"
+                        />
+                      </div>
+                      <div className="max-h-44 overflow-y-auto">
+                        {products
+                          .filter((p) =>
+                            !productSearch ||
+                            p.name_sk.toLowerCase().includes(productSearch.toLowerCase()) ||
+                            (p.sku && p.sku.toLowerCase().includes(productSearch.toLowerCase()))
+                          )
+                          .map((product) => {
+                            const selected = (formData.applies_to_products || []).includes(product.id);
+                            return (
+                              <label key={product.id} className="flex items-center gap-2 px-3 py-2 hover:bg-gray-50 cursor-pointer">
+                                <input
+                                  type="checkbox"
+                                  checked={selected}
+                                  onChange={() => {
+                                    const current = formData.applies_to_products || [];
+                                    setFormData({
+                                      ...formData,
+                                      applies_to_products: selected
+                                        ? current.filter((id) => id !== product.id)
+                                        : [...current, product.id],
+                                    });
+                                  }}
+                                  className="w-4 h-4 text-blue-600 border-gray-300 rounded"
+                                />
+                                <div className="min-w-0">
+                                  <p className="text-sm text-gray-700 truncate">{product.name_sk}</p>
+                                  {product.sku && <p className="text-xs text-gray-400">{product.sku}</p>}
+                                </div>
+                              </label>
+                            );
+                          })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                {(formData.applies_to_products?.length || 0) > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, applies_to_products: null })}
+                    className="mt-1 text-xs text-red-500 hover:text-red-700"
+                  >
+                    Zrušiť výber produktov
+                  </button>
+                )}
               </div>
 
               <div className="grid grid-cols-2 gap-4">

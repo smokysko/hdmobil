@@ -75,22 +75,32 @@ export default function AdminMarketing() {
   const [newsletterExpirationDays, setNewsletterExpirationDays] = useState(7);
   const [settingsLoading, setSettingsLoading] = useState(true);
 
+  const [segmentCounts, setSegmentCounts] = useState<Record<string, number>>({
+    all: 0,
+    newsletter: 0,
+    inactive: 0,
+    vip: 0,
+    new: 0,
+  });
+  const [campaigns, setCampaigns] = useState<{ id: string; subject: string; target_segment: string; recipients_count: number; status: string; sent_at: string }[]>([]);
+
   const customerSegments: CustomerSegment[] = [
-    { id: "all", name: "Všetci zákazníci", count: 0, description: "Všetci registrovaní zákazníci" },
+    { id: "all", name: "Všetci zákazníci", count: segmentCounts.all, description: "Všetci registrovaní zákazníci" },
     {
       id: "newsletter",
       name: "Newsletter odberatelia",
-      count: newsletterStats.totalSubscribers,
+      count: segmentCounts.newsletter,
       description: "Zákazníci s aktívnym odberom newslettra",
     },
-    { id: "inactive", name: "Neaktívni", count: 0, description: "Zákazníci bez objednávky 90+ dní" },
-    { id: "vip", name: "VIP zákazníci", count: 0, description: "Zákazníci s útratou nad 500 EUR" },
-    { id: "new", name: "Noví zákazníci", count: 0, description: "Registrovaní za posledných 30 dní" },
+    { id: "inactive", name: "Neaktívni", count: segmentCounts.inactive, description: "Zákazníci bez objednávky 90+ dní" },
+    { id: "vip", name: "VIP zákazníci", count: segmentCounts.vip, description: "Zákazníci s útratou nad 500 EUR" },
+    { id: "new", name: "Noví zákazníci", count: segmentCounts.new, description: "Registrovaní za posledných 30 dní" },
   ];
 
   useEffect(() => {
     fetchStats();
     loadNewsletterSettings();
+    fetchCampaigns();
   }, []);
 
   async function loadNewsletterSettings() {
@@ -144,37 +154,77 @@ export default function AdminMarketing() {
   async function fetchStats() {
     setLoading(true);
     try {
-      const { data: newsletterData } = await supabase
-        .from("newsletter_subscribers")
-        .select("*")
-        .order("created_at", { ascending: false });
+      const [newsletterRes, customersRes, ordersRes] = await Promise.all([
+        supabase.from("newsletter_subscribers").select("*").order("created_at", { ascending: false }),
+        supabase.from("customers").select("id, created_at"),
+        supabase.from("orders").select("customer_id, total, created_at"),
+      ]);
 
-      if (newsletterData) {
+      if (newsletterRes.data) {
         const now = new Date();
         const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
-
-        setSubscribers(newsletterData);
+        setSubscribers(newsletterRes.data);
         setNewsletterStats({
-          totalSubscribers: newsletterData.length,
-          activeSubscribers: newsletterData.filter((s) => s.is_active).length,
-          newThisMonth: newsletterData.filter(
-            (s) => new Date(s.created_at) >= startOfMonth
-          ).length,
-          usedDiscounts: newsletterData.filter((s) => s.discount_used).length,
+          totalSubscribers: newsletterRes.data.length,
+          activeSubscribers: newsletterRes.data.filter((s) => s.is_active).length,
+          newThisMonth: newsletterRes.data.filter((s) => new Date(s.created_at) >= startOfMonth).length,
+          usedDiscounts: newsletterRes.data.filter((s) => s.discount_used).length,
         });
       }
 
-      const { data: customers } = await supabase
-        .from("customers")
-        .select("id", { count: "exact" });
+      if (customersRes.data && ordersRes.data) {
+        const now = new Date();
+        const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        const ninetyDaysAgo = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000);
 
-      if (customers) {
-        customerSegments[0].count = customers.length;
+        const ordersByCustomer = ordersRes.data.reduce(
+          (acc, order) => {
+            if (!order.customer_id) return acc;
+            if (!acc[order.customer_id]) acc[order.customer_id] = { total: 0, lastOrder: null };
+            acc[order.customer_id].total += parseFloat(order.total) || 0;
+            const orderDate = new Date(order.created_at);
+            if (!acc[order.customer_id].lastOrder || orderDate > acc[order.customer_id].lastOrder) {
+              acc[order.customer_id].lastOrder = orderDate;
+            }
+            return acc;
+          },
+          {} as Record<string, { total: number; lastOrder: Date | null }>
+        );
+
+        const allCount = customersRes.data.length;
+        const newCount = customersRes.data.filter((c) => new Date(c.created_at) >= thirtyDaysAgo).length;
+        const inactiveCount = customersRes.data.filter((c) => {
+          const stats = ordersByCustomer[c.id];
+          if (!stats) return false;
+          return stats.lastOrder !== null && stats.lastOrder < ninetyDaysAgo;
+        }).length;
+        const vipCount = Object.values(ordersByCustomer).filter((s) => s.total >= 500).length;
+
+        setSegmentCounts({
+          all: allCount,
+          newsletter: newsletterRes.data?.filter((s) => s.is_active).length || 0,
+          inactive: inactiveCount,
+          vip: vipCount,
+          new: newCount,
+        });
       }
     } catch (err) {
       console.error("Error fetching stats:", err);
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function fetchCampaigns() {
+    try {
+      const { data } = await supabase
+        .from("marketing_campaigns")
+        .select("id, subject, target_segment, recipients_count, status, sent_at")
+        .order("sent_at", { ascending: false })
+        .limit(20);
+      if (data) setCampaigns(data);
+    } catch (err) {
+      console.error("Error fetching campaigns:", err);
     }
   }
 
@@ -213,12 +263,27 @@ export default function AdminMarketing() {
 
     setSending(true);
     try {
-      await new Promise((resolve) => setTimeout(resolve, 1500));
-      toast.success("Kampaň bola úspešne odoslaná");
+      const recipientsCount = customerSegments.find((s) => s.id === campaignData.targetSegment)?.count || 0;
+
+      const { error } = await supabase.from("marketing_campaigns").insert({
+        subject: campaignData.subject.trim(),
+        message: campaignData.message.trim(),
+        target_segment: campaignData.targetSegment,
+        discount_code: campaignData.discountCode.trim() || null,
+        recipients_count: recipientsCount,
+        status: "sent",
+        sent_at: new Date().toISOString(),
+      });
+
+      if (error) throw error;
+
+      toast.success(`Kampaň bola zaznamenaná (${recipientsCount} príjemcov)`);
       setShowCampaignModal(false);
       setCampaignData({ subject: "", message: "", targetSegment: "all", discountCode: "" });
+      fetchCampaigns();
     } catch (err) {
-      toast.error("Nepodarilo sa odoslať kampaň");
+      console.error("Error saving campaign:", err);
+      toast.error("Nepodarilo sa uložiť kampaň");
     } finally {
       setSending(false);
     }
@@ -678,15 +743,52 @@ export default function AdminMarketing() {
                   </button>
                 </div>
               </div>
-              <div className="p-12 text-center">
-                <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
-                  <Mail className="w-8 h-8 text-gray-400" />
+              {campaigns.length === 0 ? (
+                <div className="p-12 text-center">
+                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                    <Mail className="w-8 h-8 text-gray-400" />
+                  </div>
+                  <p className="text-gray-500 font-medium">Zatiaľ žiadne kampane</p>
+                  <p className="text-sm text-gray-400 mt-1">
+                    Vytvorte svoju prvú marketingovú kampaň
+                  </p>
                 </div>
-                <p className="text-gray-500 font-medium">Zatiaľ žiadne kampane</p>
-                <p className="text-sm text-gray-400 mt-1">
-                  Vytvorte svoju prvú marketingovú kampaň
-                </p>
-              </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="bg-gray-50 border-b border-gray-100">
+                      <tr>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Predmet</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Segment</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Príjemcovia</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Dátum</th>
+                        <th className="text-left px-5 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wider">Stav</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {campaigns.map((campaign) => {
+                        const segmentLabel = customerSegments.find((s) => s.id === campaign.target_segment)?.name || campaign.target_segment;
+                        return (
+                          <tr key={campaign.id} className="hover:bg-gray-50/50">
+                            <td className="px-5 py-4 text-sm font-medium text-gray-900">{campaign.subject}</td>
+                            <td className="px-5 py-4 text-sm text-gray-600">{segmentLabel}</td>
+                            <td className="px-5 py-4 text-sm text-gray-600">{campaign.recipients_count}</td>
+                            <td className="px-5 py-4 text-sm text-gray-600">
+                              {new Date(campaign.sent_at).toLocaleDateString("sk-SK")}
+                            </td>
+                            <td className="px-5 py-4">
+                              <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700">
+                                <Check className="w-3 h-3" />
+                                Odoslaná
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
             </div>
         </div>
 

@@ -11,9 +11,8 @@ import {
   X,
   Edit,
   Eye,
-  Calendar,
   ChevronDown,
-  GripVertical,
+  ChevronUp,
   Layers,
   Grid3X3,
 } from 'lucide-react';
@@ -357,6 +356,25 @@ function HeroSlidesTab({
     }
   };
 
+  const handleMoveSlide = async (index: number, direction: 'up' | 'down') => {
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= slides.length) return;
+
+    const slideA = slides[index];
+    const slideB = slides[swapIndex];
+
+    try {
+      await Promise.all([
+        supabase.from('hero_slides').update({ sort_order: slideB.sort_order }).eq('id', slideA.id),
+        supabase.from('hero_slides').update({ sort_order: slideA.sort_order }).eq('id', slideB.id),
+      ]);
+      onUpdate();
+    } catch (error) {
+      console.error('Error reordering slides:', error);
+      toast.error('Chyba pri zmene poradia');
+    }
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -403,14 +421,27 @@ function HeroSlidesTab({
       </div>
 
       <div className="grid gap-4">
-        {slides.map((slide) => (
+        {slides.map((slide, index) => (
           <div
             key={slide.id}
             className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
           >
             <div className="flex items-center gap-4">
-              <div className="text-gray-400 cursor-move">
-                <GripVertical className="w-5 h-5" />
+              <div className="flex flex-col gap-0.5">
+                <button
+                  onClick={() => handleMoveSlide(index, 'up')}
+                  disabled={index === 0}
+                  className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </button>
+                <button
+                  onClick={() => handleMoveSlide(index, 'down')}
+                  disabled={index === slides.length - 1}
+                  className="p-0.5 text-gray-400 hover:text-gray-600 disabled:opacity-20 disabled:cursor-not-allowed"
+                >
+                  <ChevronDown className="w-4 h-4" />
+                </button>
               </div>
               {slide.image_url ? (
                 <img
@@ -838,6 +869,25 @@ function CategoriesTab({
     }
   };
 
+  const handleMoveCategory = async (index: number, direction: 'up' | 'down') => {
+    const swapIndex = direction === 'up' ? index - 1 : index + 1;
+    if (swapIndex < 0 || swapIndex >= categories.length) return;
+
+    const catA = categories[index];
+    const catB = categories[swapIndex];
+
+    try {
+      await Promise.all([
+        supabase.from('homepage_categories').update({ sort_order: catB.sort_order }).eq('id', catA.id),
+        supabase.from('homepage_categories').update({ sort_order: catA.sort_order }).eq('id', catB.id),
+      ]);
+      onUpdate();
+    } catch (error) {
+      console.error('Error reordering categories:', error);
+      toast.error('Chyba pri zmene poradia');
+    }
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -884,7 +934,7 @@ function CategoriesTab({
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {categories.map((cat) => (
+        {categories.map((cat, index) => (
           <div
             key={cat.id}
             className="relative group bg-gray-50 rounded-lg p-4 border border-gray-200"
@@ -906,6 +956,20 @@ function CategoriesTab({
             <p className="text-xs text-gray-500 text-center truncate mt-1">{cat.link_url}</p>
 
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+              <button
+                onClick={() => handleMoveCategory(index, 'up')}
+                disabled={index === 0}
+                className="p-1.5 bg-white rounded text-gray-600 hover:text-blue-600 shadow-sm disabled:opacity-30"
+              >
+                <ChevronUp className="w-3 h-3" />
+              </button>
+              <button
+                onClick={() => handleMoveCategory(index, 'down')}
+                disabled={index === categories.length - 1}
+                className="p-1.5 bg-white rounded text-gray-600 hover:text-blue-600 shadow-sm disabled:opacity-30"
+              >
+                <ChevronDown className="w-3 h-3" />
+              </button>
               <button
                 onClick={() => setEditingCategory(cat)}
                 className="p-1.5 bg-white rounded text-gray-600 hover:text-blue-600 shadow-sm"

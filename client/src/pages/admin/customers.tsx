@@ -15,6 +15,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Loader2,
+  Edit,
+  Save,
 } from "lucide-react";
 import { supabase } from "../../lib/supabase";
 import AdminLayout from "../../components/AdminLayout";
@@ -62,6 +64,9 @@ export default function AdminCustomers() {
     { id: string; order_number: string; total: number; status: string; created_at: string }[]
   >([]);
   const [loadingOrders, setLoadingOrders] = useState(false);
+  const [editingCustomer, setEditingCustomer] = useState<Customer | null>(null);
+  const [editForm, setEditForm] = useState<Partial<Customer>>({});
+  const [savingEdit, setSavingEdit] = useState(false);
   const [page, setPage] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
   const pageSize = 20;
@@ -159,6 +164,61 @@ export default function AdminCustomers() {
   function selectCustomer(customer: Customer) {
     setSelectedCustomer(customer);
     fetchCustomerOrders(customer.id);
+  }
+
+  function openEditModal(customer: Customer) {
+    setEditingCustomer(customer);
+    setEditForm({
+      first_name: customer.first_name,
+      last_name: customer.last_name,
+      phone: customer.phone,
+      customer_type: customer.customer_type,
+      company_name: customer.company_name,
+      ico: customer.ico,
+      dic: customer.dic,
+      billing_street: customer.billing_street,
+      billing_city: customer.billing_city,
+      billing_zip: customer.billing_zip,
+      billing_country: customer.billing_country,
+    });
+  }
+
+  async function saveCustomerEdit() {
+    if (!editingCustomer) return;
+    setSavingEdit(true);
+    try {
+      const { error } = await supabase
+        .from("customers")
+        .update({
+          first_name: editForm.first_name,
+          last_name: editForm.last_name,
+          phone: editForm.phone,
+          customer_type: editForm.customer_type,
+          company_name: editForm.company_name || null,
+          ico: editForm.ico || null,
+          dic: editForm.dic || null,
+          billing_street: editForm.billing_street,
+          billing_city: editForm.billing_city,
+          billing_zip: editForm.billing_zip,
+          billing_country: editForm.billing_country,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", editingCustomer.id);
+
+      if (error) throw error;
+
+      toast.success("Zákazník bol aktualizovaný");
+      setEditingCustomer(null);
+      if (selectedCustomer?.id === editingCustomer.id) {
+        setSelectedCustomer({ ...selectedCustomer, ...editForm as Customer });
+      }
+      fetchCustomers();
+    } catch (err) {
+      console.error("Error updating customer:", err);
+      toast.error("Nepodarilo sa uložiť zmeny");
+    } finally {
+      setSavingEdit(false);
+    }
   }
 
   const filteredCustomers = customers.filter((customer) => {
@@ -384,12 +444,18 @@ export default function AdminCustomers() {
                             {new Date(customer.created_at).toLocaleDateString("sk-SK")}
                           </td>
                           <td className="px-5 py-4">
-                            <div className="flex items-center justify-end">
+                            <div className="flex items-center justify-end gap-1">
                               <button
                                 onClick={() => selectCustomer(customer)}
                                 className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
                               >
                                 <Eye className="w-4 h-4" />
+                              </button>
+                              <button
+                                onClick={() => openEditModal(customer)}
+                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                              >
+                                <Edit className="w-4 h-4" />
                               </button>
                             </div>
                           </td>
@@ -625,6 +691,157 @@ export default function AdminCustomers() {
               </div>
             )}
       </div>
+
+      {editingCustomer && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setEditingCustomer(null)} />
+          <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-lg mx-4 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-gray-100">
+              <h3 className="text-lg font-semibold text-gray-900">Upraviť zákazníka</h3>
+              <button
+                onClick={() => setEditingCustomer(null)}
+                className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Meno</label>
+                  <input
+                    type="text"
+                    value={editForm.first_name || ""}
+                    onChange={(e) => setEditForm({ ...editForm, first_name: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Priezvisko</label>
+                  <input
+                    type="text"
+                    value={editForm.last_name || ""}
+                    onChange={(e) => setEditForm({ ...editForm, last_name: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Telefón</label>
+                <input
+                  type="text"
+                  value={editForm.phone || ""}
+                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Typ zákazníka</label>
+                <select
+                  value={editForm.customer_type || "individual"}
+                  onChange={(e) => setEditForm({ ...editForm, customer_type: e.target.value as "individual" | "company" })}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                >
+                  <option value="individual">Fyzická osoba</option>
+                  <option value="company">Firma</option>
+                </select>
+              </div>
+              {editForm.customer_type === "company" && (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1.5">Názov firmy</label>
+                    <input
+                      type="text"
+                      value={editForm.company_name || ""}
+                      onChange={(e) => setEditForm({ ...editForm, company_name: e.target.value })}
+                      className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">ICO</label>
+                      <input
+                        type="text"
+                        value={editForm.ico || ""}
+                        onChange={(e) => setEditForm({ ...editForm, ico: e.target.value })}
+                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1.5">DIC</label>
+                      <input
+                        type="text"
+                        value={editForm.dic || ""}
+                        onChange={(e) => setEditForm({ ...editForm, dic: e.target.value })}
+                        className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Ulica</label>
+                <input
+                  type="text"
+                  value={editForm.billing_street || ""}
+                  onChange={(e) => setEditForm({ ...editForm, billing_street: e.target.value })}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                />
+              </div>
+              <div className="grid grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">PSC</label>
+                  <input
+                    type="text"
+                    value={editForm.billing_zip || ""}
+                    onChange={(e) => setEditForm({ ...editForm, billing_zip: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                  />
+                </div>
+                <div className="col-span-2">
+                  <label className="block text-sm font-medium text-gray-700 mb-1.5">Mesto</label>
+                  <input
+                    type="text"
+                    value={editForm.billing_city || ""}
+                    onChange={(e) => setEditForm({ ...editForm, billing_city: e.target.value })}
+                    className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1.5">Krajina</label>
+                <select
+                  value={editForm.billing_country || "SK"}
+                  onChange={(e) => setEditForm({ ...editForm, billing_country: e.target.value })}
+                  className="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm"
+                >
+                  <option value="SK">Slovensko</option>
+                  <option value="CZ">Česká republika</option>
+                  <option value="PL">Poľsko</option>
+                  <option value="AT">Rakúsko</option>
+                  <option value="HU">Maďarsko</option>
+                </select>
+              </div>
+            </div>
+            <div className="flex items-center justify-end gap-3 p-5 border-t border-gray-100">
+              <button
+                onClick={() => setEditingCustomer(null)}
+                className="px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                Zrušiť
+              </button>
+              <button
+                onClick={saveCustomerEdit}
+                disabled={savingEdit}
+                className="px-4 py-2.5 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50 flex items-center gap-2"
+              >
+                {savingEdit ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                Uložiť zmeny
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </AdminLayout>
   );
 }

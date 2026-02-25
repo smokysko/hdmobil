@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Loader2 } from "lucide-react";
+import { Loader2, RefreshCw } from "lucide-react";
 import AdminLayout from "../../components/AdminLayout";
 import { DashboardAlerts } from "../../components/admin/DashboardAlerts";
 import { DashboardStatCards } from "../../components/admin/DashboardStatCards";
@@ -13,6 +13,7 @@ import type { DashboardStats } from "../../types/dashboard";
 export default function AdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
 
   useEffect(() => {
     loadStats();
@@ -23,11 +24,16 @@ export default function AdminDashboard() {
     try {
       const data = await fetchDashboardStats();
       setStats(data);
+      setLastUpdated(new Date());
     } catch (err) {
       console.error("Error fetching dashboard stats:", err);
     } finally {
       setLoading(false);
     }
+  }
+
+  function formatLastUpdated(date: Date) {
+    return date.toLocaleTimeString("sk-SK", { hour: "2-digit", minute: "2-digit", second: "2-digit" });
   }
 
   return (
@@ -40,9 +46,21 @@ export default function AdminDashboard() {
               Vitajte späť! Tu je prehľad vášho obchodu.
             </p>
           </div>
-          <div className="text-sm text-gray-500">
-            Posledná aktualizácia:{" "}
-            <span className="font-medium text-gray-700">prave teraz</span>
+          <div className="flex items-center gap-3">
+            <span className="text-sm text-gray-500">
+              Aktualizované:{" "}
+              <span className="font-medium text-gray-700">
+                {lastUpdated ? formatLastUpdated(lastUpdated) : "—"}
+              </span>
+            </span>
+            <button
+              onClick={loadStats}
+              disabled={loading}
+              className="flex items-center gap-1.5 px-3 py-1.5 text-sm text-gray-600 hover:text-gray-900 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${loading ? "animate-spin" : ""}`} />
+              Obnoviť
+            </button>
           </div>
         </div>
 
